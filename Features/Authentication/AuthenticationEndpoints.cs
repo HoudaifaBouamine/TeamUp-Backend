@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Carter;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Authentication
 {
@@ -14,8 +15,8 @@ namespace Authentication
             var authGroup = app.MapGroup("/auth")
                     .WithTags("auth");
 
-            authGroup.MapIdentityApi<IdentityUser>().HasApiVersion(1);
-
+            authGroup.MapIdentityApi<IdentityUser>().HasApiVersion(1)
+                .RequireRateLimiting("fixed");
         }
     }
 }

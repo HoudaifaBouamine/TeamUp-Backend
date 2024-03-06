@@ -1,7 +1,10 @@
+using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Carter;
+using Configuration;
 using EndpointsManager;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -68,12 +71,29 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.AddCarter();
 
+builder.Services.AddRateLimiter(options=>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    options.AddPolicy(RateLimiterConfig.Policy.Fixed, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey:httpContext?.Connection?.RemoteIpAddress?.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromSeconds(10)
+            }
+        ));
+
+});
+
 ///////////////////////////////////////////////////
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseRateLimiter();
 app.UseCors("AllowAll");
 
 app.MapAppEndpoints();     
