@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Carter;
+using Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace Authentication
                     .WithTags("auth");
 
             authGroup.MapIdentityApi<IdentityUser>().HasApiVersion(1)
-                .RequireRateLimiting("fixed");
+                .RequireRateLimiting(RateLimiterConfig.Policy.Fixed);
         }
     }
 }

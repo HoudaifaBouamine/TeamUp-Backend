@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Configuration;
 
 namespace EndpointsManager
 {
@@ -17,18 +18,20 @@ namespace EndpointsManager
             app.MapGet("/",  ()=>
             {
                 return Results.Redirect("/swagger/index.html");
-            });
+            })
+            .RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
 
             app.MapGet("/test-auth",(ClaimsPrincipal user)=>
             {
                 return  $"wow user = {user?.Identity?.Name} is here";
             })
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
 
             app.MapGet("/test-no-auth",(ClaimsPrincipal user)=>
             {
                 return  $"wow user = {user?.Identity?.Name} is here";
-            });
+            }).RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
 
         }
     }
