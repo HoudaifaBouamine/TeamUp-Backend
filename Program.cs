@@ -51,12 +51,24 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql("Server=ep-purple-shadow-a2sl2l68.eu-central-1.aws.neon.tech;Database=TeamUp;Username=HoudaifaBouamine;Password=dipwbSB3Pj6l");
+        // builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Default Password settings.
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequiredUniqueChars = 0;
+    
+});
 
 var app = builder.Build();
 
@@ -84,20 +96,6 @@ authGroup.MapIdentityApi<IdentityUser>().HasApiVersion(1);
 app.MapGet("/",  ()=>
 {
     return Results.Redirect("/swagger/index.html");
-});
-
-versionedGroup.MapPost("/wow/{id}",async Task <Results<Ok<string>,NotFound>>(int id,[FromBody] string wow)=>{
-
-    return TypedResults.Ok("worked");
-}).HasApiVersion(2)
-.Produces(StatusCodes.Status500InternalServerError)
-.WithOpenApi(op =>
-{
-    op.Summary = "wow is amazing";
-    op.Description = "this is the tetailed explaination for wow";
-    op.Parameters[0].Description = "the wow id is greate";
-    op.RequestBody.Description = "wow is wow";
-    return op;
 });
 
 app.MapGet("/test-auth",(ClaimsPrincipal user)=>
