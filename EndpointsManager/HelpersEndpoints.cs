@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Configuration;
+using Serilog;
 
 namespace EndpointsManager
 {

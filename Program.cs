@@ -1,12 +1,16 @@
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Carter;
 using Configuration;
 using EndpointsManager;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Core;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,22 +78,46 @@ builder.Services.AddCarter();
 builder.Services.AddRateLimiter(options=>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    
+
     options.AddPolicy(RateLimiterConfig.Policy.Fixed, httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             partitionKey:httpContext?.Connection?.RemoteIpAddress?.ToString(),
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 3,
-                Window = TimeSpan.FromSeconds(10)
+                PermitLimit = 10,
+                Window = TimeSpan.FromSeconds(5)
             }
         ));
 
 });
 
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+    
 ///////////////////////////////////////////////////
 
 var app = builder.Build();
+
+app.Use((ctx,next)=>
+{
+
+    var start = DateTime.UtcNow;
+    var task = next();
+    var end = DateTime.UtcNow;
+
+    var log = new RequestLog(
+        ctx.Request.Path,
+        ctx?.User?.Identity?.Name,
+        ctx?.Response.StatusCode,
+        (end-start).TotalMilliseconds);
+
+    Log.Information("{log}",log);
+
+   return task;
+
+});
 
 app.UseHttpsRedirection();
 
@@ -101,3 +129,4 @@ app.MapHelpersEndpoints();
 app.UseSwaggerDocs();
 
 app.Run();
+record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
