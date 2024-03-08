@@ -130,3 +130,34 @@ app.UseSwaggerDocs();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
+
+class EmailSender : IEmailSender<IdentityUser>
+{
+    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink)
+    {
+        // System.Console.WriteLine(" --> Send confirm link");
+        
+        // var message = new SendGridMessage();
+        // message.AddTo(email);
+        // message.SetSubject("Confirm your email");
+        // message.AddContent(MimeType.Html, $"Please confirm your email by clicking <a href='{confirmationLink}'>here</a>.");
+        // var client = new SendGridClient("YourSendGridApiKey");
+        // return client.SendEmailAsync(message);
+
+        return Task.CompletedTask;
+    }
+
+    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode)
+    {
+        //EmailService.SendEmail(email, "Reset your password", $"Your reset code: {resetCode}");
+        System.Console.WriteLine(" --> Send password reset code");
+        return Task.CompletedTask;
+    }
+
+    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink)
+    {
+        System.Console.WriteLine(" --> Send password reset link");
+
+        return Task.CompletedTask;
+    }
+}
