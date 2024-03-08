@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Configuration;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace EndpointsManager
@@ -34,6 +35,11 @@ namespace EndpointsManager
                 return  $"wow user = {user?.Identity?.Name} is here";
             }).RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
 
+            app.MapGet("drop-tables",(AppDbContext db)=>
+            {
+                db.Users.ExecuteDelete();
+                
+            });
         }
     }
 }

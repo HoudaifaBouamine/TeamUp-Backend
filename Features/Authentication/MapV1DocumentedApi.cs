@@ -86,7 +86,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             await SendConfirmationEmailAsync(user, userManager, context, email);
             return TypedResults.Ok();
         })
-        .WithSummary("Complited, but no confemistion email is send yet")
+        .WithSummary("Complited, and email will be send to the user to confirm it his email address")
         .WithOpenApi();
 
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
@@ -189,7 +189,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             return TypedResults.Text("Thank you for confirming your email.");
         })
-        .WithSummary("not complited yet")
+        .WithSummary("complited, this endpoint parameters will be provided in the query parameters in the confirmation email")
         .WithOpenApi()
         .Add(endpointBuilder =>
         {
@@ -210,7 +210,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             await SendConfirmationEmailAsync(user, userManager, context, resendRequest.Email);
             return TypedResults.Ok();
         })
-        .WithSummary("not complited yet")
+        .WithSummary("complited")
         .WithOpenApi();
 
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>

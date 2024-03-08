@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Core;
 using Swashbuckle.AspNetCore.Filters;
+using TeamUp_Backend.Features.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,7 +56,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
-    options.UseNpgsql("Server=ep-purple-shadow-a2sl2l68.eu-central-1.aws.neon.tech;Database=TeamUp;Username=HoudaifaBouamine;Password=dipwbSB3Pj6l");
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
         // builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -96,6 +97,8 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
     
+builder.Services.AddTransient<IEmailSender<IdentityUser>,EmailSender>();
+builder.Services.AddTransient<EmailService>();
 ///////////////////////////////////////////////////
 
 var app = builder.Build();
@@ -128,36 +131,10 @@ app.MapAppEndpoints();
 app.MapHelpersEndpoints();
 app.UseSwaggerDocs();
 
+
+
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
 
-class EmailSender : IEmailSender<IdentityUser>
-{
-    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink)
-    {
-        // System.Console.WriteLine(" --> Send confirm link");
-        
-        // var message = new SendGridMessage();
-        // message.AddTo(email);
-        // message.SetSubject("Confirm your email");
-        // message.AddContent(MimeType.Html, $"Please confirm your email by clicking <a href='{confirmationLink}'>here</a>.");
-        // var client = new SendGridClient("YourSendGridApiKey");
-        // return client.SendEmailAsync(message);
 
-        return Task.CompletedTask;
-    }
-
-    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode)
-    {
-        //EmailService.SendEmail(email, "Reset your password", $"Your reset code: {resetCode}");
-        System.Console.WriteLine(" --> Send password reset code");
-        return Task.CompletedTask;
-    }
-
-    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink)
-    {
-        System.Console.WriteLine(" --> Send password reset link");
-
-        return Task.CompletedTask;
-    }
-}
+record MailMessage(string receiverEmail,string subject,string body);
