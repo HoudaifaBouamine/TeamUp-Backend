@@ -231,7 +231,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             // returned a 400 for an invalid code given a valid user email.
             return TypedResults.Ok();
         })
-        .WithSummary("not complited yet")
+        .WithSummary("Complited")
         .WithOpenApi();
 
         routeGroup.MapPost("/resetPassword", async Task<Results<Ok, ValidationProblem>>
@@ -266,7 +266,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             return TypedResults.Ok();
         })
-        .WithSummary("not complited yet")
+        .WithSummary("Complited")
         .WithOpenApi();
 
         var accountGroup = routeGroup.MapGroup("/manage").RequireAuthorization();
@@ -402,7 +402,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
-        .WithSummary("You can change the password but not the email yet")
+        .WithSummary("Complited, you change the password or the email or both")
         .WithOpenApi();
 
         async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)

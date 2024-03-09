@@ -1,0 +1,17 @@
+delete /manage/info ,
+create /currentUser => require User, produce => 
+{
+  email, userName, isEmailConfirmed, userId
+}
+
+use code for EmailConfirmation, ResetPassword. 
+
+required to send userId
+
+password require more than 8 chatacters only
+
+delete Post  /manage/info
+
+create /ChangePassword require authenticated user, new password and oldPassword
+
+

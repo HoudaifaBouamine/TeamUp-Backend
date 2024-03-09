@@ -364,5 +364,4 @@
 **/FodyWeavers.xsd
 
 # protecting the production appsettings
-**/appsettings.json
 fly.toml

@@ -57,7 +57,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-        // builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddAuthorization();
@@ -72,6 +71,8 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 1;
     options.Password.RequiredUniqueChars = 0;
+
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._ ";
 });
 
 builder.Services.AddCarter();
@@ -135,6 +136,3 @@ app.UseSwaggerDocs();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
-
-
-record MailMessage(string receiverEmail,string subject,string body);
