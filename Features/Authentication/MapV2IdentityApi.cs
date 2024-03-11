@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using EmailServices;
+using Authentication.UserManager;
+using Microsoft.EntityFrameworkCore;
+using Humanizer;
 
 namespace Authentication.CustomIdentityApi.V2;
 
@@ -41,7 +45,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
         var timeProvider = endpoints.ServiceProvider.GetRequiredService<TimeProvider>();
         var bearerTokenOptions = endpoints.ServiceProvider.GetRequiredService<IOptionsMonitor<BearerTokenOptions>>();
-        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
+        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSenderCustome<TUser>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
 
         // We'll figure out a unique endpoint name based on the final route pattern during endpoint generation.
@@ -52,7 +56,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         // NOTE: We cannot inject UserManager<TUser> directly because the TUser generic parameter is currently unsupported by RDG.
         // https://github.com/dotnet/aspnetcore/issues/47338
         routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] UserRegisterDto registration, HttpContext context, [FromServices] IServiceProvider sp) =>
+            ([FromBody] UserRegisterDto registration, HttpContext context, [FromServices] IServiceProvider sp, [FromServices] AppDbContext db) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
 
@@ -81,7 +85,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return CreateValidationProblem(result);
             }
 
-            await SendConfirmationEmailAsync(user, userManager, context, email);
+            await SendConfirmationCodeEmailAsync(db,user,email);
             return TypedResults.Ok();
         })
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
@@ -105,7 +109,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             string userName = (await userManager.GetUserNameAsync(user))!; 
 
-            var result = await signInManager.PasswordSignInAsync(userName, login.Password, isPersistent, lockoutOnFailure: true);
+            var result = await signInManager.PasswordSignInAsync(userName,login.Password, isPersistent, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
@@ -138,53 +142,44 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             return TypedResults.SignIn(newPrincipal, authenticationScheme: IdentityConstants.BearerScheme);
         })
         .WithSummary("[C]]")
-        .WithOpenApi();;
+        .WithOpenApi();
 
-        routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
-            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
+        routeGroup.MapGet("/confirmEmail", async Task<Results<Ok,BadRequest<object>, UnauthorizedHttpResult>>
+            ([FromQuery] string code, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db, ClaimsPrincipal user) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
-            if (await userManager.FindByIdAsync(userId) is not { } user)
+            if(user.Identity is null? true : !user.Identity.IsAuthenticated)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            var userManager = sp.GetRequiredService<CustomUserManager>();
+            if (await userManager.FindByNameAsync(user.Identity.Name) is not { } userIdentity)
             {
                 // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
                 return TypedResults.Unauthorized();
             }
 
-            try
-            {
-                code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            }
-            catch (FormatException)
-            {
-                return TypedResults.Unauthorized();
-            }
+            
+            var userModel = await db.Users.Include(u=>u.VerificationCode).FirstOrDefaultAsync(u=>u.Id == userIdentity.Id);
+            var result = await userManager.ConfirmEmailAsync(userModel,code);
 
-            IdentityResult result;
-
-            if (string.IsNullOrEmpty(changedEmail))
+            if(result.Succeeded)
             {
-                result = await userManager.ConfirmEmailAsync(user, code);
+                return TypedResults.Ok();
             }
             else
             {
-                // As with Identity UI, email and user name are one and the same. So when we update the email,
-                // we need to update the user name.
-                result = await userManager.ChangeEmailAsync(user, changedEmail, code);
-
-                if (result.Succeeded)
-                {
-                    result = await userManager.SetUserNameAsync(user, changedEmail);
-                }
+                object errorResponse = new 
+                    {
+                        Error = result.Errors.First(),
+                        StatusCode = 400,
+                    };
+                return TypedResults.BadRequest(errorResponse);
             }
 
-            if (!result.Succeeded)
-            {
-                return TypedResults.Unauthorized();
-            }
-
-            return TypedResults.Text("Thank you for confirming your email.");
         })
-        .WithSummary("[D]")
+        .RequireAuthorization()
+        .WithSummary("[C]")
         .WithOpenApi()
         .Add(endpointBuilder =>
         {
@@ -194,7 +189,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         });
 
         routeGroup.MapPost("/resendConfirmationEmail", async Task<Ok>
-            ([FromBody] ResendConfirmationEmailRequest resendRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
+            ([FromBody] ResendConfirmationEmailRequest resendRequest, HttpContext context, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
             if (await userManager.FindByEmailAsync(resendRequest.Email) is not { } user)
@@ -202,10 +197,10 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.Ok();
             }
 
-            await SendConfirmationEmailAsync(user, userManager, context, resendRequest.Email);
+            await SendConfirmationCodeEmailAsync(db,user,resendRequest.Email);
             return TypedResults.Ok();
         })
-        .WithSummary("[D]]")
+        .WithSummary("[C]]")
         .WithOpenApi();
 
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
@@ -319,8 +314,24 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
 
+        async Task SendConfirmationCodeEmailAsync( AppDbContext db,TUser user, string email)
+        {
+            User userModel = db.Users.First(u=>u.Email == email);
+            userModel.VerificationCode = new VerificationCode();
+            var code = userModel.VerificationCode.GenerateRandomCode(userModel.Id);
+
+            await db.SaveChangesAsync();
+            await emailSender.SendConfirmationCodeAsync(user, email, code);
+        }
+        
         return new IdentityEndpointsConventionBuilder(routeGroup);
+        
+        
     }
+
+
+
+
 
     private static ValidationProblem CreateValidationProblem(string errorCode, string errorDescription) =>
         TypedResults.ValidationProblem(new Dictionary<string, string[]> {

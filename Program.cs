@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
+using Authentication.UserManager;
 using Carter;
 using Configuration;
+using EmailServices;
 using EndpointsManager;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Core;
 using Swashbuckle.AspNetCore.Filters;
-using TeamUp_Backend.Features.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +62,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -99,7 +100,9 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
     
 builder.Services.AddTransient<IEmailSender<IdentityUser>,EmailSender>();
+builder.Services.AddTransient<IEmailSenderCustome<User>,EmailSender>();
 builder.Services.AddTransient<EmailService>();
+builder.Services.AddTransient<CustomUserManager>();
 ///////////////////////////////////////////////////
 
 var app = builder.Build();

@@ -1,14 +1,26 @@
+using System.Diagnostics;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using MimeKit;
 using MimeKit.Text;
 
-namespace TeamUp_Backend.Features.EmailService;
-public class EmailSender(EmailService emailService) : IEmailSender<IdentityUser>
+namespace EmailServices;
+
+public class EmailSender(EmailService emailService) : IEmailSenderCustome<User>, IEmailSender<IdentityUser> 
 {
     private readonly EmailService emailService = emailService;
+
+    public Task SendConfirmationCodeAsync(IdentityUser user, string email, string confirmationCode)
+    {
+        emailService.SendEmail(
+            subject: "Email Confirmation",
+            body: $"<h3>Confirmation code : {confirmationCode}</h3>",
+            receiver_email: email);
+
+        System.Console.WriteLine(" --> Send confirmation code");
+        return Task.CompletedTask;
+    }
 
     public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink)
     {
@@ -42,6 +54,26 @@ public class EmailSender(EmailService emailService) : IEmailSender<IdentityUser>
         System.Console.WriteLine(" --> Send password reset link");
         return Task.CompletedTask;
     }
+
+    Task IEmailSenderCustome<User>.SendConfirmationCodeAsync(User user, string email, string confirmationLink)
+    {
+        return SendConfirmationCodeAsync(user,email,confirmationLink);
+    }
+
+    Task IEmailSenderCustome<User>.SendConfirmationLinkAsync(User user, string email, string confirmationLink)
+    {
+        return SendConfirmationCodeAsync(user,email,confirmationLink);
+    }
+
+    Task IEmailSenderCustome<User>.SendPasswordResetCodeAsync(User user, string email, string resetCode)
+    {
+        return SendPasswordResetCodeAsync(user,email,resetCode);
+    }
+
+    Task IEmailSenderCustome<User>.SendPasswordResetLinkAsync(User user, string email, string resetLink)
+    {
+        return SendPasswordResetLinkAsync(user,email,resetLink);
+    }
 }
 
 public class EmailService
@@ -72,3 +104,86 @@ public class EmailService
         return true;
     }
 }
+
+
+
+//
+// Summary:
+//     This API supports the ASP.NET Core Identity infrastructure and is not intended
+//     to be used as a general purpose email abstraction. It should be implemented by
+//     the application so the Identity infrastructure can send confirmation and password
+//     reset emails.
+public interface IEmailSenderCustome<TUser> where TUser : class
+{
+    //
+    // Summary:
+    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
+    //     to be used as a general purpose email abstraction. It should be implemented by
+    //     the application so the Identity infrastructure can send confirmation emails.
+    //
+    //
+    // Parameters:
+    //   user:
+    //     The user that is attempting to confirm their email.
+    //
+    //   email:
+    //     The recipient's email address.
+    //
+    //   confirmationLink:
+    //     The link to follow to confirm a user's email. Do not double encode this.
+    Task SendConfirmationLinkAsync(TUser user, string email, string confirmationLink);
+
+        //
+    // Summary:
+    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
+    //     to be used as a general purpose email abstraction. It should be implemented by
+    //     the application so the Identity infrastructure can send confirmation emails.
+    //
+    //
+    // Parameters:
+    //   user:
+    //     The user that is attempting to confirm their email.
+    //
+    //   email:
+    //     The recipient's email address.
+    //
+    //   confirmationLink:
+    //     The link to follow to confirm a user's email. Do not double encode this.
+    Task SendConfirmationCodeAsync(TUser user, string email, string confirmationLink);
+
+    //
+    // Summary:
+    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
+    //     to be used as a general purpose email abstraction. It should be implemented by
+    //     the application so the Identity infrastructure can send password reset emails.
+    //
+    //
+    // Parameters:
+    //   user:
+    //     The user that is attempting to reset their password.
+    //
+    //   email:
+    //     The recipient's email address.
+    //
+    //   resetCode:
+    //     The code to use to reset the user password. Do not double encode this.
+    Task SendPasswordResetCodeAsync(TUser user, string email, string resetCode);
+    //
+    // Summary:
+    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
+    //     to be used as a general purpose email abstraction. It should be implemented by
+    //     the application so the Identity infrastructure can send password reset emails.
+    //
+    //
+    // Parameters:
+    //   user:
+    //     The user that is attempting to reset their password.
+    //
+    //   email:
+    //     The recipient's email address.
+    //
+    //   resetLink:
+    //     The link to follow to reset the user password. Do not double encode this.
+    Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink);
+}
+
