@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
@@ -20,22 +21,63 @@ class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public VerificationCode VerificationCode { get; set; } = new VerificationCode();
+    public VerificationCode EmailVerificationCode { get; set; } = new VerificationCode();
+    public VerificationCode PasswordRestCode { get; set; } = new VerificationCode();
+
 } 
-class VerificationCode
+partial class VerificationCode
 {
-    public const int CodeLifeInMin = 1;
-
+    [Key]
     public int Id { get; set; } 
-
     public string? Code { get; set; } = null; 
-
     public DateTime? ExpireTime { get; set; } = null;
+    public int? CodeTriesCount { get; set; } = null;
+    public VerificationCodeTypes VerificationCodeType { get; set; }
+}
 
+partial class VerificationCode
+{
+    public enum CodeMaxLifeInMin { EmailVerification = 10, PasswordRest = 5 }
+    public enum CodeMaxTries { EmailVerification = 4, PasswordRest = 3 }
+    public enum VerificationCodeTypes {EmailVerification = 1, PasswordRest = 2}
     public VerificationCode()
     {
+
     }
 
+    /// <summary>
+    /// Get max code life time in minutes
+    /// </summary>
+    /// <returns>integer represent code max life in minutes</returns>
+    public int GetCodeMaxLife()
+    {
+        return Convert.ToInt32(VerificationCodeType switch
+        {
+            VerificationCodeTypes.EmailVerification => CodeMaxLifeInMin.EmailVerification,
+            VerificationCodeTypes.PasswordRest      => CodeMaxLifeInMin.PasswordRest,
+            _ => 0,
+        });
+    }
+
+    public int GetCodeMaxTries()
+    {
+        return Convert.ToInt32(VerificationCodeType switch
+        {
+            VerificationCodeTypes.EmailVerification => CodeMaxTries.EmailVerification,
+            VerificationCodeTypes.PasswordRest      => CodeMaxTries.PasswordRest,
+            _ => 0,
+        });
+    }
+
+    public bool IsEmailVerificationCode()
+    {
+        return VerificationCodeType == VerificationCodeTypes.EmailVerification;
+    }
+
+    public bool IsPasswordRestCode()
+    {
+        return VerificationCodeType == VerificationCodeTypes.PasswordRest;
+    }
     public bool IsExpired()
     {
         if(Code is null || ExpireTime is null)
@@ -44,7 +86,7 @@ class VerificationCode
         return ExpireTime < DateTime.UtcNow;
     }
 
-    public bool IsValied(string code)
+    public bool IsValid(string code)
     {
         if(IsExpired())
         {
@@ -54,7 +96,29 @@ class VerificationCode
         return this.Code == code;
     }
 
-    public string GenerateRandomCode(string userId)
+    
+    public string GenerateEmailVerificationCode(string userId)
+    {
+        VerificationCodeType = VerificationCodeTypes.EmailVerification;
+        Code = GenerateRandomCode(userId); // user userId to generate user speacific code for security perposes (may be deleted if I find that it is useless)
+        ExpireTime = DateTime.UtcNow.AddMinutes(GetCodeMaxLife());
+        CodeTriesCount = GetCodeMaxTries();
+
+        return Code;
+    }
+
+    public string GeneratePasswordRestCode(string userId)
+    {
+        VerificationCodeType = VerificationCodeTypes.PasswordRest;
+        Code = GenerateRandomCode(userId); // user userId to generate user speacific code for security perposes (may be deleted if I find that it is useless)
+        ExpireTime = DateTime.UtcNow.AddMinutes(GetCodeMaxLife());
+        CodeTriesCount = GetCodeMaxTries();
+
+        return Code;
+    }
+
+
+    private static string GenerateRandomCode(string userId)
     {
         Random rand = new Random();
         int randomNumber = rand.Next(100000, 999999); 
@@ -71,10 +135,7 @@ class VerificationCode
 
             int sixDigitNumber = hashInteger % 1000000;
 
-            Code = sixDigitNumber.ToString("D6");
-            ExpireTime = DateTime.UtcNow.AddMinutes(CodeLifeInMin);
-
-            return Code;
+            return sixDigitNumber.ToString();
         }
     }
 }

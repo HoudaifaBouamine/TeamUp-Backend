@@ -85,7 +85,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return CreateValidationProblem(result);
             }
 
-            await SendConfirmationCodeEmailAsync(db,user,email);
+            await SendEmailConfirmationCodeEmailAsync(db,user,email,VerificationCode.VerificationCodeTypes.EmailVerification);
             return TypedResults.Ok();
         })
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
@@ -144,24 +144,24 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapGet("/confirmEmail", async Task<Results<Ok,BadRequest<object>, UnauthorizedHttpResult>>
-            ([FromQuery] string code, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db, ClaimsPrincipal user) =>
+        routeGroup.MapPost("/confirmEmail", async Task<Results<Ok,BadRequest<object>, UnauthorizedHttpResult>>
+            ([FromBody] EmailConfirmationDto emailConfirmation, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db) =>
         {
-            if(user.Identity is null? true : !user.Identity.IsAuthenticated)
-            {
-                return TypedResults.Unauthorized();
-            }
+            
 
             var userManager = sp.GetRequiredService<CustomUserManager>();
-            if (await userManager.FindByNameAsync(user.Identity.Name) is not { } userIdentity)
+
+
+
+            if (await userManager.FindByEmailAsync(emailConfirmation.Email) is not { } userIdentity)
             {
                 // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
                 return TypedResults.Unauthorized();
             }
 
             
-            var userModel = await db.Users.Include(u=>u.VerificationCode).FirstOrDefaultAsync(u=>u.Id == userIdentity.Id);
-            var result = await userManager.ConfirmEmailAsync(userModel,code);
+            var userModel = await db.Users.Include(u=>u.EmailVerificationCode).FirstOrDefaultAsync(u=>u.Id == userIdentity.Id);
+            var result = await userManager.ConfirmEmailAsync(userModel,emailConfirmation.Code);
 
             if(result.Succeeded)
             {
@@ -178,7 +178,6 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             }
 
         })
-        .RequireAuthorization()
         .WithSummary("[C]")
         .WithOpenApi()
         .Add(endpointBuilder =>
@@ -197,41 +196,44 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.Ok();
             }
 
-            await SendConfirmationCodeEmailAsync(db,user,resendRequest.Email);
+            await SendEmailConfirmationCodeEmailAsync(db,user,resendRequest.Email,VerificationCode.VerificationCodeTypes.EmailVerification);
             return TypedResults.Ok();
         })
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+        routeGroup.MapPost("/forgotPassword", async Task<Results<Ok,NotFound, ValidationProblem>>
+            ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] AppDbContext db,[FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
-            var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
-            if (user is not null && await userManager.IsEmailConfirmedAsync(user))
-            {
-                var code = await userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                await emailSender.SendPasswordResetCodeAsync(user, resetRequest.Email, HtmlEncoder.Default.Encode(code));
-            }
+            var userManager = sp.GetRequiredService<CustomUserManager>();
 
-            // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
-            // returned a 400 for an invalid code given a valid user email.
+            var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
+
+            if(user is null) return TypedResults.NotFound();
+            
+            var code = user.PasswordRestCode.GeneratePasswordRestCode(user.Id);
+            
+            await db.SaveChangesAsync();
+
+            await SendPasswordResetCodeEmailAsync(db,null,resetRequest.Email,VerificationCode.VerificationCodeTypes.PasswordRest);
+
+
             return TypedResults.Ok();
         })
+        .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/resetPassword", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] ResetPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
+        routeGroup.MapPost("/resetPassword", async Task<Results<Ok, ValidationProblem,NotFound>>
+            ([FromBody] ResetPasswordRequest resetRequest, [FromServices] IServiceProvider sp, [FromServices] AppDbContext db) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<CustomUserManager>();
 
-            var user = await userManager.FindByEmailAsync(resetRequest.Email);
+            var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
 
-            if (user is null || !(await userManager.IsEmailConfirmedAsync(user)))
+            if (user is null || !await userManager.IsEmailConfirmedAsync(user))
             {
                 // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
                 // returned a 400 for an invalid code given a valid user email.
@@ -241,8 +243,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             IdentityResult result;
             try
             {
-                var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(resetRequest.ResetCode));
-                result = await userManager.ResetPasswordAsync(user, code, resetRequest.NewPassword);
+                result = await userManager.ResetPasswordAsync(user, resetRequest.ResetCode, resetRequest.NewPassword);
             }
             catch (FormatException)
             {
@@ -279,49 +280,32 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             return TypedResults.Ok(userInfo);
 //            return TypedResults.Ok(await CreateInfoResponseAsync(user, userManager));
         })
-        .WithSummary("[T]")
+        .RequireAuthorization(p=>p.RequireAuthenticatedUser())
+        .WithSummary("[C]")
         .WithOpenApi()
         .Produces(StatusCodes.Status500InternalServerError);
 
-        async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
-        {
-            if (confirmEmailEndpointName is null)
-            {
-                throw new NotSupportedException("No email confirmation endpoint was registered!");
-            }
-
-            var code = isChange
-                ? await userManager.GenerateChangeEmailTokenAsync(user, email)
-                : await userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-            var userId = await userManager.GetUserIdAsync(user);
-            var routeValues = new RouteValueDictionary()
-            {
-                ["userId"] = userId,
-                ["code"] = code,
-            };
-
-            if (isChange)
-            {
-                // This is validated by the /confirmEmail endpoint on change.
-                routeValues.Add("changedEmail", email);
-            }
-
-            var confirmEmailUrl = linkGenerator.GetUriByName(context, confirmEmailEndpointName, routeValues)
-                ?? throw new NotSupportedException($"Could not find endpoint named '{confirmEmailEndpointName}'.");
-
-            await emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
-        }
-
-        async Task SendConfirmationCodeEmailAsync( AppDbContext db,TUser user, string email)
+        
+        async Task SendEmailConfirmationCodeEmailAsync(AppDbContext db,TUser user, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
         {
             User userModel = db.Users.First(u=>u.Email == email);
-            userModel.VerificationCode = new VerificationCode();
-            var code = userModel.VerificationCode.GenerateRandomCode(userModel.Id);
-
+        
+            userModel.EmailVerificationCode = new VerificationCode();
+            var code = userModel.EmailVerificationCode.GenerateEmailVerificationCode(userModel.Id);
+        
             await db.SaveChangesAsync();
             await emailSender.SendConfirmationCodeAsync(user, email, code);
+        }
+        
+        async Task SendPasswordResetCodeEmailAsync(AppDbContext db,TUser user, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
+        {
+            User userModel = db.Users.First(u=>u.Email == email);
+   
+            userModel.PasswordRestCode = new VerificationCode();
+            var code = userModel.PasswordRestCode.GeneratePasswordRestCode(userModel.Id);
+        
+            await db.SaveChangesAsync();
+            await emailSender.SendPasswordResetCodeAsync(user, email, code);
         }
         
         return new IdentityEndpointsConventionBuilder(routeGroup);
@@ -404,4 +388,5 @@ public static class IdentityApiEndpointRouteBuilderExtensions
     record UserInfoDto(string Id, string UserName,string Email,bool IsEmailConfirmed);
     record UserLoginDto(string Email,string Password);
     record UserRegisterDto(string DisplayName,string Email,string Password);
+    record EmailConfirmationDto(string Email,string Code);
 }

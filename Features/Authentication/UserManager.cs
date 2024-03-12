@@ -14,21 +14,29 @@ class CustomUserManager : UserManager<User>
         this.db = db;
     }
 
-    public override async Task<bool> VerifyUserTokenAsync(User user, string tokenProvider, string purpose, string token)
+    public override async Task<bool> VerifyUserTokenAsync(User user, string tokenProvider, string purpose, string code)
     {
         ThrowIfDisposed();
 
-        if(user.VerificationCode.IsValied(token))
+        if(purpose == ResetPasswordTokenPurpose)
         {
-            return true;
+            if(user.PasswordRestCode.IsValid(code))
+            {
+                return true;
+            }
+        
+            return false;
         }
-       
+        else if(purpose == ConfirmEmailTokenPurpose)
+        {
+            if(user.EmailVerificationCode.IsValid(code))
+            {
+                return true;
+            }
+        
+            return false;
+        }
         return false;
     }
             
-
-    private object GetEmailStore()
-    {
-        throw new NotImplementedException();
-    }
 }

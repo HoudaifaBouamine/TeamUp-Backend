@@ -11,11 +11,12 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome<User>,
 {
     private readonly EmailService emailService = emailService;
 
-    public Task SendConfirmationCodeAsync(IdentityUser user, string email, string confirmationCode)
+    public Task SendConfirmationCodeAsync(IdentityUser user, string email, string code)
     {
         emailService.SendEmail(
             subject: "Email Confirmation",
-            body: $"<h3>Confirmation code : {confirmationCode}</h3>",
+            body: $"<h3>Confirmation code : {code}</h3>" +
+            $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.EmailVerification} minutes",
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send confirmation code");
@@ -37,7 +38,8 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome<User>,
     {
         emailService.SendEmail(
             subject: "Reset password code",
-            body: $"<h2>your reset password code : {resetCode} </h2>",
+            body: $"<h2>your reset password code : {resetCode} </h2>" +
+            $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.PasswordRest} minutes",
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send password reset code");
@@ -60,20 +62,11 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome<User>,
         return SendConfirmationCodeAsync(user,email,confirmationLink);
     }
 
-    Task IEmailSenderCustome<User>.SendConfirmationLinkAsync(User user, string email, string confirmationLink)
-    {
-        return SendConfirmationCodeAsync(user,email,confirmationLink);
-    }
-
     Task IEmailSenderCustome<User>.SendPasswordResetCodeAsync(User user, string email, string resetCode)
     {
         return SendPasswordResetCodeAsync(user,email,resetCode);
     }
 
-    Task IEmailSenderCustome<User>.SendPasswordResetLinkAsync(User user, string email, string resetLink)
-    {
-        return SendPasswordResetLinkAsync(user,email,resetLink);
-    }
 }
 
 public class EmailService
@@ -115,25 +108,9 @@ public class EmailService
 //     reset emails.
 public interface IEmailSenderCustome<TUser> where TUser : class
 {
-    //
-    // Summary:
-    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
-    //     to be used as a general purpose email abstraction. It should be implemented by
-    //     the application so the Identity infrastructure can send confirmation emails.
-    //
-    //
-    // Parameters:
-    //   user:
-    //     The user that is attempting to confirm their email.
-    //
-    //   email:
-    //     The recipient's email address.
-    //
-    //   confirmationLink:
-    //     The link to follow to confirm a user's email. Do not double encode this.
-    Task SendConfirmationLinkAsync(TUser user, string email, string confirmationLink);
+    
 
-        //
+    //
     // Summary:
     //     This API supports the ASP.NET Core Identity infrastructure and is not intended
     //     to be used as a general purpose email abstraction. It should be implemented by
@@ -149,7 +126,7 @@ public interface IEmailSenderCustome<TUser> where TUser : class
     //
     //   confirmationLink:
     //     The link to follow to confirm a user's email. Do not double encode this.
-    Task SendConfirmationCodeAsync(TUser user, string email, string confirmationLink);
+    Task SendConfirmationCodeAsync(TUser user, string email, string code);
 
     //
     // Summary:
@@ -168,22 +145,6 @@ public interface IEmailSenderCustome<TUser> where TUser : class
     //   resetCode:
     //     The code to use to reset the user password. Do not double encode this.
     Task SendPasswordResetCodeAsync(TUser user, string email, string resetCode);
-    //
-    // Summary:
-    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
-    //     to be used as a general purpose email abstraction. It should be implemented by
-    //     the application so the Identity infrastructure can send password reset emails.
-    //
-    //
-    // Parameters:
-    //   user:
-    //     The user that is attempting to reset their password.
-    //
-    //   email:
-    //     The recipient's email address.
-    //
-    //   resetLink:
-    //     The link to follow to reset the user password. Do not double encode this.
-    Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink);
+    
 }
 
