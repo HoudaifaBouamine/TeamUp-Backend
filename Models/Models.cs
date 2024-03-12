@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks; 
 // NOTE (ISHAK) : see the ER diagram and transfer it to models in this file, then seperate the models to different files inside Models folder
+//okey done  ; i will separate the in multiple files 
 
 namespace Models
 {
