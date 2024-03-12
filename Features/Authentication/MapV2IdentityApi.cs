@@ -45,7 +45,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
         var timeProvider = endpoints.ServiceProvider.GetRequiredService<TimeProvider>();
         var bearerTokenOptions = endpoints.ServiceProvider.GetRequiredService<IOptionsMonitor<BearerTokenOptions>>();
-        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSenderCustome<TUser>>();
+        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSenderCustome>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
 
         // We'll figure out a unique endpoint name based on the final route pattern during endpoint generation.
@@ -55,7 +55,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
         // NOTE: We cannot inject UserManager<TUser> directly because the TUser generic parameter is currently unsupported by RDG.
         // https://github.com/dotnet/aspnetcore/issues/47338
-        routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem>>
+        routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem,StatusCodeHttpResult>>
             ([FromBody] UserRegisterDto registration, HttpContext context, [FromServices] IServiceProvider sp, [FromServices] AppDbContext db) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -85,9 +85,14 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return CreateValidationProblem(result);
             }
 
-            await SendEmailConfirmationCodeEmailAsync(db,user,email,VerificationCode.VerificationCodeTypes.EmailVerification);
-            return TypedResults.Ok();
+            var success = await SendEmailConfirmationCodeEmailAsync(db,email,VerificationCode.VerificationCodeTypes.EmailVerification);
+            
+            if(success)
+                return TypedResults.Ok();
+            else
+                return TypedResults.StatusCode(500);
         })
+        .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
 
@@ -187,7 +192,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
         });
 
-        routeGroup.MapPost("/resendConfirmationEmail", async Task<Ok>
+        routeGroup.MapPost("/resendConfirmationEmail", async Task<Results<Ok,StatusCodeHttpResult>>
             ([FromBody] ResendConfirmationEmailRequest resendRequest, HttpContext context, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -196,13 +201,18 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return TypedResults.Ok();
             }
 
-            await SendEmailConfirmationCodeEmailAsync(db,user,resendRequest.Email,VerificationCode.VerificationCodeTypes.EmailVerification);
-            return TypedResults.Ok();
+            var success = await SendEmailConfirmationCodeEmailAsync(db,resendRequest.Email,VerificationCode.VerificationCodeTypes.EmailVerification);
+            
+            if(success)
+                return TypedResults.Ok();
+            else
+                return TypedResults.StatusCode(500);
         })
+        .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/forgotPassword", async Task<Results<Ok,NotFound, ValidationProblem>>
+        routeGroup.MapPost("/forgotPassword", async Task<Results<Ok,NotFound, ValidationProblem,StatusCodeHttpResult>>
             ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] AppDbContext db,[FromServices] IServiceProvider sp) =>
         {
 
@@ -217,10 +227,13 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             
             await db.SaveChangesAsync();
 
-            await SendPasswordResetCodeEmailAsync(db,null,resetRequest.Email,VerificationCode.VerificationCodeTypes.PasswordRest);
+            var success = await SendPasswordResetCodeEmailAsync(db,resetRequest.Email,VerificationCode.VerificationCodeTypes.PasswordRest);
 
+            if(success)
+                return TypedResults.Ok();
+            else
+                return TypedResults.StatusCode(500);
 
-            return TypedResults.Ok();
         })
         .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C]")
@@ -286,7 +299,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         .Produces(StatusCodes.Status500InternalServerError);
 
         
-        async Task SendEmailConfirmationCodeEmailAsync(AppDbContext db,TUser user, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
+        async Task<bool> SendEmailConfirmationCodeEmailAsync(AppDbContext db, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
         {
             User userModel = db.Users.First(u=>u.Email == email);
         
@@ -294,10 +307,10 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             var code = userModel.EmailVerificationCode.GenerateEmailVerificationCode(userModel.Id);
         
             await db.SaveChangesAsync();
-            await emailSender.SendConfirmationCodeAsync(user, email, code);
+            return await emailSender.SendConfirmationCodeAsync(userModel, email, code);
         }
         
-        async Task SendPasswordResetCodeEmailAsync(AppDbContext db,TUser user, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
+        async Task<bool> SendPasswordResetCodeEmailAsync(AppDbContext db, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
         {
             User userModel = db.Users.First(u=>u.Email == email);
    
@@ -305,7 +318,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             var code = userModel.PasswordRestCode.GeneratePasswordRestCode(userModel.Id);
         
             await db.SaveChangesAsync();
-            await emailSender.SendPasswordResetCodeAsync(user, email, code);
+            return await emailSender.SendPasswordResetCodeAsync(userModel, email, code);
         }
         
         return new IdentityEndpointsConventionBuilder(routeGroup);

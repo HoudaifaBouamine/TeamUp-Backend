@@ -4,81 +4,49 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using MimeKit;
 using MimeKit.Text;
+using Serilog;
 
 namespace EmailServices;
 
-public class EmailSender(EmailService emailService) : IEmailSenderCustome<User>, IEmailSender<IdentityUser> 
+public class EmailSender(EmailService emailService) : IEmailSenderCustome
 {
     private readonly EmailService emailService = emailService;
-
-    public Task SendConfirmationCodeAsync(IdentityUser user, string email, string code)
+    async Task<bool> IEmailSenderCustome.SendConfirmationCodeAsync(User user, string email, string code)
     {
-        emailService.SendEmail(
+       var success = emailService.SendEmail(
             subject: "Email Confirmation",
             body: $"<h3>Confirmation code : {code}</h3>" +
             $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.EmailVerification} minutes",
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send confirmation code");
-        return Task.CompletedTask;
+        return success;
     }
 
-    public Task SendConfirmationLinkAsync(IdentityUser user, string email, string confirmationLink)
+    async Task<bool> IEmailSenderCustome.SendPasswordResetCodeAsync(User user, string email, string resetCode)
     {
-        emailService.SendEmail(
-            subject: "Email Confirmation",
-            body: $"<h2>confirme this is you</h2><h3>link : {confirmationLink}</h3>",
-            receiver_email: email);
-
-        System.Console.WriteLine(" --> Send confirmation link");
-        return Task.CompletedTask;
-    }
-
-    public Task SendPasswordResetCodeAsync(IdentityUser user, string email, string resetCode)
-    {
-        emailService.SendEmail(
+        var success = emailService.SendEmail(
             subject: "Reset password code",
             body: $"<h2>your reset password code : {resetCode} </h2>" +
             $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.PasswordRest} minutes",
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send password reset code");
-        return Task.CompletedTask;    
+        return success;     
     }
-
-    public Task SendPasswordResetLinkAsync(IdentityUser user, string email, string resetLink)
-    {
-        emailService.SendEmail(
-            subject: "Reset password link",
-            body: $"<h2>your reset password code : {resetLink} </h2>",
-            receiver_email: email);
-
-        System.Console.WriteLine(" --> Send password reset link");
-        return Task.CompletedTask;
-    }
-
-    Task IEmailSenderCustome<User>.SendConfirmationCodeAsync(User user, string email, string confirmationLink)
-    {
-        return SendConfirmationCodeAsync(user,email,confirmationLink);
-    }
-
-    Task IEmailSenderCustome<User>.SendPasswordResetCodeAsync(User user, string email, string resetCode)
-    {
-        return SendPasswordResetCodeAsync(user,email,resetCode);
-    }
-
 }
 
-public class EmailService
+public class EmailService(IConfiguration configuration)
 {
+    IConfiguration configuration = configuration;
     public bool SendEmail(string subject,string body,string receiver_email)
     {
-        var senderMail = "houdaifa.bouamine@gmail.com";
-        var senderPass = "akqldlyvuuxhbgwj";//true
+        var senderEmail = configuration.GetSection("EmailsSender").GetChildren().First(c=>c.Key == "SenderEmail").Value;
+        var senderPassword = configuration.GetSection("EmailsSender").GetChildren().First(c=>c.Key == "SenderPassword").Value;
         var reciverMail = receiver_email;
         var email = new MimeMessage();
 
-        email.From.Add(MailboxAddress.Parse(senderMail));   
+        email.From.Add(MailboxAddress.Parse(senderEmail));   
         email.To.Add(MailboxAddress.Parse(reciverMail));    
         
         email.Subject = subject;
@@ -89,10 +57,21 @@ public class EmailService
         };
 
         using var smtp = new SmtpClient();
+
+        try
+        {
+
         smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-        smtp.Authenticate(senderMail,senderPass);
+        smtp.Authenticate(senderEmail,senderPassword);
         smtp.Send(email);
         smtp.Disconnect(true);
+
+        }
+        catch(Exception ex)
+        {
+            Log.Error(ex.Message);
+            return false;
+        }
 
         return true;
     }
@@ -106,7 +85,7 @@ public class EmailService
 //     to be used as a general purpose email abstraction. It should be implemented by
 //     the application so the Identity infrastructure can send confirmation and password
 //     reset emails.
-public interface IEmailSenderCustome<TUser> where TUser : class
+public interface IEmailSenderCustome
 {
     
 
@@ -126,7 +105,7 @@ public interface IEmailSenderCustome<TUser> where TUser : class
     //
     //   confirmationLink:
     //     The link to follow to confirm a user's email. Do not double encode this.
-    Task SendConfirmationCodeAsync(TUser user, string email, string code);
+    Task<bool> SendConfirmationCodeAsync(User user, string email, string code);
 
     //
     // Summary:
@@ -144,7 +123,7 @@ public interface IEmailSenderCustome<TUser> where TUser : class
     //
     //   resetCode:
     //     The code to use to reset the user password. Do not double encode this.
-    Task SendPasswordResetCodeAsync(TUser user, string email, string resetCode);
+    Task<bool> SendPasswordResetCodeAsync(User user, string email, string resetCode);
     
 }
 

@@ -17,7 +17,7 @@ class AppDbContext : IdentityDbContext<User>
     public DbSet<VerificationCode> VerificationCodes { get; set; }
 }
 
-class User : IdentityUser
+public class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -25,7 +25,7 @@ class User : IdentityUser
     public VerificationCode PasswordRestCode { get; set; } = new VerificationCode();
 
 } 
-partial class VerificationCode
+public partial class VerificationCode
 {
     [Key]
     public int Id { get; set; } 

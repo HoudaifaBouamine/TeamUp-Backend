@@ -99,8 +99,7 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
     
-builder.Services.AddTransient<IEmailSender<IdentityUser>,EmailSender>();
-builder.Services.AddTransient<IEmailSenderCustome<User>,EmailSender>();
+builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddTransient<CustomUserManager>();
 ///////////////////////////////////////////////////
