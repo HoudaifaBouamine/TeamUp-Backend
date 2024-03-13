@@ -50,3 +50,52 @@ class YourActivity : AppCompatActivity() {
     }
     // ...
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+To do new : 
+Select Category when creating account
+
+ ==> Dashboard Screen :
+--------------------------
+His Active Project,
+Number of projects,
+Top 3 skills used in projects, then send all
+Search bar for projects
+filters{
+	resent join, resent commit, old join, old commit, number contrubuters | mentor, skills,
+},
+project{
+	name,mentor-name,last-chat-see, top 3-5 users send message,chatroom-id
+},
+-------------------------
+ ==> UserData
+User
+{
+FullName,
+Handler,
+Rate,
+Reviews,
+ImageUrl,	
+}
+----------------------------
+project detailes page
+{
+OwnerName, title, body, project category, Max team members (at least 3), Duration, 3 of picturesUrl of enroled users,
+}
+----------------------------
+creat project{
+
+}
+

@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
-class AppDbContext : IdentityDbContext<User>
+public class AppDbContext : IdentityDbContext<User>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -23,7 +23,7 @@ public class User : IdentityUser
     public string? LastName { get; set; }
     public VerificationCode EmailVerificationCode { get; set; } = new VerificationCode();
     public VerificationCode PasswordRestCode { get; set; } = new VerificationCode();
-
+    public string ProfilePicture { get; set; }
 } 
 public partial class VerificationCode
 {

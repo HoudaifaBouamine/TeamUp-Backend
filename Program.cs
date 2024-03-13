@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
+using Authentication.Oauth.Google;
 using Authentication.UserManager;
 using Carter;
 using Configuration;
@@ -76,6 +77,13 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._ ";
 });
 
+
+builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
+
 builder.Services.AddCarter();
 
 builder.Services.AddRateLimiter(options=>
@@ -102,7 +110,13 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddTransient<CustomUserManager>();
+builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));
+
+
 ///////////////////////////////////////////////////
+
+
 
 var app = builder.Build();
 
@@ -134,7 +148,7 @@ app.MapAppEndpoints();
 app.MapHelpersEndpoints();
 app.UseSwaggerDocs();
 
-
+app.MapGoogleAuth();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
