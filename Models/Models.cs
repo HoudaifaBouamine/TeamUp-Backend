@@ -45,8 +45,7 @@ namespace Models
         public string Email { get; set; } = String.Empty ;// what f email is doing here
         public DateTime StartDateTime { get; set;}
         public DateTime EndDateTime { get; set;}
-        [Required]
-        public ChatRoom ChatRoomId { get; set;}
+        public required ChatRoom ChatRoomId { get; set;}
 
 
     }
@@ -62,9 +61,9 @@ namespace Models
         public DateTime DateTime { get; set; }
 
         [Required]
-        public ChatRoom ChatRoomId { get; set; }
+        public required ChatRoom ChatRoomId { get; set; }
         
-        public User UserID { get; set; }
+        public required User UserID { get; set; }
         public bool pinned { get; set; } 
 
     }
@@ -74,7 +73,7 @@ namespace Models
     {
         public int Id { get; set; }
         
-        public Project ProjectID { get; set; } 
+        public required Project ProjectID { get; set; } 
     }
 
     [Table("ProjectViews")]
@@ -91,8 +90,8 @@ namespace Models
     public class UsersProject
     {
         public int Id { get; set; }
-        public User UserId { get; set; }
-        public Category CategoryId { get; set; }
+        public required User UserId { get; set; }
+        public required Category CategoryId { get; set; }
 
     }
 
@@ -108,8 +107,8 @@ namespace Models
     public class ProjectCategory
     {
         public int Id { get; set; }
-        public Category CategoryId { get; set; } 
-        public Project ProjectId { get; set; }
+        public required Category CategoryId { get; set; } 
+        public required Project ProjectId { get; set; }
 
     }
 
@@ -117,9 +116,9 @@ namespace Models
     public class UserProject
     {
         public int Id { get; set; }
-        public User UserId { get; set; }
+        public required User UserId { get; set; }
 
-        public Project ProjectId { get; set; }
+        public required Project ProjectId { get; set; }
     }
 
 
@@ -128,8 +127,8 @@ namespace Models
     {
         public int Id { get; set; }
         public string Text { get; set; } = string.Empty;  
-        public User ReviewerUserId { get; set; }
-        public User ReviewedUserId { get; set; }
+        public required User ReviewerUserId { get; set; }
+        public required User ReviewedUserId { get; set; }
 
         public byte stars { get; set; }
     }
@@ -138,15 +137,15 @@ namespace Models
     public class Skill
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 
     [Table("UsersSkills")]
     public class UserSkill
     {
         public int Id { get; set; }
-        public User UserId { get; set; }
-        public Skill SkillId { get; set;}
+        public required User UserId { get; set; }
+        public required Skill SkillId { get; set;}
     }
 }
 
