@@ -21,10 +21,38 @@ public class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public VerificationCode EmailVerificationCode { get; set; } = new VerificationCode();
-    public VerificationCode PasswordRestCode { get; set; } = new VerificationCode();
-    public string ProfilePicture { get; set; }
+    [Required] public string DisplayName { get; set; }
+    public VerificationCode? EmailVerificationCode { get; set; }
+    public VerificationCode? PasswordRestCode { get; set; }
+    public string? ProfilePicture { get; set; }
+
+
+    public string GetFullName()
+    {
+        return CapitalizeFirstLetter(FirstName) + " " + CapitalizeFirstLetter(LastName);
+    }
+
+    private static string CapitalizeFirstLetter(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        // Convert the input string to lowercase
+        input = input.ToLower();
+
+        // Convert the first character to uppercase
+        char firstChar = char.ToUpper(input[0]);
+
+        // Concatenate the first uppercase character with the rest of the string
+        string result = firstChar + input.Substring(1);
+
+        return result;
+    }
 } 
+
+
 public partial class VerificationCode
 {
     [Key]

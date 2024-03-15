@@ -9,28 +9,28 @@ using System.Threading.Tasks;
 namespace Models
 {
 
-    [Table("Users")]
-    public class User
-    {   
-        public int Id { get; set; }
+    // [Table("Users")]
+    // public class User
+    // {   
+    //     public int Id { get; set; }
 
-        [Required]
-        public string FirstName { get; set; } = String.Empty;
-        [Required]
-        public string LastName { get; set; } = String.Empty;
-        [Required]
-        public string Email { get; set; } = String.Empty;
-        [Required]
-        public string HashedPassword { get; set; } = String.Empty; 
-        public string? Handle { get; set;}
-        public string? PdfUrlCv { get; set;}
+    //     [Required]
+    //     public string FirstName { get; set; } = String.Empty;
+    //     [Required]
+    //     public string LastName { get; set; } = String.Empty;
+    //     [Required]
+    //     public string Email { get; set; } = String.Empty;
+    //     [Required]
+    //     public string HashedPassword { get; set; } = String.Empty; 
+    //     public string? Handle { get; set;}
+    //     public string? PdfUrlCv { get; set;}
 
-        public string? ImageUrl { get; set; }
-        public float Rank { get; set; }
+    //     public string? ImageUrl { get; set; }
+    //     public float Rank { get; set; }
 
     
-        /// complete the rest
-    }
+    //     /// complete the rest
+    // }
 
 
     [Table("Projects")]

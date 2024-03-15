@@ -58,26 +58,28 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem,StatusCodeHttpResult>>
             ([FromBody] UserRegisterDto registration, HttpContext context, [FromServices] IServiceProvider sp, [FromServices] AppDbContext db) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
 
             if (!userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException($"{nameof(MapIdentityApiV2)} requires a user store with email support.");
             }
 
-            var userStore = sp.GetRequiredService<IUserStore<TUser>>();
-            var emailStore = (IUserEmailStore<TUser>)userStore;
+            var userStore = sp.GetRequiredService<IUserStore<User>>();
+            var emailStore = (IUserEmailStore<User>)userStore;
             var email = registration.Email;
-            var userName = registration.DisplayName;
+            var userName = registration.Email;
+            var displayName = registration.DisplayName;
 
             if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
             {
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
-            var user = new TUser();
+            var user = new User();
             await userStore.SetUserNameAsync(user, userName, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+            user.DisplayName = displayName;
             var result = await userManager.CreateAsync(user, registration.Password);
 
             if (!result.Succeeded)
@@ -277,17 +279,17 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         routeGroup.MapGet("/currentUser", async Task<Results<Ok<UserInfoDto>, ValidationProblem, NotFound>>
             (ClaimsPrincipal claimsPrincipal, [FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
             if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
             {
                 return TypedResults.NotFound();
             }
 
             var userInfo = new UserInfoDto(
-                Id : await userManager.GetUserIdAsync(user),
-                Email : await userManager.GetEmailAsync(user),
-                IsEmailConfirmed : await userManager.IsEmailConfirmedAsync(user),
-                UserName : await userManager.GetUserNameAsync(user)
+                Id : user.Id,
+                Email : user.Email,
+                IsEmailConfirmed : user.EmailConfirmed,
+                UserName : user.DisplayName
             );
 
             return TypedResults.Ok(userInfo);

@@ -24,7 +24,8 @@ public class GoogleLoginDto
 
 public class GoogleAuthConfig 
 {
-    public string ClientId { get; set; }
+    public string AndroidClientId { get; set; }
+    public string WebClientId { get; set; }
     public string ClientSecret { get; set; } 
 }
 
@@ -47,63 +48,94 @@ public class CreateUserFromSocialLogin
     /// <param name="model">the model</param>
     /// <param name="loginProvider">the login provider</param>
     /// <returns>System.Threading.Tasks.Task&lt;User&gt;</returns>
+
     
-    public static async Task<User> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
-    {
-        //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
-        var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
-
-        if (user is not null)
-            return user; //USER ALREADY EXISTS.
-
-        user = await userManager.FindByEmailAsync(model.Email);
-
-        if (user is null)
+        public static async Task<User> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
         {
-            user = new User
+            //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
+            var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
+
+            if (user is not null)
+                return user; //USER ALREADY EXISTS.
+
+            user = await userManager.FindByEmailAsync(model.Email);
+
+            if (user is null)
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                UserName = model.Email,
-                ProfilePicture = model.ProfilePicture
-            };
-
-            await userManager.CreateAsync(user);
-
-            //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER
-            user.EmailConfirmed = true;
-
-            await userManager.UpdateAsync(user);
-            await context.SaveChangesAsync();
-        }
-
-        UserLoginInfo userLoginInfo = null;
-        switch (loginProvider)
-        {
-            case LoginProvider.Google:
+                user = new User
                 {
-                    userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
-                }
-                break;
-            case LoginProvider.Facebook:
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    UserName = model.Email,
+                    ProfilePicture = model.ProfilePicture,
+                };
+                
+                if(user.FirstName is null && user.LastName is null)
+                    user.DisplayName = user.Email.Split("@")[0];
+                else
+                    user.DisplayName = user.GetFullName().Trim();
+
+                var wow = await userManager.CreateAsync(user);
+                if(wow.Succeeded)
                 {
-                    userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+                    //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER
+                    user.EmailConfirmed = true;
+
+                    var idResult = await userManager.UpdateAsync(user);
+                    
+                    if(idResult.Succeeded)
+                    {
+                        await context.SaveChangesAsync();
+
+                    }
+                    else
+                    {
+                        Log.Error(" --> Error : " + wow.Errors.First().Description);
+                        return null;
+                    }
+                    
+
                 }
-                break;
-            default:
-                break;
+                else
+                {
+
+                    Log.Error(" --> Error : " + wow.Errors.First().Description);
+                    return null;
+                }
+            }
+
+            UserLoginInfo userLoginInfo = null;
+            switch (loginProvider)
+            {
+                case LoginProvider.Google:
+                    {
+                        userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+                    }
+                    break;
+                // case LoginProvider.Facebook:
+                //     {
+                //         userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+                //     }
+                //     break;
+                default:
+                    break;
+            }
+
+            //ADDS THE USER TO AN IDENTITY PROVIDER
+            var result = await userManager.AddLoginAsync(user, userLoginInfo);
+
+            if (result.Succeeded)
+                return user;
+
+            else
+            {
+                Log.Error(" ---> Error : " + result.Errors.First());
+                return null;
+            }
         }
-
-        //ADDS THE USER TO AN IDENTITY PROVIDER
-        var result = await userManager.AddLoginAsync(user, userLoginInfo);
-
-        if (result.Succeeded)
-            return user;
-
-        else
-            return null;
-    }
+    
+    
 }
 
 public class GoogleAuthService
@@ -133,7 +165,7 @@ public class GoogleAuthService
         {
             payload = await ValidateAsync(model.IdToken, new ValidationSettings
             {
-                Audience = new[] { _googleAuthConfig.ClientId }
+                Audience = [ _googleAuthConfig.AndroidClientId, _googleAuthConfig.WebClientId ]
             });
 
         }
