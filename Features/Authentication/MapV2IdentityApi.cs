@@ -225,6 +225,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             if(user is null) return TypedResults.NotFound();
             
+            if(user.PasswordRestCode is null) user.PasswordRestCode = new VerificationCode();
             var code = user.PasswordRestCode.GeneratePasswordRestCode(user.Id);
             
             await db.SaveChangesAsync();

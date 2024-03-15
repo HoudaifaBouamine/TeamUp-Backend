@@ -13,10 +13,21 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome
     private readonly EmailService emailService = emailService;
     async Task<bool> IEmailSenderCustome.SendConfirmationCodeAsync(User user, string email, string code)
     {
+        var path = "Features/EmailService/Templets/VerifyEmail.htm";
+        
+        Dictionary<string,string> parameters = new Dictionary<string, string>();
+        parameters.Add("DisplayName",user.DisplayName);
+        parameters.Add("Code",code.ToString());
+        parameters.Add("CodeLifeTime",((int)VerificationCode.CodeMaxLifeInMin.EmailVerification).ToString());
+        
+        var emailBody = EmailService.CreateEmailWithParamters(path,parameters);
+        
+
        var success = emailService.SendEmail(
             subject: "Email Confirmation",
-            body: $"<h3>Confirmation code : {code}</h3>" +
-            $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.EmailVerification} minutes",
+            // body: $"<h3>Confirmation code : {code}</h3>" +
+            // $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.EmailVerification} minutes",
+            body:emailBody,
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send confirmation code");
@@ -25,10 +36,22 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome
 
     async Task<bool> IEmailSenderCustome.SendPasswordResetCodeAsync(User user, string email, string resetCode)
     {
+
+        var path = "Features/EmailService/Templets/ResetPassword.htm";
+        
+        Dictionary<string,string> parameters = new Dictionary<string, string>();
+        parameters.Add("DisplayName",user.DisplayName);
+        parameters.Add("Code",resetCode.ToString());
+        parameters.Add("CodeLifeTime",((int)VerificationCode.CodeMaxLifeInMin.PasswordRest).ToString());
+        
+        var emailBody = EmailService.CreateEmailWithParamters(path,parameters);
+        
+
         var success = emailService.SendEmail(
             subject: "Reset password code",
-            body: $"<h2>your reset password code : {resetCode} </h2>" +
-            $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.PasswordRest} minutes",
+            // body: $"<h2>your reset password code : {resetCode} </h2>" +
+            // $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.PasswordRest} minutes",
+           body:emailBody,
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send password reset code");
@@ -75,6 +98,24 @@ public class EmailService(IConfiguration configuration)
 
         return true;
     }
+
+
+    public static string CreateEmailWithParamters(string emailBodyFilePath,Dictionary<string,string> parameters)
+    {
+        string body = string.Empty;
+        //"Features/EmailService/Templets/ResetPassword.htm"
+        using (StreamReader reader = new StreamReader(emailBodyFilePath))
+        {
+            body = reader.ReadToEnd();
+        }
+
+        foreach(var p in parameters)
+        {
+            body = body.Replace("@{" + p.Key + "}", p.Value);
+        }
+        return body;
+    }
+
 }
 
 
