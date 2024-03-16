@@ -21,7 +21,7 @@ public class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    [Required] public string DisplayName { get; set; }
+    [Required] public string DisplayName { get; set; } = string.Empty;
     public VerificationCode? EmailVerificationCode { get; set; }
     public VerificationCode? PasswordRestCode { get; set; }
     public string? ProfilePicture { get; set; }
@@ -32,11 +32,11 @@ public class User : IdentityUser
         return CapitalizeFirstLetter(FirstName) + " " + CapitalizeFirstLetter(LastName);
     }
 
-    private static string CapitalizeFirstLetter(string input)
+    private static string CapitalizeFirstLetter(string? input)
     {
         if (string.IsNullOrEmpty(input))
         {
-            return input;
+            return "";
         }
 
         // Convert the input string to lowercase

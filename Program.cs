@@ -143,64 +143,19 @@ app.Use((ctx,next)=>
 
 });
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
-app.UseCors("AllowAll");
 
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
 app.UseSwaggerDocs();
-
-
 
 app.MapGet("/users",(AppDbContext db)=>
 {
     return db.Users.Select(u=>new {Id = u.Id,DisplayName = u.DisplayName, Email = u.Email});
 });
 
-// app.MapPost("/login-google", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult>>
-//             ([FromBody] UserLoginDto login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
-//         {
-//             var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
-//             var userManager = sp.GetRequiredService<UserManager<TUser>>();
-
-//             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-//             var isPersistent = (useCookies == true) && (useSessionCookies != true);
-//             signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
-
-//             if (await userManager.FindByEmailAsync(login.Email) is not { } user)
-//             {
-//                 // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
-//                 return TypedResults.Unauthorized();
-//             }
-
-//             string userName = (await userManager.GetUserNameAsync(user))!; 
-
-//             var result = await signInManager.PasswordSignInAsync(userName,login.Password, isPersistent, lockoutOnFailure: true);
-
-//             if (!result.Succeeded)
-//             {
-//                 return TypedResults.Problem(result.ToString(), statusCode: StatusCodes.Status401Unauthorized);
-//             }
-
-//             // The signInManager already produced the needed response in the form of a cookie or bearer token.
-//             return TypedResults.Empty;
-//         });
-
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
-public class GoogleSignInDto
-    {
-        /// <summary>
-        /// This token being passed here is generated from the client side when a request is made  to 
-        /// i.e. react, angular, flutter etc. It is being returned as A jwt from google oauth server. 
-        /// </summary>
-        [Required]
-        public string IdToken { get; set; } 
-    }
-        public enum LoginProvider
-    {
-        Google = 1,
-        Facebook
-    }

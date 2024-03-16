@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Duende.IdentityServer.ResponseHandling;
 using Enums;
-using Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -19,23 +17,23 @@ public class GoogleLoginDto
     /// i.e. react, angular, flutter etc. It is being returned as A jwt from google oauth server. 
     /// </summary>
     [Required]
-    public string IdToken { get; set; } 
+    public string IdToken { get; set; } = null!;
 }
 
 public class GoogleAuthConfig 
 {
-    public string AndroidClientId { get; set; }
-    public string WebClientId { get; set; }
-    public string ClientSecret { get; set; } 
+    public string AndroidClientId { get; set; } = "";
+    public string WebClientId { get; set; } = "";
+    public string ClientSecret { get; set; } = "";
 }
 
 public class CreateUserFromSocialLogin
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string ProfilePicture { get; set; }
-    public string LoginProviderSubject { get; set; }
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string ProfilePicture { get; set; } = null!;
+    public string LoginProviderSubject { get; set; } = null!;
 }
 
     public static class CreateUserFromSocialLoginExtension
@@ -50,7 +48,7 @@ public class CreateUserFromSocialLogin
     /// <returns>System.Threading.Tasks.Task&lt;User&gt;</returns>
 
     
-        public static async Task<User> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
+        public static async Task<User?> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
         {
             //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
             var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
@@ -105,7 +103,7 @@ public class CreateUserFromSocialLogin
                 }
             }
 
-            UserLoginInfo userLoginInfo = null;
+            UserLoginInfo? userLoginInfo = null;
             switch (loginProvider)
             {
                 case LoginProvider.Google:
@@ -119,7 +117,9 @@ public class CreateUserFromSocialLogin
                 //     }
                 //     break;
                 default:
-                    break;
+                    {
+                        return null;
+                    }
             }
 
             //ADDS THE USER TO AN IDENTITY PROVIDER
@@ -189,14 +189,14 @@ public class GoogleAuthService
             return new BaseResponse<User>(user);
 
         else
-            return new BaseResponse<User>(null, new List<string> { "Failed to get response." });
+            return new BaseResponse<User>("can not create user from social login", new List<string> { "Failed to get response." });
     }
 
 public async Task<BaseResponse<string>> SignInWithGoogle(GoogleLoginDto model) 
 {
     var response = await GoogleSignIn(model);
     if(response.Status == RequestExecution.Successful)
-        return new  BaseResponse<string>(response.ResponseMessage,response.TotalCount,response.ResponseMessage);
+        return new  BaseResponse<string>(response.ResponseMessage!,response.TotalCount!.Value,response.ResponseMessage);
     else if (response.Status == RequestExecution.Failed)
         return new BaseResponse<string>(response.ResponseMessage,response.Errors);
     else
@@ -220,7 +220,7 @@ public static class GoogleAuthEndpoint
             }
             catch (Exception ex)
             {
-                return "Some error";
+                return new {Error = ex.Message};
             }
         }).WithTags("Oauth");
     }

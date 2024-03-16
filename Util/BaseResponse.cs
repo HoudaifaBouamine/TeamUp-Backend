@@ -1,3 +1,4 @@
+using System.Collections;
 using Enums;
 
 namespace Presentation;
@@ -6,16 +7,20 @@ public class BaseResponse<T>
 {
     public BaseResponse()
     {
+        this.Status = default;
+        this.ResponseMessage = default!;
+        this.Errors = default!;
+        this.Data = default!;
     }
 
-    public BaseResponse(T data, string responseMessage = null)
+    public BaseResponse(T? data, string? responseMessage = null)
     {
         this.Data = data;
         this.Status = RequestExecution.Successful;
         this.ResponseMessage = responseMessage;
     }
 
-    public BaseResponse(T data, int totalCount, string responseMessage = null)
+    public BaseResponse(T? data, int? totalCount, string? responseMessage = null)
     {
         this.Data = data;
         this.TotalCount = totalCount;
@@ -23,23 +28,24 @@ public class BaseResponse<T>
         this.ResponseMessage = responseMessage;
     }
 
-    public BaseResponse(string error, List<string> errors = null)
+    public BaseResponse(string? error, List<string>? errors = null)
     {
         this.Status = RequestExecution.Failed;
         this.ResponseMessage = error;
         this.Errors = errors;
+        this.Data = default!;
     }
 
-    public BaseResponse(T data, string error, List<string> errors, RequestExecution status)
+    public BaseResponse(T? data, string? error, List<string>? errors, RequestExecution? status)
     {
         this.Status = status;
         this.ResponseMessage = error;
         this.Errors = errors;
         this.Data = data;
     }
-    public RequestExecution Status { get; set; }
-    public T Data { get; set; }
-    public string ResponseMessage { get; set; }
-    public int TotalCount { get; set; }
-    public List<string> Errors { get; set; } = new List<string>();
+    public RequestExecution? Status { get; set; }
+    public T? Data { get; set; }
+    public string? ResponseMessage { get; set; }
+    public int? TotalCount { get; set; }
+    public List<string>? Errors { get; set; } = new List<string>();
 }

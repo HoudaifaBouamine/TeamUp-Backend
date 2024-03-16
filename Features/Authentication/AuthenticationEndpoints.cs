@@ -2,6 +2,7 @@ using Authentication.CustomIdentityApi.V2;
 using Authentication.Oauth.Google;
 using Carter;
 using Configuration;
+using Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,7 @@ public class AuthenticationEndpoints : ICarterModule
             .WithSummary("Not complited, do not use v2 yet")
             .WithOpenApi();
 
-        authGroup.MapPost("/google",async ([FromBody] GoogleSignInDto model ,[FromServices] IServiceProvider sp,[FromServices] AppDbContext db,[FromServices] IOptions<GoogleAuthConfig> authConfigOptions)=>
+        authGroup.MapPost("/google",async ([FromBody] GoogleLoginDto model ,[FromServices] IServiceProvider sp,[FromServices] AppDbContext db,[FromServices] IOptions<GoogleAuthConfig> authConfigOptions)=>
         {
 
             var userManager = sp.GetRequiredService<UserManager<User>>();

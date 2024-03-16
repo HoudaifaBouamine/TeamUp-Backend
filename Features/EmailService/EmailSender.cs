@@ -11,58 +11,59 @@ namespace EmailServices;
 public class EmailSender(EmailService emailService) : IEmailSenderCustome
 {
     private readonly EmailService emailService = emailService;
-    async Task<bool> IEmailSenderCustome.SendConfirmationCodeAsync(User user, string email, string code)
+
+    Task<bool> IEmailSenderCustome.SendConfirmationCodeAsync(User user, string email, string code)
     {
         var path = "Features/EmailService/Templets/VerifyEmail.htm";
-        
-        Dictionary<string,string> parameters = new Dictionary<string, string>();
-        parameters.Add("DisplayName",user.DisplayName);
-        parameters.Add("Code",code.ToString());
-        parameters.Add("CodeLifeTime",((int)VerificationCode.CodeMaxLifeInMin.EmailVerification).ToString());
-        
-        var emailBody = EmailService.CreateEmailWithParamters(path,parameters);
-        
 
-       var success = emailService.SendEmail(
-            subject: "Email Confirmation",
-            // body: $"<h3>Confirmation code : {code}</h3>" +
-            // $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.EmailVerification} minutes",
-            body:emailBody,
-            receiver_email: email);
+        Dictionary<string, string> parameters = new Dictionary<string, string>
+        {
+            { "DisplayName", user.DisplayName },
+            { "Code", code.ToString() },
+            { "CodeLifeTime", ((int)VerificationCode.CodeMaxLifeInMin.EmailVerification).ToString() }
+        };
+
+        var emailBody = EmailService.CreateEmailFromHTMLFileWithParamters(path, parameters);
+
+
+        var success = emailService.SendEmail(
+             subject: "Email Confirmation",
+             body: emailBody,
+             receiver_email: email);
 
         System.Console.WriteLine(" --> Send confirmation code");
         return success;
     }
 
-    async Task<bool> IEmailSenderCustome.SendPasswordResetCodeAsync(User user, string email, string resetCode)
+    Task<bool> IEmailSenderCustome.SendPasswordResetCodeAsync(User user, string email, string resetCode)
     {
 
         var path = "Features/EmailService/Templets/ResetPassword.htm";
-        
-        Dictionary<string,string> parameters = new Dictionary<string, string>();
-        parameters.Add("DisplayName",user.DisplayName);
-        parameters.Add("Code",resetCode.ToString());
-        parameters.Add("CodeLifeTime",((int)VerificationCode.CodeMaxLifeInMin.PasswordRest).ToString());
-        
-        var emailBody = EmailService.CreateEmailWithParamters(path,parameters);
-        
+
+        Dictionary<string, string> parameters = new Dictionary<string, string>
+        {
+            { "DisplayName", user.DisplayName },
+            { "Code", resetCode.ToString() },
+            { "CodeLifeTime", ((int)VerificationCode.CodeMaxLifeInMin.PasswordRest).ToString() }
+        };
+
+        var emailBody = EmailService.CreateEmailFromHTMLFileWithParamters(path, parameters);
+
 
         var success = emailService.SendEmail(
             subject: "Reset password code",
-            // body: $"<h2>your reset password code : {resetCode} </h2>" +
-            // $"<h5>Expired in {(int)VerificationCode.CodeMaxLifeInMin.PasswordRest} minutes",
-           body:emailBody,
+           body: emailBody,
             receiver_email: email);
 
         System.Console.WriteLine(" --> Send password reset code");
-        return success;     
+        return success;
     }
 }
 
 public class EmailService(IConfiguration configuration)
 {
     IConfiguration configuration = configuration;
-    public bool SendEmail(string subject,string body,string receiver_email)
+    public async Task<bool> SendEmail(string subject,string body,string receiver_email)
     {
         var senderEmail = configuration.GetSection("EmailsSender").GetChildren().First(c=>c.Key == "SenderEmail").Value;
         var senderPassword = configuration.GetSection("EmailsSender").GetChildren().First(c=>c.Key == "SenderPassword").Value;
@@ -84,10 +85,10 @@ public class EmailService(IConfiguration configuration)
         try
         {
 
-        smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-        smtp.Authenticate(senderEmail,senderPassword);
-        smtp.Send(email);
-        smtp.Disconnect(true);
+            await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(senderEmail,senderPassword);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
 
         }
         catch(Exception ex)
@@ -100,10 +101,10 @@ public class EmailService(IConfiguration configuration)
     }
 
 
-    public static string CreateEmailWithParamters(string emailBodyFilePath,Dictionary<string,string> parameters)
+    public static string CreateEmailFromHTMLFileWithParamters(string emailBodyFilePath,Dictionary<string,string> parameters)
     {
         string body = string.Empty;
-        //"Features/EmailService/Templets/ResetPassword.htm"
+
         using (StreamReader reader = new StreamReader(emailBodyFilePath))
         {
             body = reader.ReadToEnd();
@@ -118,53 +119,9 @@ public class EmailService(IConfiguration configuration)
 
 }
 
-
-
-//
-// Summary:
-//     This API supports the ASP.NET Core Identity infrastructure and is not intended
-//     to be used as a general purpose email abstraction. It should be implemented by
-//     the application so the Identity infrastructure can send confirmation and password
-//     reset emails.
 public interface IEmailSenderCustome
 {
-    
-
-    //
-    // Summary:
-    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
-    //     to be used as a general purpose email abstraction. It should be implemented by
-    //     the application so the Identity infrastructure can send confirmation emails.
-    //
-    //
-    // Parameters:
-    //   user:
-    //     The user that is attempting to confirm their email.
-    //
-    //   email:
-    //     The recipient's email address.
-    //
-    //   confirmationLink:
-    //     The link to follow to confirm a user's email. Do not double encode this.
     Task<bool> SendConfirmationCodeAsync(User user, string email, string code);
-
-    //
-    // Summary:
-    //     This API supports the ASP.NET Core Identity infrastructure and is not intended
-    //     to be used as a general purpose email abstraction. It should be implemented by
-    //     the application so the Identity infrastructure can send password reset emails.
-    //
-    //
-    // Parameters:
-    //   user:
-    //     The user that is attempting to reset their password.
-    //
-    //   email:
-    //     The recipient's email address.
-    //
-    //   resetCode:
-    //     The code to use to reset the user password. Do not double encode this.
-    Task<bool> SendPasswordResetCodeAsync(User user, string email, string resetCode);
-    
+    Task<bool> SendPasswordResetCodeAsync(User user, string email, string resetCode);   
 }
 

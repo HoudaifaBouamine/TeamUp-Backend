@@ -151,7 +151,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/confirmEmail", async Task<Results<Ok,BadRequest<object>, UnauthorizedHttpResult>>
+        routeGroup.MapPost("/confirmEmail", async Task<Results<Ok,BadRequest<object>, UnauthorizedHttpResult,NotFound>>
             ([FromBody] EmailConfirmationDto emailConfirmation, [FromServices] IServiceProvider sp,[FromServices] AppDbContext db) =>
         {
             
@@ -168,6 +168,9 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             
             var userModel = await db.Users.Include(u=>u.EmailVerificationCode).FirstOrDefaultAsync(u=>u.Id == userIdentity.Id);
+
+            if(userModel is null) return TypedResults.NotFound();
+
             var result = await userManager.ConfirmEmailAsync(userModel,emailConfirmation.Code);
 
             if(result.Succeeded)
@@ -288,7 +291,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             var userInfo = new UserInfoDto(
                 Id : user.Id,
-                Email : user.Email,
+                Email : user.Email!,
                 IsEmailConfirmed : user.EmailConfirmed,
                 UserName : user.DisplayName
             );
