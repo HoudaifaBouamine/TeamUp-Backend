@@ -21,11 +21,14 @@ public class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
+    public string Handler {get;set;} = string.Empty;
     [Required] public string DisplayName { get; set; } = string.Empty;
     public VerificationCode? EmailVerificationCode { get; set; }
     public VerificationCode? PasswordRestCode { get; set; }
     public string? ProfilePicture { get; set; }
+    public float Rate { get; set; } = MaxRate;
 
+    const int MaxRate = 5;
 
     public string GetFullName()
     {

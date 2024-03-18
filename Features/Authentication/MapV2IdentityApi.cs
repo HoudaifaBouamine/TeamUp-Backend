@@ -18,6 +18,7 @@ using EmailServices;
 using Authentication.UserManager;
 using Microsoft.EntityFrameworkCore;
 using Humanizer;
+using Serilog;
 
 namespace Authentication.CustomIdentityApi.V2;
 
@@ -55,15 +56,19 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
         // NOTE: We cannot inject UserManager<TUser> directly because the TUser generic parameter is currently unsupported by RDG.
         // https://github.com/dotnet/aspnetcore/issues/47338
-        routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem,StatusCodeHttpResult>>
+        routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem,BadRequest<object>>>
             ([FromBody] UserRegisterDto registration, HttpContext context, [FromServices] IServiceProvider sp, [FromServices] AppDbContext db) =>
         {
+            System.Console.WriteLine("----> Error : 1");
+
             var userManager = sp.GetRequiredService<UserManager<User>>();
 
             if (!userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException($"{nameof(MapIdentityApiV2)} requires a user store with email support.");
             }
+
+            System.Console.WriteLine("----> Error : 2");
 
             var userStore = sp.GetRequiredService<IUserStore<User>>();
             var emailStore = (IUserEmailStore<User>)userStore;
@@ -76,25 +81,44 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
+                        System.Console.WriteLine("----> Error : 3");
+
+
             var user = new User();
             await userStore.SetUserNameAsync(user, userName, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
             user.DisplayName = displayName;
             var result = await userManager.CreateAsync(user, registration.Password);
 
+                        System.Console.WriteLine("----> Error : 4");
+
+
             if (!result.Succeeded)
             {
                 return CreateValidationProblem(result);
             }
 
+                        System.Console.WriteLine("----> Error : 5");
+
+
             var success = await SendEmailConfirmationCodeEmailAsync(db,email,VerificationCode.VerificationCodeTypes.EmailVerification);
             
+                        System.Console.WriteLine("----> Error : 6");
+
             if(success)
+            {
+                            System.Console.WriteLine("----> Error : 6-1");
+
                 return TypedResults.Ok();
+            }
             else
-                return TypedResults.StatusCode(500);
+            {
+                            System.Console.WriteLine("----> Error : 6-2");
+
+                Log.Debug($" --> : Cannot send confirmation email to {user.Email}");
+                return TypedResults.BadRequest((object)new {Error = $"Cannot send confirmation email to {user.Email}"});
+            }
         })
-        .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
 

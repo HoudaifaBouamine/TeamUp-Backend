@@ -19,9 +19,9 @@ public class AuthenticationEndpoints : ICarterModule
         var authGroup = app.MapGroup("/auth")
                 .WithTags("auth");
 
-        authGroup.MapIdentityApiV2<User>().HasApiVersion(2)
+        authGroup.MapIdentityApiV2<User>()
+            .HasApiVersion(2)
             .RequireRateLimiting(RateLimiterConfig.Policy.Fixed)
-            .WithSummary("Not complited, do not use v2 yet")
             .WithOpenApi();
 
         authGroup.MapPost("/google",async ([FromBody] GoogleLoginDto model ,[FromServices] IServiceProvider sp,[FromServices] AppDbContext db,[FromServices] IOptions<GoogleAuthConfig> authConfigOptions)=>
