@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamUp.Test", "..\TeamUp.Test\TeamUp.Test.csproj", "{EFDE086E-A3A3-4DEF-AB2A-257DE7524675}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamUp.App", "TeamUp.App.csproj", "{CF673527-3528-4D15-95E3-96C15EB67956}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFDE086E-A3A3-4DEF-AB2A-257DE7524675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFDE086E-A3A3-4DEF-AB2A-257DE7524675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFDE086E-A3A3-4DEF-AB2A-257DE7524675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFDE086E-A3A3-4DEF-AB2A-257DE7524675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF673527-3528-4D15-95E3-96C15EB67956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF673527-3528-4D15-95E3-96C15EB67956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF673527-3528-4D15-95E3-96C15EB67956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF673527-3528-4D15-95E3-96C15EB67956}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAB0ACD7-254D-411F-9E0C-E9E89981EAD8}
+	EndGlobalSection
+EndGlobal
