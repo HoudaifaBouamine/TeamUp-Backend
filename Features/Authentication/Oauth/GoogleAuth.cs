@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
+using Models;
 using Presentation;
 using Serilog;
 using static Google.Apis.Auth.GoogleJsonWebSignature;

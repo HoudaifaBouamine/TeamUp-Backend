@@ -30,6 +30,7 @@
     <PackageReference Include="MailKit" Version="4.4.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.67.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
+    <PackageReference Include="Bogus" Version="35.5.0" />
   </ItemGroup>
 
 </Project>

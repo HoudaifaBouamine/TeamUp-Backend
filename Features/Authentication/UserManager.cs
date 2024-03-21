@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Models;
 namespace Authentication.UserManager;
 
 class CustomUserManager : UserManager<User>

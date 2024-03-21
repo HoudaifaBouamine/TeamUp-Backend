@@ -19,7 +19,9 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Core;
 using Swashbuckle.AspNetCore.Filters;
-using static Google.Apis.Auth.GoogleJsonWebSignature;
+using Bogus;
+using Models;
+using TeamUp_Backend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,7 +112,7 @@ builder.Services.AddRateLimiter(options=>
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
-    
+
 builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();
@@ -143,6 +145,20 @@ app.Use((ctx,next)=>
 
 });
 
+app.Use(async (ctx,next)=>
+{
+    try{
+        await next();
+    }
+    catch(Exception ex)
+    {
+        ctx.Response.StatusCode = 500;
+        await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
+    } 
+});
+
+
+
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
@@ -152,10 +168,29 @@ app.MapAppEndpoints();
 app.MapHelpersEndpoints();
 app.UseSwaggerDocs();
 
-app.MapGet("/users",(AppDbContext db)=>
+app.MapGet("/generate-fake-data",async (AppDbContext db,UserManager<User> userManager)=>
 {
-    return db.Users.Select(u=>new {Id = u.Id,DisplayName = u.DisplayName, Email = u.Email});
+    var usersFaker = new Faker<User>()
+    .RuleFor(u=>u.FirstName,
+        (f,u)=>f.Name.FirstName())
+    .RuleFor(u=>u.LastName,
+        (f,u)=>f.Name.LastName())
+    .RuleFor(u=>u.DisplayName,
+        (f,u)=>f.Internet.UserName(u.FirstName,u.LastName))
+    .RuleFor(u=>u.Email, 
+        (f,u)=>f.Internet.Email(u.FirstName,u.LastName))
+    .RuleFor(u=>u.EmailConfirmed,(f,u)=>f.Random.Bool())
+    .RuleFor(u=>u.FullAddress,(f,u)=>f.Address.FullAddress())
+    .RuleFor(u=>u.PasswordHash,f=>f.Internet.Password())
+    .RuleFor(u=>u.Handler,(f,u)=>$"{f.Name.JobTitle()} @{f.Company.CompanyName()}");
+
+    var users = usersFaker.Generate(100);
+
+    await db.Users.AddRangeAsync(users);
+    await db.SaveChangesAsync();
 });
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
+
+

@@ -16,7 +16,13 @@ public partial class UserEndpoints : ICarterModule
             .WithOpenApi();
 
         usersGroup.MapGet("/",GetUsers)
-            .Produces(StatusCodes.Status200OK,typeof(GetUsersResponse))
             .Produces(StatusCodes.Status500InternalServerError);
+
+        usersGroup.MapGet("/by",GetUser);
+
+        usersGroup.MapPut("/",UpdateUser)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .RequireAuthorization(p=>p.RequireAuthenticatedUser());
+
     }
 }

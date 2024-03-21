@@ -19,6 +19,9 @@ using Authentication.UserManager;
 using Microsoft.EntityFrameworkCore;
 using Humanizer;
 using Serilog;
+using Models;
+using Duende.IdentityServer.Models;
+using TeamUp_Backend;
 
 namespace Authentication.CustomIdentityApi.V2;
 
@@ -122,9 +125,11 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
 
-        routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult>>
+        routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult,BadRequest<ErrorResponse>>>
             ([FromBody] UserLoginDto login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
         {
+
+
             var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
 
@@ -149,6 +154,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             // The signInManager already produced the needed response in the form of a cookie or bearer token.
             return TypedResults.Empty;
+
+   
         })
         .WithSummary("[C]")
         .WithOpenApi();

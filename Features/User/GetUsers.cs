@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace Users;
 
 partial class UserEndpoints
 {
 
-    async Task<Results<Ok<GetUsersResponse>,StatusCodeHttpResult>> 
+    async Task<Results<Ok<GetUsersListResponse>,StatusCodeHttpResult>> 
         GetUsers(
         [FromQuery] string? SearchPattern,
         [FromQuery] int? PageNumber,
@@ -32,10 +33,10 @@ partial class UserEndpoints
                 .Take(PageSize.Value);
 
         var usersResult = await users
-            .Select(u => new UserReadDto(u.Id,u.Email,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))
+            .Select(u => new UserReadDto(u.Id,u.Email!,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))
             .ToListAsync();
 
-        return TypedResults.Ok(new GetUsersResponse
+        return TypedResults.Ok(new GetUsersListResponse
             (
             TotalCount,
             PageNumber??=1,
@@ -44,8 +45,5 @@ partial class UserEndpoints
             PageNumber * PageSize < TotalCount, 
             usersResult));
     }
-
-    record GetUsersResponse(int TotalCount,int PageNumber,int PageSize,bool IsPrevPageExist,bool IsNextPageExist,IEnumerable<UserReadDto> Users);
-    record UserReadDto(string Id,string Email,string DisplayName,string Handler,float Rate,string ProfilePicture);
 }
 

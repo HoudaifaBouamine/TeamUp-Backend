@@ -5,6 +5,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using MimeKit;
 using MimeKit.Text;
+using Models;
 using Serilog;
 
 namespace EmailServices;
