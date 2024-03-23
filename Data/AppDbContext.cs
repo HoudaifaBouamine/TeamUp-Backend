@@ -15,6 +15,7 @@ class AppDbContext : IdentityDbContext<User>
     }
 
     public DbSet<VerificationCode> VerificationCodes { get; set; }
+    public Dbset<Project> Projects { get; set; } 
 }
 
 public class User : IdentityUser
