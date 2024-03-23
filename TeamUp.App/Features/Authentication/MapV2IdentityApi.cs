@@ -259,8 +259,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             if(user is null) return TypedResults.NotFound();
             
-            if(user.PasswordRestCode is null) user.PasswordRestCode = new VerificationCode();
-            var code = user.PasswordRestCode.GeneratePasswordRestCode(user.Id);
+            if(user.PasswordRestCode is null) user.PasswordRestCode = VerificationCode.CreatePasswordResetCode();
+            var code = user.PasswordRestCode.Code;
             
             await db.SaveChangesAsync();
 
@@ -340,8 +340,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         {
             User userModel = db.Users.First(u=>u.Email == email);
         
-            userModel.EmailVerificationCode = new VerificationCode();
-            var code = userModel.EmailVerificationCode.GenerateEmailVerificationCode(userModel.Id);
+            userModel.EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
+            var code = userModel.EmailVerificationCode.Code;
         
             await db.SaveChangesAsync();
             return await emailSender.SendConfirmationCodeAsync(userModel, email, code);
@@ -351,8 +351,8 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         {
             User userModel = db.Users.First(u=>u.Email == email);
    
-            userModel.PasswordRestCode = new VerificationCode();
-            var code = userModel.PasswordRestCode.GeneratePasswordRestCode(userModel.Id);
+            userModel.PasswordRestCode = VerificationCode.CreatePasswordResetCode();
+            var code = userModel.PasswordRestCode.Code;
         
             await db.SaveChangesAsync();
             return await emailSender.SendPasswordResetCodeAsync(userModel, email, code);

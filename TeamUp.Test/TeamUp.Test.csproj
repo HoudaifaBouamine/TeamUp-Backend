@@ -20,4 +20,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TeamUp.App\TeamUp.App.csproj" />
+  </ItemGroup>
+
 </Project>
