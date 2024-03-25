@@ -20,7 +20,7 @@ public class Project
     public string ProjectDescription { get; set; } = String.Empty ;
     public DateTime StartDateTime { get; set;}
     public DateTime EndDateTime { get; set;}
-    public ChatRoom ChatRoomId { get; set;} = null!;
+    public ChatRoom ChatRoom { get; set;} = null!;
 
 
 }

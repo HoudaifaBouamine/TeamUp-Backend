@@ -6,9 +6,10 @@
     using System;
     using TeamUp_Backend.Features.Project;
     using Models;
-  
-    
-        [Route("api/[controller]")]
+    using Asp.Versioning;
+
+        [ApiVersion(1)]
+        [Route("api/v{v:apiVersion}/[controller]")]
         [ApiController]
         public class ProjectsController : ControllerBase
         {
@@ -29,7 +30,7 @@
                     ProjectDescription = p.ProjectDescription,
                     StartDateTime = p.StartDateTime,
                     EndDateTime = p.EndDateTime,
-                    ChatRoomId = p.ChatRoomId
+                    ChatRoomId = p.ChatRoom
                 }).ToList();
 
                 return Ok(projects);
@@ -53,7 +54,7 @@
                     ProjectDescription = project.ProjectDescription,
                     StartDateTime = project.StartDateTime,
                     EndDateTime = project.EndDateTime,
-                    ChatRoomId = project.ChatRoomId
+                    ChatRoomId = project.ChatRoom
                 };
 
                 return Ok(projectDto);
@@ -69,7 +70,7 @@
                     ProjectDescription = projectDto.ProjectDescription,
                     StartDateTime = projectDto.StartDateTime,
                     EndDateTime = projectDto.EndDateTime,
-                    ChatRoomId = projectDto.ChatRoomId
+                    ChatRoom = projectDto.ChatRoomId
                 };
 
                 _context.Projects.Add(project);
@@ -96,7 +97,7 @@
                 project.ProjectDescription = projectDto.ProjectDescription;
                 project.StartDateTime = projectDto.StartDateTime;
                 project.EndDateTime = projectDto.EndDateTime;
-                project.ChatRoomId = projectDto.ChatRoomId;
+                project.ChatRoom = projectDto.ChatRoomId;
 
                 _context.SaveChanges();
 

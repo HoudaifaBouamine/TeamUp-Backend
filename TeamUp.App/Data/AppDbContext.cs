@@ -14,6 +14,19 @@ public class AppDbContext : IdentityDbContext<User>
         Database.EnsureCreated();
     }
 
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+
+
+        builder.Entity<Project>()
+            .HasOne(p => p.ChatRoom)
+            .WithOne(ch => ch.Project)
+            .HasForeignKey<Project>("ChatRoom_Id");
+
+        base.OnModelCreating(builder);
+    }
     public DbSet<VerificationCode> VerificationCodes { get; set; }
-    public DbSet<Project> Projects{get ; set; }
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<ChatRoom> ChatRooms { get; set; }
+
 }

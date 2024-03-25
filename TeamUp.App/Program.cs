@@ -166,6 +166,7 @@ app.UseRateLimiter();
 
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
+app.MapControllers();
 app.UseSwaggerDocs();
 
 app.MapGet("/generate-fake-data",async (AppDbContext db,UserManager<User> userManager)=>

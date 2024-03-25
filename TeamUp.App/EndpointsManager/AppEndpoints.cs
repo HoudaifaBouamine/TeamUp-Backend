@@ -24,8 +24,7 @@ namespace EndpointsManager
                 .MapGroup("api/v{apiVersion:apiVersion}")
                 .WithApiVersionSet(apiVersionSet);
 
-            versionedApp.MapCarter();
-                    
+            versionedApp.MapCarter();     
         }
 
     }

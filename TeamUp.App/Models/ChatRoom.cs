@@ -15,7 +15,7 @@ public class ChatRoom
 {
     public int Id { get; set; }
     
-    public required Project ProjectID { get; set; } 
+    public required Project Project { get; set; } 
 }
 
 
