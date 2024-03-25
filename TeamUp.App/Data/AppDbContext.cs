@@ -15,4 +15,5 @@ public class AppDbContext : IdentityDbContext<User>
     }
 
     public DbSet<VerificationCode> VerificationCodes { get; set; }
+    public DbSet<Project> Projects{get ; set; }
 }
