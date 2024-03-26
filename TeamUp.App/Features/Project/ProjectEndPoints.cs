@@ -10,6 +10,8 @@
     using Microsoft.AspNetCore.Authorization;
     using System.Security.Claims;
     using Authentication.UserManager;
+    using Microsoft.EntityFrameworkCore;
+    using Users;
 
     [Tags("Projects Group")]
         [ApiVersion(1)]
@@ -27,39 +29,57 @@
             [HttpGet]
             public ActionResult<IEnumerable<ProjectReadDto>> GetProjects()    
             {
-                var projects = _context.Projects.Select(p => new ProjectReadDto
-                {
-                    Id = p.Id,
-                    ProjectName = p.ProjectName,
-                    ProjectDescription = p.ProjectDescription,
-                    StartDateTime = p.StartDateTime,
-                    EndDateTime = p.EndDateTime,
-                }).ToList();
+                var projects = _context.Projects
+                    .Include(p=>p.Users)
+                    .Select(p => new ProjectReadDto
+                    {
+                        Id = p.Id,
+                        Name = p.ProjectName,
+                        Description = p.ProjectDescription,
+                        StartDate = p.StartDateTime,
+                        EndDate = p.EndDateTime,
+                        UsersCount = p.Users.Count(),
+                        UsersSample = p.Users.Take(3).Select(u => new ProjecUserShortDto
+                        (
+                            u.Id,
+                            u.ProfilePicture            
+                        )).ToList(),
+                    }).ToList();
 
                 return Ok(projects);
             }
 
             
             [HttpGet("{id}")]
-            public ActionResult<ProjectReadDto> GetProject(int id)
+            public async Task<ActionResult<ProjectDetailsReadDto>> GetProject(int id)
             {
-                var project = _context.Projects.Find(id);
+                var project = await _context.Projects
+                    .Include(p=>p.Users)
+                    .Select(p=>new ProjectDetailsReadDto()
+                    {
+                        Id = p.Id,
+                        Name = p.ProjectName,
+                        Description = p.ProjectDescription,
+                        StartDate = p.StartDateTime,
+                        EndDate = p.EndDateTime,
+                        UsersCount = p.Users.Count(),
+                        Users = p.Users.Select(u=>new ProjecUserLongDto
+                        (
+                           u.Id,
+                           u.DisplayName,
+                           u.Handler,
+                           u.ProfilePicture
+                        )).ToList()               
+                    })
+                    .FirstOrDefaultAsync(u=>u.Id == id);
 
-                if (project == null)
+                if (project is null)
                 {
                     return NotFound();
                 }
 
-                var projectDto = new ProjectReadDto
-                {
-                    Id = project.Id,
-                    ProjectName = project.ProjectName,
-                    ProjectDescription = project.ProjectDescription,
-                    StartDateTime = project.StartDateTime,
-                    EndDateTime = project.EndDateTime,
-                };
 
-                return Ok(projectDto);
+                return Ok(project);
             }
 
             

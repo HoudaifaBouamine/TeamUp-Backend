@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Bogus;
 using Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Serilog;
 
 namespace EndpointsManager
 {
@@ -98,6 +93,8 @@ namespace EndpointsManager
                     {
                         p.Users.Add(users.ElementAt(rand.Next(users.Count())));
                     }
+
+                    p.ChatRoom = new ChatRoom();
                 }
 
                 await db.Projects.AddRangeAsync(projects);

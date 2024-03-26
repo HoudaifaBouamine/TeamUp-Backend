@@ -1,8 +1,6 @@
 namespace Users;
 
-partial class UserEndpoints
-{
-    record GetUsersListResponse(
+record GetUsersListResponse(
         int TotalCount,
         int PageNumber,int PageSize,
         bool IsPrevPageExist,
@@ -36,5 +34,3 @@ partial class UserEndpoints
         string Handler,
         string? FullAddress,
         string? ProfilePicture);
-}
-
