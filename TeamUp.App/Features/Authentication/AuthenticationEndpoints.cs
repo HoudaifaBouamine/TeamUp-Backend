@@ -1,4 +1,4 @@
-using Authentication.CustomIdentityApi.V2;
+using Authentication.IdentityApi;
 using Authentication.Oauth.Google;
 using Carter;
 using Configuration;
@@ -19,11 +19,6 @@ public class AuthenticationEndpoints : ICarterModule
     {
         var authGroup = app.MapGroup("/auth")
                 .WithTags("Auth Group");
-
-        authGroup.MapIdentityApiV2<User>()
-            .HasApiVersion(2)
-            .RequireRateLimiting(RateLimiterConfig.Policy.Fixed)
-            .WithOpenApi();
 
         authGroup.MapPost("/google",async ([FromBody] GoogleLoginDto model ,[FromServices] IServiceProvider sp,[FromServices] AppDbContext db,[FromServices] IOptions<GoogleAuthConfig> authConfigOptions)=>
         {

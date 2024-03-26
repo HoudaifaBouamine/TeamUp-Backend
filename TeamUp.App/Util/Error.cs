@@ -1,3 +1,3 @@
-﻿namespace TeamUp_Backend;
+﻿namespace Utils;
 
 public record ErrorResponse(string Error);

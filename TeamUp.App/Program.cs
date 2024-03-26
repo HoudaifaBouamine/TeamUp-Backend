@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Authentication.Oauth.Google;
@@ -8,20 +6,13 @@ using Carter;
 using Configuration;
 using EmailServices;
 using EndpointsManager;
-using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Core;
 using Swashbuckle.AspNetCore.Filters;
-using Bogus;
 using Models;
-using TeamUp_Backend;
+using Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

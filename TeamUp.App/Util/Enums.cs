@@ -1,15 +1,14 @@
-namespace Enums
+namespace Enums;
+public enum RequestExecution
 {
-    public enum RequestExecution
-    {
-        Successful = 1,
-        Failed,
-        Error 
-    }
-
-    public enum LoginProvider
-    {
-        Google = 1,
-        Facebook
-    }
+    Successful = 1,
+    Failed,
+    Error 
 }
+
+public enum LoginProvider
+{
+    Google = 1,
+    Facebook
+}
+

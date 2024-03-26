@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>TeamUp_Backend</RootNamespace>
+    <RootNamespace>TeamUp</RootNamespace>
     <UserSecretsId>594e150a-f9ae-4a8e-8d5c-af1b3191a4a7</UserSecretsId>
   </PropertyGroup>
 

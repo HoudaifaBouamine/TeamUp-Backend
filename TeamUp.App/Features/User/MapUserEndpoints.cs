@@ -18,7 +18,7 @@ public partial class UserEndpoints : ICarterModule
         usersGroup.MapGet("/",GetUsers)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        usersGroup.MapGet("/by",GetUser);
+        usersGroup.MapGet("/{Id}",GetUser);
 
         usersGroup.MapPut("/",UpdateUser)
             .Produces(StatusCodes.Status500InternalServerError)

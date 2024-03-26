@@ -1,12 +1,9 @@
 ﻿using System.Security.Claims;
-using AutoMapper;
-using Carter;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Models;
-using TeamUp_Backend;
+using Utils;
 
 namespace Users;
 
