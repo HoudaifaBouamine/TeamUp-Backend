@@ -37,104 +37,95 @@ public class CreateUserFromSocialLogin
     public string LoginProviderSubject { get; set; } = null!;
 }
 
-    public static class CreateUserFromSocialLoginExtension
+public static class CreateUserFromSocialLoginExtension
 {
-    /// <summary>
-    /// Creates user from social login
-    /// </summary>
-    /// <param name="userManager">the usermanager</param>
-    /// <param name="context">the context</param>
-    /// <param name="model">the model</param>
-    /// <param name="loginProvider">the login provider</param>
-    /// <returns>System.Threading.Tasks.Task&lt;User&gt;</returns>
-
     
-        public static async Task<User?> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
+    public static async Task<User?> CreateUserFromSocialLogin(this UserManager<User> userManager, AppDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
+    {
+        //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
+        var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
+
+        if (user is not null)
+            return user; //USER ALREADY EXISTS.
+
+        user = await userManager.FindByEmailAsync(model.Email);
+
+        if (user is null)
         {
-            //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
-            var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
-
-            if (user is not null)
-                return user; //USER ALREADY EXISTS.
-
-            user = await userManager.FindByEmailAsync(model.Email);
-
-            if (user is null)
+            user = new User
             {
-                user = new User
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    ProfilePicture = model.ProfilePicture,
-                };
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                UserName = model.Email,
+                ProfilePicture = model.ProfilePicture,
+            };
+            
+            if(user.FirstName is null && user.LastName is null)
+                user.DisplayName = user.Email.Split("@")[0];
+            else
+                user.DisplayName = user.GetFullName().Trim();
+
+            var wow = await userManager.CreateAsync(user);
+            if(wow.Succeeded)
+            {
+                //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER
+                user.EmailConfirmed = true;
+
+                var idResult = await userManager.UpdateAsync(user);
                 
-                if(user.FirstName is null && user.LastName is null)
-                    user.DisplayName = user.Email.Split("@")[0];
-                else
-                    user.DisplayName = user.GetFullName().Trim();
-
-                var wow = await userManager.CreateAsync(user);
-                if(wow.Succeeded)
+                if(idResult.Succeeded)
                 {
-                    //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER
-                    user.EmailConfirmed = true;
-
-                    var idResult = await userManager.UpdateAsync(user);
-                    
-                    if(idResult.Succeeded)
-                    {
-                        await context.SaveChangesAsync();
-
-                    }
-                    else
-                    {
-                        Log.Error(" --> Error : " + wow.Errors.First().Description);
-                        return null;
-                    }
-                    
+                    await context.SaveChangesAsync();
 
                 }
                 else
                 {
-
                     Log.Error(" --> Error : " + wow.Errors.First().Description);
                     return null;
                 }
+                
+
             }
-
-            UserLoginInfo? userLoginInfo = null;
-            switch (loginProvider)
-            {
-                case LoginProvider.Google:
-                    {
-                        userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
-                    }
-                    break;
-                // case LoginProvider.Facebook:
-                //     {
-                //         userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
-                //     }
-                //     break;
-                default:
-                    {
-                        return null;
-                    }
-            }
-
-            //ADDS THE USER TO AN IDENTITY PROVIDER
-            var result = await userManager.AddLoginAsync(user, userLoginInfo);
-
-            if (result.Succeeded)
-                return user;
-
             else
             {
-                Log.Error(" ---> Error : " + result.Errors.First());
+
+                Log.Error(" --> Error : " + wow.Errors.First().Description);
                 return null;
             }
         }
+
+        UserLoginInfo? userLoginInfo = null;
+        switch (loginProvider)
+        {
+            case LoginProvider.Google:
+                {
+                    userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+                }
+                break;
+            // case LoginProvider.Facebook:
+            //     {
+            //         userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+            //     }
+            //     break;
+            default:
+                {
+                    return null;
+                }
+        }
+
+        //ADDS THE USER TO AN IDENTITY PROVIDER
+        var result = await userManager.AddLoginAsync(user, userLoginInfo);
+
+        if (result.Succeeded)
+            return user;
+
+        else
+        {
+            Log.Error(" ---> Error : " + result.Errors.First());
+            return null;
+        }
+    }
     
     
 }

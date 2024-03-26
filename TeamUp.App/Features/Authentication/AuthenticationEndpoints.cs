@@ -20,51 +20,6 @@ public class AuthenticationEndpoints : ICarterModule
         var authGroup = app.MapGroup("/auth")
                 .WithTags("Auth Group");
 
-        authGroup.MapPost("/google",async ([FromBody] GoogleLoginDto model ,[FromServices] IServiceProvider sp,[FromServices] AppDbContext db,[FromServices] IOptions<GoogleAuthConfig> authConfigOptions)=>
-        {
-
-            var userManager = sp.GetRequiredService<UserManager<User>>();
-            var signInManager = sp.GetRequiredService<SignInManager<User>>();
-            var authConfig = authConfigOptions.Value;
-            Payload payload = new();
-
-                try
-                {
-                    payload = await ValidateAsync(model.IdToken, new ValidationSettings
-                    {
-                        Audience =[authConfig.AndroidClientId,"407408718192.apps.googleusercontent.com" ]
-                    });
-
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(" --> Error : " + ex.Message);
-
-                }
-
-                var userToBeCreated = new CreateUserFromSocialLogin
-                {
-                    FirstName = payload.GivenName,
-                    LastName = payload.FamilyName,
-                    Email = payload.Email,
-                    ProfilePicture = payload.Picture,
-                    LoginProviderSubject = payload.Subject,
-                };
-                
-            var user = await userManager.CreateUserFromSocialLogin(db, userToBeCreated, LoginProvider.Google);
-
-                if (user is not null)
-                {
-                    await signInManager.ExternalLoginSignInAsync(LoginProvider.Google.GetDisplayName(),payload.Subject,true);
-                    return Results.Ok();
-
-                }
-                else
-                    return Results.BadRequest(new {Error = "Unable to link a Local User to a Provider"});
-            
-            
-        });
-
     }
 }
 }

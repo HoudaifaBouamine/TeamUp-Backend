@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Models;
 using Serilog;
-namespace Authentication.IdentityApi;
+using Utils;
 
+namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
-
-    public async Task<Results<Ok, ValidationProblem,BadRequest<object>>> Register
+    public async Task<Results<Ok, ValidationProblem,BadRequest<ErrorResponse>>> Register
         ([FromBody] UserRegisterDto registration,
         HttpContext context,
         [FromServices] IServiceProvider sp,
@@ -53,7 +52,7 @@ partial class AuthEndpoints
         else
         {
             Log.Debug($" --> : Cannot send confirmation email to {user.Email}");
-            return TypedResults.BadRequest((object)new {Error = $"Cannot send confirmation email to {user.Email}"});
+            return TypedResults.BadRequest(new ErrorResponse($"Cannot send confirmation email to {user.Email}"));
         }
     }
 
