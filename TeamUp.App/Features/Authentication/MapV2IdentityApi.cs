@@ -341,7 +341,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             User userModel = db.Users.First(u=>u.Email == email);
         
             userModel.EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
-            var code = userModel.EmailVerificationCode.Code;
+            string code = userModel.EmailVerificationCode.Code!;
         
             await db.SaveChangesAsync();
             return await emailSender.SendConfirmationCodeAsync(userModel, email, code);
@@ -352,7 +352,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             User userModel = db.Users.First(u=>u.Email == email);
    
             userModel.PasswordRestCode = VerificationCode.CreatePasswordResetCode();
-            var code = userModel.PasswordRestCode.Code;
+            string code = userModel.PasswordRestCode.Code!;
         
             await db.SaveChangesAsync();
             return await emailSender.SendPasswordResetCodeAsync(userModel, email, code);

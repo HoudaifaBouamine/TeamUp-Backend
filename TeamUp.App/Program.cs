@@ -126,6 +126,7 @@ builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("A
 
 var app = builder.Build();
 
+// Handmade Global logging
 app.Use((ctx,next)=>
 {
 
@@ -145,6 +146,7 @@ app.Use((ctx,next)=>
 
 });
 
+// Handmade Global Error Handling
 app.Use(async (ctx,next)=>
 {
     try{
@@ -168,28 +170,6 @@ app.MapAppEndpoints();
 app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
-
-app.MapGet("/generate-fake-data",async (AppDbContext db,UserManager<User> userManager)=>
-{
-    var usersFaker = new Faker<User>()
-    .RuleFor(u=>u.FirstName,
-        (f,u)=>f.Name.FirstName())
-    .RuleFor(u=>u.LastName,
-        (f,u)=>f.Name.LastName())
-    .RuleFor(u=>u.DisplayName,
-        (f,u)=>f.Internet.UserName(u.FirstName,u.LastName))
-    .RuleFor(u=>u.Email, 
-        (f,u)=>f.Internet.Email(u.FirstName,u.LastName))
-    .RuleFor(u=>u.EmailConfirmed,(f,u)=>f.Random.Bool())
-    .RuleFor(u=>u.FullAddress,(f,u)=>f.Address.FullAddress())
-    .RuleFor(u=>u.PasswordHash,f=>f.Internet.Password())
-    .RuleFor(u=>u.Handler,(f,u)=>$"{f.Name.JobTitle()} @{f.Company.CompanyName()}");
-
-    var users = usersFaker.Generate(100);
-
-    await db.Users.AddRangeAsync(users);
-    await db.SaveChangesAsync();
-});
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);

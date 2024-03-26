@@ -7,7 +7,11 @@
     using TeamUp_Backend.Features.Project;
     using Models;
     using Asp.Versioning;
+    using Microsoft.AspNetCore.Authorization;
+    using System.Security.Claims;
+    using Authentication.UserManager;
 
+    [Tags("Projects Group")]
         [ApiVersion(1)]
         [Route("api/v{v:apiVersion}/[controller]")]
         [ApiController]
@@ -21,16 +25,15 @@
             }
             
             [HttpGet]
-            public ActionResult<IEnumerable<ProjectDto>> GetProjects()    
+            public ActionResult<IEnumerable<ProjectReadDto>> GetProjects()    
             {
-                var projects = _context.Projects.Select(p => new ProjectDto
+                var projects = _context.Projects.Select(p => new ProjectReadDto
                 {
                     Id = p.Id,
                     ProjectName = p.ProjectName,
                     ProjectDescription = p.ProjectDescription,
                     StartDateTime = p.StartDateTime,
                     EndDateTime = p.EndDateTime,
-                    ChatRoomId = p.ChatRoom
                 }).ToList();
 
                 return Ok(projects);
@@ -38,7 +41,7 @@
 
             
             [HttpGet("{id}")]
-            public ActionResult<ProjectDto> GetProject(int id)
+            public ActionResult<ProjectReadDto> GetProject(int id)
             {
                 var project = _context.Projects.Find(id);
 
@@ -47,14 +50,13 @@
                     return NotFound();
                 }
 
-                var projectDto = new ProjectDto
+                var projectDto = new ProjectReadDto
                 {
                     Id = project.Id,
                     ProjectName = project.ProjectName,
                     ProjectDescription = project.ProjectDescription,
                     StartDateTime = project.StartDateTime,
                     EndDateTime = project.EndDateTime,
-                    ChatRoomId = project.ChatRoom
                 };
 
                 return Ok(projectDto);
@@ -62,15 +64,25 @@
 
             
             [HttpPost]
-            public ActionResult<ProjectDto> CreateProject(ProjectDto projectDto)
+            [Authorize]
+            public async Task<ActionResult<ProjectCreateDto>> CreateProject(
+                [FromBody] ProjectCreateDto projectDto,
+                [FromServices] CustomUserManager userManager)
             {
+                User? user = await userManager.GetUserAsync(User); // the variable User declared in the controller base class
+                
+                if(user is null) return NotFound(new ErrorResponse("User not found, this should not happen (Contact the backend developer to fix the bag)"));
+
+                if(! user.EmailConfirmed) return BadRequest(new ErrorResponse("To create a project, your email must be verified"));
+
                 var project = new Project
                 {
                     ProjectName = projectDto.ProjectName,
                     ProjectDescription = projectDto.ProjectDescription,
                     StartDateTime = projectDto.StartDateTime,
-                    EndDateTime = projectDto.EndDateTime,
-                    ChatRoom = projectDto.ChatRoomId
+                    EndDateTime = null,
+                    ChatRoom = new ChatRoom(),
+                    Users = [user]
                 };
 
                 _context.Projects.Add(project);
@@ -80,24 +92,16 @@
             }
 
             [HttpPut("{id}")]
-            public IActionResult UpdateProject(int id, ProjectDto projectDto)
+            public IActionResult UpdateProject(int id, ProjectCreateDto projectDto)
             {
-                if (id != projectDto.Id)
-                {
-                    return BadRequest();
-                }
 
                 var project = _context.Projects.Find(id);
-                if (project == null)
-                {
-                    return NotFound();
-                }
+
+                if (project is null) return NotFound();
 
                 project.ProjectName = projectDto.ProjectName;
                 project.ProjectDescription = projectDto.ProjectDescription;
                 project.StartDateTime = projectDto.StartDateTime;
-                project.EndDateTime = projectDto.EndDateTime;
-                project.ChatRoom = projectDto.ChatRoomId;
 
                 _context.SaveChanges();
 
@@ -109,10 +113,8 @@
             public IActionResult DeleteProject(int id)
             {
                 var project = _context.Projects.Find(id);
-                if (project == null)
-                {
-                    return NotFound();
-                }
+
+                if (project is null) return NotFound();
 
                 _context.Projects.Remove(project);
                 _context.SaveChanges();

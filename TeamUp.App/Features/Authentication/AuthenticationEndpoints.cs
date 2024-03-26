@@ -18,7 +18,7 @@ public class AuthenticationEndpoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var authGroup = app.MapGroup("/auth")
-                .WithTags("auth");
+                .WithTags("Auth Group");
 
         authGroup.MapIdentityApiV2<User>()
             .HasApiVersion(2)

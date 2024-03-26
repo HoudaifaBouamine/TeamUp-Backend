@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity ; 
 
 
-namespace Models {
+namespace Models;
 
-
-[Table("UsersAccessCategory")]
+// This is the join table between Users & Projects table, allowing to perform M-TO-M relationship
+// [Table("UsersProjects")] NOTE : The default name of the table will be the same name of the declared collection on the AppDbContext, if the table and collection names are the same, no need for addional information
 public class UsersProject
 {
     public int Id { get; set; }
-    public required User UserId { get; set; }
-    public required Category CategoryId { get; set; }
-
+    public User User { get; set; } = null!;
+    public Project Project { get; set; } = null!;
+    public bool IsMentor { get; set; }
 }
 
-}
 

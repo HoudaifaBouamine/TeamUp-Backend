@@ -27,6 +27,8 @@ namespace EndpointsManager
 
                         options.SwaggerEndpoint(url,name);
                     }
+
+                    options.EnableFilter("Group");
                 });
             }
         }

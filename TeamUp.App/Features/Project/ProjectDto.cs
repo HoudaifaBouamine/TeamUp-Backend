@@ -3,14 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeamUp_Backend.Features.Project
 {
-    public class ProjectDto
+    public class ProjectCreateDto
+    {
+        public string ProjectName { get; set; } = string.Empty;
+        public string ProjectDescription { get; set; } = string.Empty;
+        public DateOnly StartDateTime { get; set; }
+    }
+
+    public class ProjectReadDto
     {
         public int Id { get; set; }
         public string ProjectName { get; set; } = string.Empty;
         public string ProjectDescription { get; set; } = string.Empty;
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
-        public required ChatRoom ChatRoomId { get; set; }
+        public DateOnly StartDateTime { get; set; }
+        public DateOnly? EndDateTime { get; set; } = null;
     }
 
 }

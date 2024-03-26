@@ -7,13 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace Models {
+namespace Models;
 
 
 
 
 
-public class User : IdentityUser
+public partial class User : IdentityUser
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -23,7 +23,17 @@ public class User : IdentityUser
     public VerificationCode? PasswordRestCode { get; set; }
     public float Rate { get; set; } = MaxRate;
     public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
-    public string? FullAddress { get; set; } = null!;
+    public string? FullAddress { get; set; }
+
+    // Project have many users, users have many projects, so we declare a list of users in project, and list of projects in user
+    public List<Project> Projects { get; set; } = [];
+    public List<UsersProject> UsersProjects { get; set; } = [];
+}
+
+
+// Seperating Fields and Methods to 2 classes to simplify the work
+partial class User
+{
 
     const int MaxRate = 5;
 
@@ -52,4 +62,3 @@ public class User : IdentityUser
     }
 }
 
-};

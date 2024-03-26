@@ -9,7 +9,7 @@ public partial class UserEndpoints : ICarterModule
     {
         var usersGroup = app
             .MapGroup("/users")
-            .WithTags("Users")
+            .WithTags("Users Group")
             .HasApiVersion(1)
             .RequireRateLimiting(RateLimiterConfig.Policy.Fixed)
             .WithSummary("In development")
