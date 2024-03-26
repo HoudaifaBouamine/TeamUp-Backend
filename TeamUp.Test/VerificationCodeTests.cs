@@ -87,6 +87,8 @@ System.Console.WriteLine("wow");
 
             // Assert
             Assert.False(isValid);
+
+            System.Console.WriteLine("\n\n Success");
         }
     }
 }

@@ -23,6 +23,39 @@ public class AppDbContext : IdentityDbContext<User>
             .WithOne(ch => ch.Project)
             .HasForeignKey<Project>("ChatRoom_Id");
 
+        // builder.Entity<User>()
+        //     .HasMany(u=>u.Projects)
+        //     .WithMany(p=>p.Users)
+        //     .UsingEntity<UsersProject>(
+        //             l => l.HasOne<Project>().WithMany(p=>p.ProjectsUsers),
+        //             r => r.HasOne<User>().WithMany(u=>u.UsersProjects)
+        //         );
+
+
+        builder.Entity<UsersProject>()
+            .HasOne(up => up.User)
+            .WithMany(u => u.UsersProjects)
+            .HasForeignKey(up => up.UserId);
+
+        builder.Entity<UsersProject>()
+            .HasOne(up => up.Project)
+            .WithMany(p => p.ProjectsUsers)
+            .HasForeignKey(up => up.ProjectId);
+
+        builder.Entity<User>()
+            .HasMany(u => u.Projects)
+            .WithMany(p => p.Users)
+            .UsingEntity<UsersProject>(
+                j => j
+                    .HasOne(up => up.Project)
+                    .WithMany(p => p.ProjectsUsers)
+                    .HasForeignKey(up => up.ProjectId),
+                j => j
+                    .HasOne(up => up.User)
+                    .WithMany(u => u.UsersProjects)
+                    .HasForeignKey(up => up.UserId)
+            );
+
         base.OnModelCreating(builder);
     }
 

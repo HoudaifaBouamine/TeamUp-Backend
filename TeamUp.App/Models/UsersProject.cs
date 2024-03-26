@@ -14,10 +14,13 @@ namespace Models;
 // [Table("UsersProjects")] NOTE : The default name of the table will be the same name of the declared collection on the AppDbContext, if the table and collection names are the same, no need for addional information
 public class UsersProject
 {
+    [Key]
     public int Id { get; set; }
     public User User { get; set; } = null!;
     public Project Project { get; set; } = null!;
-    public bool IsMentor { get; set; }
+    public string UserId { get; set; } = null!;
+    public int ProjectId { get; set; }
+    public bool IsMentor { get; set; } = false;
 }
 
 

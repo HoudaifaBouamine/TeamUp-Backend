@@ -84,7 +84,11 @@
                     ChatRoom = new ChatRoom(),
                     Users = [user]
                 };
-
+                project.ProjectsUsers.Add(new UsersProject()
+                {
+                    User = user,
+                    IsMentor = true
+                });
                 _context.Projects.Add(project);
                 _context.SaveChanges();
 

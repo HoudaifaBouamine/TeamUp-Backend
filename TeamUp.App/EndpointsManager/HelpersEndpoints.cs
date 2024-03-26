@@ -65,6 +65,42 @@ namespace EndpointsManager
 
                 var users = usersFaker.Generate(100);
 
+                var projectFaker = new Faker<Project>()
+                .RuleFor(p=>p.ProjectName, (f,p)=>f.Company.CompanyName())
+                .RuleFor(p=>p.ProjectDescription, f=>f.Lorem.Paragraphs(2,5))
+                .RuleFor(p=>p.StartDateTime,f=>f.Date.BetweenDateOnly(new DateOnly(2023,5,4),new DateOnly(2025,3,6)))
+                .RuleFor(p=>p.EndDateTime,(f,p)=>{
+                    
+                    if(f.Random.Bool())
+                    {
+                        return f.Date.BetweenDateOnly(p.StartDateTime.AddDays(3),p.StartDateTime.AddDays(70));
+                    }
+                    return null;
+                    });
+
+                var projects = projectFaker.Generate(30);
+
+                var rand = new Random();
+
+                foreach(var p in projects)
+                {
+                    var mentor = users.ElementAt(rand.Next(users.Count()));
+                    p.ProjectsUsers.Add(new UsersProject()
+                    {
+                        User = mentor,
+                        IsMentor = true
+                    });
+                    p.Users.Add(mentor);
+
+                    var usersInProjectCount = rand.Next(5,15);
+
+                    for(int i = 0; i < usersInProjectCount;i++)
+                    {
+                        p.Users.Add(users.ElementAt(rand.Next(users.Count())));
+                    }
+                }
+
+                await db.Projects.AddRangeAsync(projects);
                 await db.Users.AddRangeAsync(users);
                 await db.SaveChangesAsync();
             });
