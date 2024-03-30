@@ -1,151 +1,73 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models;
-using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
-using Authentication.UserManager;
-using Microsoft.EntityFrameworkCore;
+using Features.Projects;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Utils;
 
-namespace Features.Projects;
-
-[Tags("Projects Group")]
-[ApiVersion(1)]
-[Route("api/v{v:apiVersion}/projects")]
-[ApiController]
-public class ProjectsController : ControllerBase
+namespace Features.Projects
 {
-
-    private readonly AppDbContext  _context;
-
-    public ProjectsController(AppDbContext context)
+    [Tags("Projects Group")]
+    [ApiVersion(1)]
+    [Route("api/v{v:apiVersion}/projects")]
+    [ApiController]
+    public class ProjectsController : ControllerBase
     {
-        _context = context;
-    }
-    
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProjectReadDto>>> GetProjects()    
-    {
-        var projects = await _context.Projects
-            .Include(p=>p.Users)
-            .Select(p => new ProjectReadDto
-            {
-                Id = p.Id,
-                Name = p.ProjectName,
-                Description = p.ProjectDescription,
-                StartDate = p.StartDateTime,
-                EndDate = p.EndDateTime,
-                UsersCount = p.Users.Count(),
-                UsersSample = p.Users.Take(3).Select(u => new ProjecUserShortDto
-                (
-                    u.Id,
-                    u.ProfilePicture            
-                )).ToList(),
-            }).ToListAsync();
+        private readonly IProjectRepository _projectRepository;
 
-        return Ok(projects);
-    }
-
-    
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ProjectDetailsReadDto>> GetProject(int id)
-    {
-        var project = await _context.Projects
-            .Include(p=>p.Users)
-            .Include(p=>p.ProjectsUsers)
-            .Select(p=>new ProjectDetailsReadDto()
-            {
-                Id = p.Id,
-                Name = p.ProjectName,
-                Description = p.ProjectDescription,
-                StartDate = p.StartDateTime,
-                EndDate = p.EndDateTime,
-                UsersCount = p.Users.Count(),
-                Users = p.Users.Select(u=>new ProjecUserLongDto
-                (
-                    u.Id,
-                    u.DisplayName,
-                    u.Handler,
-                    u.ProfilePicture,
-                    p.ProjectsUsers.First(up=>up.UserId == u.Id).IsMentor
-                )).ToList()               
-            })
-            .FirstOrDefaultAsync(u=>u.Id == id);
-
-        if (project is null)
+        public ProjectsController(IProjectRepository projectRepository)
         {
-            return NotFound();
+            _projectRepository = projectRepository;
         }
 
-
-        return Ok(project);
-    }
-
-    
-    [HttpPost]
-    [Authorize]
-    public async Task<ActionResult<ProjectCreateDto>> CreateProject(
-        [FromBody] ProjectCreateDto projectDto,
-        [FromServices] CustomUserManager userManager)
-    {
-        User? user = await userManager.GetUserAsync(User); // the variable User declared in the controller base class
-        
-        if(user is null) return NotFound(new ErrorResponse("User not found, this should not happen (Contact the backend developer to fix the bag)"));
-
-        if(! user.EmailConfirmed) return BadRequest(new ErrorResponse("To create a project, your email must be verified"));
-
-        var project = new Project
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProjectReadDto>>> GetProjects()
         {
-            ProjectName = projectDto.Name,
-            ProjectDescription = projectDto.Description,
-            StartDateTime = projectDto.StartDate,
-            EndDateTime = null,
-            ChatRoom = new ChatRoom(),
-            Users = [user]
-        };
+            var projects = await _projectRepository.GetAllAsync();
+            return Ok(projects);
+        }
 
-        project.ProjectsUsers.Add(new UsersProject()
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProjectDetailsReadDto>> GetProject(int id)
         {
-            User = user,
-            IsMentor = true
-        });
+            var project = await _projectRepository.GetDetailsAsync(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return Ok(project);
+        }
 
-        _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<ActionResult<ProjectCreateDto>> CreateProject([FromBody] ProjectCreateDto projectDto)
+        {
+            // Validate the projectDto if necessary
+            var projectId = await _projectRepository.CreateAsync(projectDto);
+            return CreatedAtAction(nameof(GetProject), new { id = projectId }, projectDto);
+        }
 
-        return CreatedAtAction(nameof(GetProject), new { id = project.Id }, projectDto);
-    }
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProjectDetailsReadDto>> UpdateProject(int id, [FromBody] ProjectCreateDto projectDto)
+        {
+            // Validate the projectDto if necessary
+            await _projectRepository.UpdateAsync(id, projectDto);
+            var updatedProject = await _projectRepository.GetDetailsAsync(id);
+            if (updatedProject == null)
+            {
+                return NotFound();
+            }
+            return Ok(updatedProject);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ProjectDetailsReadDto>> UpdateProject(int id, ProjectCreateDto projectDto)
-    {
-
-        var project = await _context.Projects.FindAsync(id);
-
-        if (project is null) return NotFound();
-
-        project.ProjectName = projectDto.Name;
-        project.ProjectDescription = projectDto.Description;
-        project.StartDateTime = projectDto.StartDate;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(project);
-    }
-
-    
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProject(int id)
-    {
-        var project = await _context.Projects.FindAsync(id);
-
-        if (project is null) return NotFound();
-
-        _context.Projects.Remove(project);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject(int id)
+        {
+            var existingProject = await _projectRepository.GetByIdAsync(id);
+            if (existingProject == null)
+            {
+                return NotFound();
+            }
+            await _projectRepository.DeleteAsync(id);
+            return NoContent();
+        }
     }
 }
-
-
-
