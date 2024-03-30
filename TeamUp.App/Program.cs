@@ -164,5 +164,3 @@ app.UseSwaggerDocs();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
-
-

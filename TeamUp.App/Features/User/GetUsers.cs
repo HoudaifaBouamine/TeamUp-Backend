@@ -31,6 +31,10 @@ partial class UserEndpoints
             users = users
                 .Skip(PageSize.Value * (PageNumber.Value -1))
                 .Take(PageSize.Value);
+        else if (PageSize is not null)
+            users = users
+                .Take(PageSize.Value);
+
 
         var usersResult = await users
             .Select(u => new UserReadDto(u.Id,u.Email!,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))

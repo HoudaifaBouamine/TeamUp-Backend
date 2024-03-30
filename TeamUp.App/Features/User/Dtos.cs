@@ -1,21 +1,27 @@
 namespace Users;
 
-record GetUsersListResponse(
+    record GetUsersListResponse
+    (
         int TotalCount,
-        int PageNumber,int PageSize,
+        int PageNumber,
+        int PageSize,
         bool IsPrevPageExist,
         bool IsNextPageExist,
-        IEnumerable<UserReadDto> Users);
+        IEnumerable<UserReadDto> Users
+    );
     
-    record UserReadDto(
+    record UserReadDto
+    (
         string Id,
         string Email,
         string DisplayName,
         string Handler,
         float Rate,
-        string? ProfilePicture);
+        string? ProfilePicture
+    );
 
-    record UserReadDetailsDto(
+    record UserReadDetailsDto
+    (
         string Id,
         string Email,
         string? FirstName,
@@ -24,13 +30,15 @@ record GetUsersListResponse(
         string Handler,
         string? FullAddress,
         float Rate,
-        string? ProfilePicture);
+        string? ProfilePicture
+    );
 
-    record UserUpdateRequestDto(
-        // string Id, // Not Id because the endpoint require authenticated user
+    record UserUpdateRequestDto
+    (
         string? FirstName,
         string? LastName,
         string DisplayName,
         string Handler,
         string? FullAddress,
-        string? ProfilePicture);
+        string? ProfilePicture
+    );
