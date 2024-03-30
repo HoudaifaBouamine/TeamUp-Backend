@@ -13,6 +13,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using Models;
 using Utils;
+using Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,6 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
@@ -75,11 +75,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
-// builder.Services.AddAuthentication().AddGoogle(googleOptions =>
-//     {
-//         googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-//         googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-//     });
+builder.Services.AddAuthentication();
+// (options=>
+// {
+//     options.DefaultScheme = "Cookie",
+// });
+builder.Services.AddAuthorization();
 
 builder.Services.AddCarter();
 
@@ -108,6 +109,7 @@ builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();
 builder.Services.AddScoped<GoogleAuthService>();
+builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));
 
 

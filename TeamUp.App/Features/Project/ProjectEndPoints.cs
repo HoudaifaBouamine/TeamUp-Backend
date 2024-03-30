@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models;
-using Asp.Versioning;
-using Microsoft.AspNetCore.Authorization;
-using Authentication.UserManager;
-using Microsoft.EntityFrameworkCore;
+using Features.Projects;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Utils;
+using Asp.Versioning;
+using Repositories;
+using System.Security.Claims;
+using Authentication.UserManager;
+using Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Features.Projects;
 
@@ -14,168 +18,87 @@ namespace Features.Projects;
 [ApiController]
 public class ProjectsController : ControllerBase
 {
+    private readonly IProjectRepository _projectRepository;
 
-    private readonly AppDbContext  _context;
-
-    public ProjectsController(AppDbContext context)
+    public ProjectsController(IProjectRepository projectRepository)
     {
-        _context = context;
+        _projectRepository = projectRepository;
     }
-    
+
     [HttpGet]
     public async Task<ActionResult<GetProjectsListResponse>> GetProjects(
-        [FromQuery] string? SearchPattern,
+        [FromQuery] int? PageSize,
         [FromQuery] int? PageNumber,
-        [FromQuery] int? PageSize)    
+        [FromQuery] string? SearchPattern
+    )
     {
-
-        if(PageSize is null) PageNumber = null;
-
-        IQueryable<Project> projects = _context.Projects;
-
-        if(SearchPattern is not null)
-            projects = projects.Where(p=>
-                p.Description.ToLower().Contains(SearchPattern.ToLower()) ||
-                p.Name.ToLower().Contains(SearchPattern.ToLower()));
-
-        int TotalCount = projects.Count();
-
-        if(PageSize is not null && PageNumber is not null)
-            projects = projects
-                .Skip(PageSize.Value * (PageNumber.Value -1))
-                .Take(PageSize.Value);
-        else if (PageSize is not null)
-            projects = projects
-                .Take(PageSize.Value);
-
-        var projectsDto = await projects
-            .Include(p=>p.Users)
-            .Select(p => new ProjectReadDto
-            (
-                p.Id,
-                p.Name,
-                p.Description,
-                p.StartDate,
-                p.EndDate,
-                p.Users.Count,
-                p.Users.Take(3).Select(u => new ProjecUserShortDto
-                (
-                    u.Id,
-                    u.ProfilePicture            
-                )).ToList()
-            )).ToListAsync();
-
-            return Ok(new GetProjectsListResponse
-            (
-                TotalCount : TotalCount,
-                PageNumber : PageNumber??=1,
-                PageSize : PageSize??=TotalCount,
-                IsPrevPageExist : PageNumber > 1,
-                IsNextPageExist : PageNumber * PageSize < TotalCount, 
-                Projects: projectsDto
-            ));
+        var projects = await _projectRepository.GetAllAsync(PageSize, PageNumber, SearchPattern);
+        return Ok(projects);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectDetailsReadDto>> GetProject(int id)
     {
-        var project = await _context.Projects
-            .Include(p=>p.Users)
-            .Include(p=>p.ProjectsUsers)
-            .Select(p=>new ProjectDetailsReadDto
-            (
-                p.Id,
-                p.Name,
-                p.Description,
-                p.StartDate,
-                p.EndDate,
-                p.Users.Count(),
-                p.Users.Select(u=>new ProjecUserLongDto
-                (
-                    u.Id,
-                    u.DisplayName,
-                    u.Handler,
-                    u.ProfilePicture,
-                    p.ProjectsUsers.First(up=>up.UserId == u.Id).IsMentor
-                )).ToList()               
-            ))
-            .FirstOrDefaultAsync(u=>u.Id == id);
-
-        if (project is null)
+        var project = await _projectRepository.GetDetailsAsync(id);
+        if (project == null)
         {
             return NotFound();
         }
-
-
         return Ok(project);
     }
 
-    
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<ProjectCreateDto>> CreateProject(
+    public async Task<ActionResult<ProjectReadDto>> CreateProject(
         [FromBody] ProjectCreateDto projectDto,
-        [FromServices] CustomUserManager userManager)
-    {
-        User? user = await userManager.GetUserAsync(User); // the variable User declared in the controller base class
+        [FromServices] CustomUserManager userManager
+    )
+    {   
+        User? user = await userManager.GetUserAsync(User);
         
-        if(user is null) return NotFound(new ErrorResponse("User not found, this should not happen (Contact the backend developer to fix the bag)"));
+        if(user is null) 
+            return BadRequest(new ErrorResponse("User account does not exist any more"));
 
-        if(! user.EmailConfirmed) return BadRequest(new ErrorResponse("To create a project, your email must be verified"));
+        if (user.EmailConfirmed is false) 
+            return BadRequest(new ErrorResponse("User email is not confirmed"));
 
-        var project = new Project
-        {
-            Name = projectDto.Name,
-            Description = projectDto.Description,
-            StartDate = projectDto.StartDate,
-            EndDate = null,
-            ChatRoom = new ChatRoom(),
-            Users = [user]
-        };
-
-        project.ProjectsUsers.Add(new UsersProject()
-        {
-            User = user,
-            IsMentor = true
-        });
-
-        _context.Projects.Add(project);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetProject), new { id = project.Id }, projectDto);
+        var projectId = await _projectRepository.CreateAsync(projectDto,user);
+        var projectReadDto = new ProjectReadDto
+        (
+            Id : projectId,
+            Name: projectDto.Name,
+            Description: projectDto.Description,
+            StartDate: projectDto.StartDate,
+            null,
+            1,
+            [new ProjecUserShortDto(user.Id, user.ProfilePicture)]
+        );
+        return CreatedAtAction(nameof(GetProject), new { id = projectId }, projectReadDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ProjectDetailsReadDto>> UpdateProject(int id, ProjectCreateDto projectDto)
+    public async Task<ActionResult<ProjectDetailsReadDto>> UpdateProject(int id, [FromBody] ProjectCreateDto projectDto)
     {
-
-        var project = await _context.Projects.FindAsync(id);
-
-        if (project is null) return NotFound();
-
-        project.Name = projectDto.Name;
-        project.Description = projectDto.Description;
-        project.StartDate = projectDto.StartDate;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(project);
+        // Validate the projectDto if necessary
+        await _projectRepository.UpdateAsync(id, projectDto);
+        var updatedProject = await _projectRepository.GetDetailsAsync(id);
+        if (updatedProject == null)
+        {
+            return NotFound();
+        }
+        return Ok(updatedProject);
     }
 
-    
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProject(int id)
     {
-        var project = await _context.Projects.FindAsync(id);
-
-        if (project is null) return NotFound();
-
-        _context.Projects.Remove(project);
-        await _context.SaveChangesAsync();
-
+        var existingProject = await _projectRepository.GetByIdAsync(id);
+        if (existingProject == null)
+        {
+            return NotFound();
+        }
+        await _projectRepository.DeleteAsync(id);
         return NoContent();
     }
 }
-
-
 

@@ -11,8 +11,8 @@ using Models;
 using Serilog;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 
-namespace Authentication
-{
+namespace Authentication;
+
 public class AuthenticationEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -21,5 +21,4 @@ public class AuthenticationEndpoints : ICarterModule
                 .WithTags("Auth Group");
 
     }
-}
 }
