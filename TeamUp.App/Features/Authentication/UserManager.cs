@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Models;
+
 namespace Authentication.UserManager;
 
 public class CustomUserManager(
@@ -24,6 +25,7 @@ public class CustomUserManager(
         services, 
         logger)
 {
+
     public override Task<bool> VerifyUserTokenAsync(User user, string tokenProvider, string purpose, string code)
     {
         ThrowIfDisposed();

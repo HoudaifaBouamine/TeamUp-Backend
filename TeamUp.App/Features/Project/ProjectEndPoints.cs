@@ -26,13 +26,18 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<GetProjectsListResponse>> GetProjects(
+    [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(GetProjectsListResponse))]
+    public async Task<IActionResult> 
+        GetProjectsAsync(
         [FromQuery] int? PageSize,
         [FromQuery] int? PageNumber,
-        [FromQuery] string? SearchPattern
-    )
+        [FromQuery] string? SearchPattern)
     {
-        var projects = await _projectRepository.GetAllAsync(PageSize, PageNumber, SearchPattern);
+        var projects = await _projectRepository.GetAllAsync(
+            PageSize,
+            PageNumber, 
+            SearchPattern);
+
         return Ok(projects);
     }
 
@@ -49,7 +54,9 @@ public class ProjectsController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<ProjectReadDto>> CreateProject(
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest,Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> CreateProjectAsync(
         [FromBody] ProjectCreateDto projectDto,
         [FromServices] CustomUserManager userManager
     )
@@ -59,9 +66,8 @@ public class ProjectsController : ControllerBase
         if(user is null) 
             return BadRequest(new ErrorResponse("User account does not exist any more"));
 
-        if (user.EmailConfirmed is false) 
+        if (user.EmailConfirmed is false)
             return BadRequest(new ErrorResponse("User email is not confirmed"));
-
         var projectId = await _projectRepository.CreateAsync(projectDto,user);
         var projectReadDto = new ProjectReadDto
         (
