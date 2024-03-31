@@ -71,7 +71,6 @@ public class VerificationCodeTests
         // Act
         var isValid = verificationCode.IsValid("123456");
 
-System.Console.WriteLine("wow");
         // Assert
         Assert.True(isValid);
     }
@@ -87,8 +86,6 @@ System.Console.WriteLine("wow");
 
         // Assert
         Assert.False(isValid);
-
-        System.Console.WriteLine("\n\n Success");
     }
 }
 

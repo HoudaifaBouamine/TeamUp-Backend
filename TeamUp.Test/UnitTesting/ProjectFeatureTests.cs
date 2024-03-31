@@ -57,7 +57,7 @@ public class ProjectControllerTests
 
         var store = new Mock<IUserStore<User>>();
         // var userManagerMock = new UserManagerMock(store.Object);
-        var userManagerMock = new Mock<CustomUserManager>(store.Object, null, null, null, null, null, null, null, null);
+        var userManagerMock = new Mock<CustomUserManager>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
         userManagerMock.Setup(um=>um.GetUserAsync(
             It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(new User
@@ -100,7 +100,7 @@ public class ProjectControllerTests
 
         var store = new Mock<IUserStore<User>>();
         // var userManagerMock = new UserManagerMock(store.Object);
-        var userManagerMock = new Mock<CustomUserManager>(store.Object, null, null, null, null, null, null, null, null);
+        var userManagerMock = new Mock<CustomUserManager>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
         userManagerMock.Setup(um=>um.GetUserAsync(
             It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync(new User
@@ -143,7 +143,7 @@ public class ProjectControllerTests
 
         var store = new Mock<IUserStore<User>>();
         // var userManagerMock = new UserManagerMock(store.Object);
-        var userManagerMock = new Mock<CustomUserManager>(store.Object, null, null, null, null, null, null, null, null);
+        var userManagerMock = new Mock<CustomUserManager>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
         userManagerMock.Setup(um=>um.GetUserAsync(
             It.IsAny<ClaimsPrincipal>()))
                 .ReturnsAsync((User?)null);

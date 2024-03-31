@@ -7,10 +7,7 @@ using Carter;
 namespace Authentication.IdentityApi;
 
 public partial class AuthEndpoints(
-    TimeProvider timeProvider,
-    IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
-    IEmailSenderCustome emailSender,
-    LinkGenerator linkGenerator
+    IEmailSenderCustome emailSender
     ) : ICarterModule 
 {
 
@@ -19,7 +16,7 @@ public partial class AuthEndpoints(
 
         var routeGroup = app.MapGroup("auth").WithTags("Auth Group");
 
-        routeGroup.MapPost("/register", Register)
+        routeGroup.MapPost("/register", RegisterAsync)
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
 
@@ -62,16 +59,21 @@ public partial class AuthEndpoints(
         .WithOpenApi()
         .Produces(StatusCodes.Status500InternalServerError);
 
+        routeGroup.MapPost("/exchangeResetCodeForToken", GetResetPasswordToken)
+        .HasApiVersion(3)
+        .WithSummary("D")
+        .WithOpenApi();
+        
+        routeGroup.MapPost("/resetPassword", ResetPasswordByToken)
+        .HasApiVersion(3)
+        .WithSummary("D")
+        .WithOpenApi();
+
     }
 
 
     // Validate the email address using DataAnnotations like the UserValidator does when RequireUniqueEmail = true.
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
-    TimeProvider timeProvider = timeProvider;
-    IOptionsMonitor<BearerTokenOptions> bearerTokenOptions = bearerTokenOptions;
     IEmailSenderCustome emailSender = emailSender;
-    LinkGenerator linkGenerator = linkGenerator;
     string? confirmEmailEndpointName = null;
-
-
 }

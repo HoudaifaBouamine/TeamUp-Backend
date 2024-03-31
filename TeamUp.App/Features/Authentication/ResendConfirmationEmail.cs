@@ -1,3 +1,4 @@
+using Authentication.UserManager;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -8,17 +9,15 @@ partial class AuthEndpoints
 {
     async Task<Results<Ok,StatusCodeHttpResult>> ResendConfirmationEmail
         ([FromBody] ResendConfirmationEmailRequest resendRequest,
-        HttpContext context,
-        [FromServices] IServiceProvider sp,
-        [FromServices] AppDbContext db)
+        [FromServices] CustomUserManager userManager)
+
     {
-        var userManager = sp.GetRequiredService<UserManager<User>>();
         if (await userManager.FindByEmailAsync(resendRequest.Email) is not { } user)
         {
             return TypedResults.Ok();
         }
 
-        var success = await SendEmailConfirmationCodeEmailAsync(db,resendRequest.Email,VerificationCode.VerificationCodeTypes.EmailVerification);
+        var success = await SendEmailConfirmationCodeEmailAsync(userManager,resendRequest.Email,VerificationCode.VerificationCodeTypes.EmailVerification);
         
         if(success)
             return TypedResults.Ok();

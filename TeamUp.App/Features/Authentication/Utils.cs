@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Authentication.UserManager;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
@@ -10,14 +11,15 @@ namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
 
-    async Task<bool> SendEmailConfirmationCodeEmailAsync(AppDbContext db, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
+    async Task<bool> SendEmailConfirmationCodeEmailAsync(CustomUserManager userManager, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
     {
-        User userModel = db.Users.First(u=>u.Email == email);
+        User userModel = userManager.Users.First(u=>u.Email == email);
 
         userModel.EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
         string code = userModel.EmailVerificationCode.Code!;
 
-        await db.SaveChangesAsync();
+        await userManager.UpdateAsync(userModel);
+
         return await emailSender.SendConfirmationCodeAsync(userModel, email, code);
     }
 

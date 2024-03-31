@@ -21,6 +21,7 @@ public partial class User : IdentityUser
     [Required] public string DisplayName { get; set; } = string.Empty;
     public VerificationCode? EmailVerificationCode { get; set; }
     public VerificationCode? PasswordRestCode { get; set; }
+    public string? PasswordResetToken { get; set; } 
     public float Rate { get; set; } = MaxRate;
     public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
     public string? FullAddress { get; set; }

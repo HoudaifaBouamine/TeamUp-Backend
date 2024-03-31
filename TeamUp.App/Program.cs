@@ -57,7 +57,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    if(builder.Environment.IsDevelopment())
+        options.UseInMemoryDatabase("TeamUpDb");
+    else if(builder.Environment.IsProduction())
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 

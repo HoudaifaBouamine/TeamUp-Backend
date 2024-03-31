@@ -50,4 +50,39 @@ public class CustomUserManager(
         }
         return Task.FromResult(false);
     }
+
+}
+
+
+public class CustomUserManagerV2 : CustomUserManager
+{
+    public CustomUserManagerV2(IUserStore<User> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<User> passwordHasher, IEnumerable<IUserValidator<User>> userValidators, IEnumerable<IPasswordValidator<User>> passwordValidators, ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<User>> logger) : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+    {
+    }
+
+    public override Task<bool> VerifyUserTokenAsync(User user, string tokenProvider, string purpose, string token)
+    {
+        ThrowIfDisposed();
+
+        if(purpose == ResetPasswordTokenPurpose)
+        {
+            if(token == user.PasswordResetToken)
+            {
+                return Task.FromResult(true);
+            }
+        
+            return Task.FromResult(false);
+        }
+        else if(purpose == ConfirmEmailTokenPurpose)
+        {
+            if(user.EmailVerificationCode?.IsValid(token) is true)
+            {
+                return Task.FromResult(true);
+            }
+        
+            return Task.FromResult(false);
+        }
+        return Task.FromResult(false);
+    
+    }
 }
