@@ -135,22 +135,6 @@ partial class VerificationCode
 
     private static string GenerateRandomCode()
     {
-        Random rand = new Random();
-        int randomNumber = rand.Next(100000, 999999); 
-
-        string combinedString = Guid.NewGuid() + randomNumber.ToString();
-
-        using (SHA256 sha256Hash = SHA256.Create())
-        {
-            byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(combinedString));
-
-            int hashInteger = BitConverter.ToInt32(bytes, 0);
-
-            hashInteger = Math.Abs(hashInteger);
-
-            int sixDigitNumber = hashInteger % 1000000;
-
-            return sixDigitNumber.ToString();
-        }
+        return new Random().Next(100000, 999999).ToString(); 
     }
 }

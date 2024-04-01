@@ -16,6 +16,8 @@ public partial class AuthEndpoints(
 
         var routeGroup = app.MapGroup("auth").WithTags("Auth Group");
 
+        routeGroup.MapPost("/google", GoogleAsync);
+
         routeGroup.MapPost("/register", RegisterAsync)
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
