@@ -11,7 +11,7 @@ partial class AuthEndpoints
 {
     public async Task<Results<Ok, ValidationProblem,BadRequest<ErrorResponse>>> 
     RegisterAsync(
-        [FromBody] UserRegisterDto registration,
+        [FromBody] UserRegisterRequestDto registration,
         [FromServices] CustomUserManager userManager
     )
     {

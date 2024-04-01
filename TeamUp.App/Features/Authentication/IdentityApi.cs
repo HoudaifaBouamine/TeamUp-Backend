@@ -30,13 +30,13 @@ public partial class AuthEndpoints(
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/confirmEmail",ConfirmEmail)
+        routeGroup.MapPost("/confirmEmail",ConfirmEmailAsync)
         .WithSummary("[C]")
         .WithOpenApi()
         .Add(endpointBuilder =>
         {
             var finalPattern = ((RouteEndpointBuilder)endpointBuilder).RoutePattern.RawText;
-            confirmEmailEndpointName = $"{nameof(ConfirmEmail)}-{finalPattern}";
+            confirmEmailEndpointName = $"{nameof(ConfirmEmailAsync)}-{finalPattern}";
             endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
         });
 

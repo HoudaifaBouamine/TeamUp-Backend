@@ -108,7 +108,11 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
-builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
+if(builder.Environment.IsDevelopment())
+    builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
+else if (builder.Environment.IsProduction())
+    builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
+
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();
 builder.Services.AddScoped<GoogleAuthService>();

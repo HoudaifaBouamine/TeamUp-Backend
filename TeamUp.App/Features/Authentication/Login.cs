@@ -9,7 +9,7 @@ namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
     async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult,BadRequest<ErrorResponse>>> Login
-        ([FromBody] UserLoginDto login,
+        ([FromBody] UserLoginRequestDto login,
         [FromQuery] bool? useCookies,
         [FromQuery] bool? useSessionCookies,
         [FromServices] IServiceProvider sp)

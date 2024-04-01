@@ -8,7 +8,7 @@ namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
     
-    async Task<Results<Ok<UserInfoDto>, ValidationProblem, NotFound>> CurrentUser
+    async Task<Results<Ok<UserInfoResponseDto>, ValidationProblem, NotFound>> CurrentUser
             (ClaimsPrincipal claimsPrincipal,
             [FromServices] IServiceProvider sp) 
     {
@@ -18,7 +18,7 @@ partial class AuthEndpoints
             return TypedResults.NotFound();
         }
 
-        var userInfo = new UserInfoDto(
+        var userInfo = new UserInfoResponseDto(
             Id : user.Id,
             Email : user.Email!,
             IsEmailConfirmed : user.EmailConfirmed,

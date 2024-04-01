@@ -15,7 +15,7 @@ public class AuthTest
     async void Register_WhereUserInfoIsValied_ShouldReturnOk()
     {
         // Arrange
-        var userRegister = new UserRegisterDto
+        var userRegister = new UserRegisterRequestDto
         (
             "displayName",
             "email@example.com",

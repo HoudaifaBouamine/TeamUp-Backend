@@ -20,19 +20,25 @@ public class AuthIntegrationTests
     async void RegisterAndConfirmeEmail()
     {
         // Arrange
+        string VerificationCode = "NoCode";
         var emailSenderMock = new Mock<IEmailSenderCustome>();
         emailSenderMock.Setup(es=>es.SendConfirmationCodeAsync(
             It.IsAny<User>(),
             It.IsAny<string>(),
             It.IsAny<string>()
-        )).ReturnsAsync(true);
+        ))
+            .Callback((User user, string email, string code)=>
+            {
+                VerificationCode = code;
+            })
+            .ReturnsAsync(true);
 
         var authEndpoints = new AuthEndpoints(emailSenderMock.Object);
         
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext> ();
         optionsBuilder.UseInMemoryDatabase("TeamUpDb");
         var db = new AppDbContext(optionsBuilder.Options);
-        var userRegisterDto = new UserRegisterDto
+        var userRegisterDto = new UserRegisterRequestDto
         (
             "displayName",
             "email@example.com",
@@ -69,6 +75,43 @@ public class AuthIntegrationTests
         // Assert
 
         Assert.IsType<Ok> (response.Result);
+        var registredUser = Assert.Single(db.Users);
+        Assert.Equal(false,registredUser?.EmailConfirmed);
+        Assert.Equal(userRegisterDto.Email, registredUser?.Email);
+        System.Console.WriteLine("Code " + VerificationCode);
+        Assert.Equal(6,VerificationCode.Length);
+        // arrange
+
+        var emailConfirmation = new EmailConfirmationRequestDto
+        (
+            Email: registredUser?.Email!,
+            Code: VerificationCode
+        );
+
+        userManagerMock.Setup(u=>u.ConfirmEmailAsync
+        (
+            It.IsAny<User>(),
+            It.IsAny<string>()
+        ))
+        .Callback((User user, string code)=>
+        {
+            user.EmailConfirmed = true;
+        })
+        .ReturnsAsync(IdentityResult.Success);
+        // act
+
+        var emailConfirmationRespones = await authEndpoints.ConfirmEmailAsync
+        (
+            emailConfirmation,
+            userManager: userManagerMock.Object
+        );
+
+        // assert
+        Assert.IsType<Ok<object>>(emailConfirmationRespones.Result);
+        Assert.Equal(true,registredUser?.EmailConfirmed);
+
+        await db.SaveChangesAsync();
+
     }
 
     public class FakeUserManager : CustomUserManager

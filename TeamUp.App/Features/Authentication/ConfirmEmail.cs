@@ -7,21 +7,20 @@ namespace Authentication.IdentityApi;
 
 partial class AuthEndpoints
 {
-    async Task<Results<Ok<object>,BadRequest<ErrorResponse>,NotFound>> ConfirmEmail (
-        [FromBody] EmailConfirmationDto emailConfirmation,
-        [FromServices] IServiceProvider sp,
-        [FromServices] AppDbContext db,
+    public async Task<Results<Ok<object>,BadRequest<ErrorResponse>,NotFound>> ConfirmEmailAsync (
+        [FromBody] EmailConfirmationRequestDto emailConfirmation,
         [FromServices] CustomUserManager userManager)
     {
+        
+        var userModel = await userManager.Users
+            .Include(u=>u.EmailVerificationCode)
+            .FirstOrDefaultAsync(u=>u.Email == emailConfirmation.Email);
 
-        if (await userManager.FindByEmailAsync(emailConfirmation.Email) is not { } userIdentity)
+        if(userModel is null) 
         {
+            System.Console.WriteLine("--> not found by id");
             return TypedResults.NotFound();
         }
-        
-        var userModel = await db.Users.Include(u=>u.EmailVerificationCode).FirstOrDefaultAsync(u=>u.Id == userIdentity.Id);
-
-        if(userModel is null) return TypedResults.NotFound();
 
         var result = await userManager.ConfirmEmailAsync(userModel,emailConfirmation.Code);
 
