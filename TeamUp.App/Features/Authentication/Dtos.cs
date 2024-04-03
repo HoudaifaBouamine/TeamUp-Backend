@@ -8,6 +8,7 @@ partial class AuthEndpoints
     (
         string Id, 
         string UserName,
+        [EmailAddress]
         string Email,
         bool IsEmailConfirmed
     );
@@ -24,9 +25,28 @@ partial class AuthEndpoints
         string Email,
         string Password
     );
-    public record EmailConfirmationRequestDto(string Email,string Code);
-    public record GetResetPasswordTokenRequestDto(string Email,string Code);
-    public record GetResetPasswordTokenResponseDto(string ResetToken);
-    public record ResetPasswordByTokenRequestDto(string Email,string ResetToken,string NewPassword);
+    public record EmailConfirmationRequestDto
+    (
+        [EmailAddress] 
+        string Email,
+        string Code
+    );
+    public record GetResetPasswordTokenRequestDto
+    (
+        [EmailAddress] 
+        string Email,
+        string Code
+    );
+    public record GetResetPasswordTokenResponseDto
+    (
+        string ResetToken
+    );
+    public record ResetPasswordByTokenRequestDto
+    (
+        [EmailAddress] 
+        string Email,
+        string ResetToken,
+        string NewPassword
+    );
 
 }

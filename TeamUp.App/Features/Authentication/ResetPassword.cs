@@ -5,12 +5,76 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Serilog;
 
 namespace Authentication.IdentityApi;
 
 partial class AuthEndpoints
 {
     
+    async Task<Results< Ok <GetResetPasswordTokenResponseDto>, ValidationProblem, NotFound>> 
+        GetResetPasswordToken(
+        [FromBody] GetResetPasswordTokenRequestDto resetRequest, 
+        [FromServices] IServiceProvider sp, 
+        [FromServices] AppDbContext db,
+        [FromServices] CustomUserManagerV2 userManager)
+    {
+        var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
+
+        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
+            return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
+        
+        var token = CreateResetPasswordToken();
+        user.PasswordResetToken = token;
+        await userManager.UpdateAsync(user);
+        return TypedResults.Ok(new GetResetPasswordTokenResponseDto(token));
+    }
+
+
+    async Task<Results< Ok, ValidationProblem, NotFound>> ResetPasswordByToken(
+    [FromBody] ResetPasswordByTokenRequestDto resetRequest, 
+    [FromServices] AppDbContext db,
+    [FromServices] CustomUserManagerV2 userManager
+    )
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
+
+        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
+        {
+            return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
+        }
+
+        IdentityResult result;
+        try
+        {
+            result = await userManager.ResetPasswordAsync(user, resetRequest.ResetToken, resetRequest.NewPassword);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to reset password, invaliedToken");
+            result = IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken());
+        }
+
+        if (!result.Succeeded)
+        {
+            return CreateValidationProblem(result);
+        }
+
+        return TypedResults.Ok();
+    }
+
+
+    string CreateResetPasswordToken()
+    {
+        return Guid.NewGuid().ToString();
+    }
+
+
+
+
+
+
+
     async Task<Results<Ok, ValidationProblem,NotFound>> ResetPassword(
         [FromBody] ResetPasswordRequest resetRequest, 
         [FromServices] IServiceProvider sp, 
@@ -43,58 +107,4 @@ partial class AuthEndpoints
         return TypedResults.Ok();
     }
 
-    async Task<Results< Ok <GetResetPasswordTokenResponseDto>, ValidationProblem, NotFound>> GetResetPasswordToken(
-        [FromBody] GetResetPasswordTokenRequestDto resetRequest, 
-        [FromServices] IServiceProvider sp, 
-        [FromServices] AppDbContext db,
-        [FromServices] CustomUserManagerV2 userManager)
-    {
-        var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
-
-        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
-            return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
-        
-        var token = CreateResetPasswordToken();
-        user.PasswordResetToken = token;
-
-        return TypedResults.Ok(new GetResetPasswordTokenResponseDto(token));
-    }
-
-
-    async Task<Results< Ok, ValidationProblem, NotFound>> ResetPasswordByToken(
-    [FromBody] ResetPasswordByTokenRequestDto resetRequest, 
-    [FromServices] AppDbContext db,
-    [FromServices] CustomUserManagerV2 userManager
-    )
-    {
-        var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
-
-        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
-        {
-            return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
-        }
-
-        IdentityResult result;
-        try
-        {
-            result = await userManager.ResetPasswordAsync(user, resetRequest.ResetToken, resetRequest.NewPassword);
-        }
-        catch (FormatException)
-        {
-            result = IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken());
-        }
-
-        if (!result.Succeeded)
-        {
-            return CreateValidationProblem(result);
-        }
-
-        return TypedResults.Ok();
-    }
-
-
-    string CreateResetPasswordToken()
-    {
-        return Guid.NewGuid().ToString();
-    }
 }

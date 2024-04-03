@@ -35,4 +35,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamUp.Test"/>
+  </ItemGroup>
+
 </Project>

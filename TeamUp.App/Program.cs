@@ -57,9 +57,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
-    if(builder.Environment.IsDevelopment())
-        options.UseInMemoryDatabase("TeamUpDb");
-    else if(builder.Environment.IsProduction())
+    // if(builder.Environment.IsDevelopment())
+        // options.UseInMemoryDatabase("TeamUpDb");
+    // else if(builder.Environment.IsProduction())
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -108,13 +108,14 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
-if(builder.Environment.IsDevelopment())
-    builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
-else if (builder.Environment.IsProduction())
+// if(builder.Environment.IsDevelopment())
+    // builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
+// else if (builder.Environment.IsProduction())
     builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();
+builder.Services.AddScoped<CustomUserManagerV2>();
 builder.Services.AddScoped<GoogleAuthService>();
 builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));

@@ -10,7 +10,7 @@ namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
 
-    async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>> Refresh
+    async Task<Results<UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>> Refresh
         ([FromBody] RefreshRequest refreshRequest,
         [FromServices] IServiceProvider sp,
         [FromServices] IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
