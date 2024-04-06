@@ -21,6 +21,8 @@ public class Project
     public ChatRoom ChatRoom { get; set;} = null!;
 
     // Project have many users, users have many projects, so we declare a list of users in project, and list of projects in user 
-    public List<User> Users { get; set; } = [];
+    public int TeamSize { get; set; } = default;
+    public List<User> Users { get; set;} = [];
     public List<UsersProject> ProjectsUsers { get; set; } = [];
+
 }

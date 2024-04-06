@@ -12,7 +12,7 @@ public interface IProjectRepository
     Task<ProjectReadDto> GetByIdAsync(int id);
     Task<GetProjectsListResponse> GetAllAsync (int? PageSize,int? PageNumber, string? SearchPattern);
     Task<int> CreateAsync(ProjectCreateDto projectDto,User user);
-    Task UpdateAsync(int id, ProjectCreateDto projectDto);
+    Task <bool>UpdateAsync(int id, ProjectCreateDto projectDto);
     Task DeleteAsync(int id);
     Task<int> GetUsersCountAsync(int projectId);
     Task<IEnumerable<ProjecUserShortDto>> GetUsersSampleAsync(int projectId);

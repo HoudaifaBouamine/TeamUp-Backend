@@ -55,7 +55,7 @@ public async Task<GetProjectsListResponse> GetAllAsync (int? PageSize,int? PageN
             p.Description,
             p.StartDate,
             p.EndDate,
-            p.Users.Count,
+            p.Users.Count(),
             p.Users.Take(3).Select(u => new ProjecUserShortDto
             (
                 u.Id,
@@ -88,11 +88,13 @@ public async Task<GetProjectsListResponse> GetAllAsync (int? PageSize,int? PageN
             Users = [user]
         };
 
+
         project.ProjectsUsers.Add(new UsersProject
         {
             IsMentor = true,
             User = user
         });
+        project.TeamSize = 1;
 
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();
@@ -100,19 +102,81 @@ public async Task<GetProjectsListResponse> GetAllAsync (int? PageSize,int? PageN
     }
 
 
+    public async Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor)
+    {
+        var project = await _context.Projects
+            .Include(p => p.ProjectsUsers)
+            .FirstOrDefaultAsync(p => p.Id == projectId);
 
+        if (project is not null)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId.ToString());
 
-    public async Task UpdateAsync(int id, ProjectCreateDto projectDto)
+            if (user != null)
+            {
+                project.ProjectsUsers.Add(new UsersProject
+                {
+                    User = user,
+                    IsMentor = isMentor
+                });
+                project.TeamSize++;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Add list of users to a project, returning the number of users added successfuly
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="userIds"></param>
+    /// <returns></returns> <summary>
+    /// 
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="userIds"></param>
+    /// <returns></returns>
+    public async Task<int> AddUsersToProjectAsync(int projectId, List<Guid> userIds)
+    {
+        var project = await _context.Projects
+            .Include(p => p.Users)
+            .FirstOrDefaultAsync(p => p.Id == projectId);
+
+        if(project is null) return -1;
+
+        var users = await _context.Users
+            .Where(u => userIds.Contains(Guid.Parse(u.Id)))
+            .ToListAsync();
+
+        var prevUsersCount = project.Users.Count();
+        project.Users.AddRange(users);
+        var newUsersCount = project.Users.Count();
+        project.TeamSize = newUsersCount;
+
+        await _context.SaveChangesAsync();
+        
+        return newUsersCount - prevUsersCount;
+    }
+
+    public async Task<bool> UpdateAsync(int id, ProjectCreateDto projectDto)
     {
         var project = await _context.Projects.FindAsync(id);
-        if (project != null)
+        
+        if (project is not null)
         {
             project.Name = projectDto.Name;
             project.Description = projectDto.Description;
             project.StartDate = projectDto.StartDate;
 
             await _context.SaveChangesAsync();
+            return true;
         }
+
+        return false;
     }
 
 

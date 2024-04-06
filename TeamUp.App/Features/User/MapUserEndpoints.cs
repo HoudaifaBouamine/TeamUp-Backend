@@ -24,5 +24,8 @@ public partial class UserEndpoints : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(p=>p.RequireAuthenticatedUser());
 
+        usersGroup.MapDelete("/{Id}",DeleteUserAsync)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
     }
 }
