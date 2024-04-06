@@ -16,6 +16,30 @@ namespace TeamUp.Test.Integration.Authentication;
 
 public class AuthIntegrationTests
 {
+
+    [Fact]
+    /// <summary>
+    /// 
+    /// the user click 'reset password' so you do :
+    /// call : /api/v2/auth/forgotPassword
+    /// paramters : email
+    /// response : ok, with sending code to user's emai  
+    /// when the user enter the code reseved from email you do   
+    /// call : /api/v3/auth/exchangeResetCodeForToken
+    /// paramters : email, code (code recived in the email)
+    /// response : ok with "resetToken   
+    /// when you recive resetToken successfuly you do :
+    /// call : /api/v3/auth/resetPassword
+    /// paramters : email,resetToken, newPassword
+    /// response : ok
+    /// </summary>
+    /// <returns></returns>
+    void ResetPassoword()
+    {
+
+    }
+
+
     [Fact]
     async void RegisterAndConfirmeEmail()
     {
