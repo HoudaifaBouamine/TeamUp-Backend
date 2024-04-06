@@ -93,13 +93,21 @@ namespace EndpointsManager
                     {
                         p.Users.Add(users.ElementAt(rand.Next(users.Count())));
                     }
-                    p.TeamSize = p.Users.Count();
                     p.ChatRoom = new ChatRoom();
                 }
 
                 await db.Projects.AddRangeAsync(projects);
                 await db.Users.AddRangeAsync(users);
                 await db.SaveChangesAsync();
+
+                foreach(var p in db.Projects)
+                {
+                    p.TeamSize = p.Users.Count();
+                }
+
+                await db.SaveChangesAsync();
+
+
             });
 
         }

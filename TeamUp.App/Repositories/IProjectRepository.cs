@@ -10,12 +10,18 @@ namespace Repositories;
 public interface IProjectRepository
 {
     Task<ProjectReadDto> GetByIdAsync(int id);
-    Task<GetProjectsListResponse> GetAllAsync (int? PageSize,int? PageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse> GetListWithSearchAndPaginationAsync (
+        int? PageSize,int? PageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse> GetListWithFiltersAsync (
+        int? PageSize,int? PageNumber, string? SearchPattern, 
+        string[]? TeamSizes, string[]? Categories, string[]? Durations);
     Task<int> CreateAsync(ProjectCreateDto projectDto,User user);
     Task <bool>UpdateAsync(int id, ProjectCreateDto projectDto);
     Task DeleteAsync(int id);
     Task<int> GetUsersCountAsync(int projectId);
     Task<IEnumerable<ProjecUserShortDto>> GetUsersSampleAsync(int projectId);
     Task<ProjectDetailsReadDto> GetDetailsAsync(int projectId);
+
+    Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
 
 }

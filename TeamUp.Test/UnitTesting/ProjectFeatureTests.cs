@@ -19,7 +19,7 @@ public class ProjectControllerTests
         // Arrange
                 
         var rep = new Mock<IProjectRepository>();
-        rep.Setup(rep=>rep.GetAllAsync(
+        rep.Setup(rep=>rep.GetListWithFiltersAsync(
             It.IsAny<int?>(),
             It.IsAny<int?>(),
             It.IsAny<string>()))

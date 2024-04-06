@@ -108,9 +108,9 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
-if(builder.Environment.IsDevelopment())
-    builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
-else if (builder.Environment.IsProduction())
+// if(builder.Environment.IsDevelopment())
+//     builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
+// else
     builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 
 builder.Services.AddTransient<EmailService>();

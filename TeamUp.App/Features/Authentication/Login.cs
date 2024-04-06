@@ -1,3 +1,4 @@
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -39,5 +40,7 @@ partial class AuthEndpoints
         // The signInManager already produced the needed response in the form of a cookie or bearer token.
         return TypedResults.Empty;
     }
-    
+
+
+
 }
