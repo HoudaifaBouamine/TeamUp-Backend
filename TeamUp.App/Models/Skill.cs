@@ -14,6 +14,10 @@ public class Skill
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+
+    //each skill has many users , so we colaborate it with a list of UserSkill
+    public virtual ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
+
 }
 
 

@@ -13,8 +13,14 @@ namespace Models {
 public class UserSkill
 {
     public int Id { get; set; }
+
+    [Required] 
     public required User UserId { get; set; }
+
+    [Required] 
     public required Skill SkillId { get; set;}
+
+
 }
 
 

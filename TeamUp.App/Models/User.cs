@@ -29,6 +29,9 @@ public partial class User : IdentityUser
     // Project have many users, users have many projects, so we declare a list of users in project, and list of projects in user
     public List<Project> Projects { get; set; } = [];
     public List<UsersProject> UsersProjects { get; set; } = [];
+    //users have many skills so we declare a list of UserSkill 
+    public virtual ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
+
 }
 
 
