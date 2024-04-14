@@ -1,51 +1,16 @@
-using System.Security.Claims;
 using Bogus;
-using Configuration;
 using Features.Projects;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Repositories;
 
-namespace EndpointsManager
+public class ProjectsTest()
 {
-    public static class HelpersEndpoints
+
+    [Fact]
+    async Task test()
     {
-        /// <summary>
-        /// Containes endpoints for testing and documentations 
-        /// </summary>
-        /// <param name="app"></param>
-        public static void MapHelpersEndpoints(this IEndpointRouteBuilder app)
-        {
-            var testingGroup = app.MapGroup("/").WithTags("Testing");
-
-            testingGroup.MapGet("/",  ()=>
-            {
-                return Results.Redirect("/swagger/index.html");
-            })
-            .RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
-
-            testingGroup.MapGet("/test-auth",(ClaimsPrincipal user)=>
-            {
-                return  $"wow user = {user?.Identity?.Name} is here";
-            })
-            .RequireAuthorization()
-            .RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
-
-            testingGroup.MapGet("/test-no-auth",(ClaimsPrincipal user)=>
-            {
-                return  $"wow user = {user?.Identity?.Name} is here";
-            }).RequireRateLimiting(RateLimiterConfig.Policy.Fixed);;
-
-            testingGroup.MapGet("/reset-database", async (AppDbContext db) =>
-            {
-                await db.Database.EnsureDeletedAsync();
-                await db.Database.EnsureCreatedAsync();   
-            });
-
-            testingGroup.MapGet("/generate-fake-data",async ([FromServices] AppDbContext db,[FromServices] IProjectRepository pr)=>
-            {
+            AppDbContext db = new(new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TeamUpDb").Options);
+            ProjectRepository pr = new ProjectRepository(db);
 
         var usersFaker = new Faker<User>("en")
         .RuleFor(u=>u.FirstName,
@@ -94,8 +59,10 @@ namespace EndpointsManager
                 p.Description,
                 p.StartDate
             ),
-            users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
-            );
+            new User
+            {
+                Id = users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)].Id    
+            });
 
             for(int i = 0;i<rand.Next(5,20);i++)
             {
@@ -107,8 +74,6 @@ namespace EndpointsManager
 
         await db.SaveChangesAsync();
 
-    
-        });
-        }
     }
+            
 }

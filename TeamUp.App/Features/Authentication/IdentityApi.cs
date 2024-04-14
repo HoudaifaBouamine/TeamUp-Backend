@@ -22,11 +22,11 @@ public partial class AuthEndpoints(
         .WithSummary("[C] an email will be send to the user to confirm it his email address")
         .WithOpenApi();
 
-        routeGroup.MapPost("/login", Login)
+        routeGroup.MapPost("/login", LoginAsync)
         .WithSummary("[C]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/refresh", Refresh)
+        routeGroup.MapPost("/refresh", RefreshAsync)
         .WithSummary("[C]]")
         .WithOpenApi();
 
@@ -40,33 +40,33 @@ public partial class AuthEndpoints(
             endpointBuilder.Metadata.Add(new EndpointNameMetadata(confirmEmailEndpointName));
         });
 
-        routeGroup.MapPost("/resendConfirmationEmail", ResendConfirmationEmail)
+        routeGroup.MapPost("/resendConfirmationEmail", ResendConfirmationEmailAsync)
         .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C]]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/forgotPassword", ForgetPassword)
+        routeGroup.MapPost("/forgotPassword", ForgetPasswordAsync)
         .Produces(StatusCodes.Status500InternalServerError)
         .WithSummary("[C]")
         .WithOpenApi();
 
-        routeGroup.MapPost("/resetPassword", ResetPassword)
+        routeGroup.MapPost("/resetPassword", ResetPasswordAsync)
         .WithSummary("[C]]")
         .WithOpenApi();
 
 
-        routeGroup.MapGet("/currenUser", CurrentUser)
+        routeGroup.MapGet("/currenUser", CurrentUserAsync)
         .RequireAuthorization(p=>p.RequireAuthenticatedUser())
         .WithSummary("[C]")
         .WithOpenApi()
         .Produces(StatusCodes.Status500InternalServerError);
 
-        routeGroup.MapPost("/exchangeResetCodeForToken", GetResetPasswordToken)
+        routeGroup.MapPost("/exchangeResetCodeForToken", GetResetPasswordTokenAsync)
         .HasApiVersion(3)
         .WithSummary("D")
         .WithOpenApi();
         
-        routeGroup.MapPost("/resetPassword", ResetPasswordByToken)
+        routeGroup.MapPost("/resetPassword", ResetPasswordByTokenAsync)
         .HasApiVersion(3)
         .WithSummary("D")
         .WithOpenApi();

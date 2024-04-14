@@ -81,7 +81,7 @@ public static class ExpressionGenerator
         var parameter = Expression.Parameter(typeof(Project), "p");
         var property = Expression.Property(parameter, "TeamSize");
 
-        Expression filterExpression = null;
+        Expression? filterExpression = null;
 
         foreach (var filter in filters)
         {
@@ -177,6 +177,12 @@ public static class ExpressionGenerator
         );
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="projectDto"></param>
+    /// <param name="user"></param>
+    /// <returns>Project Id</returns>
     public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
     {
         var project = new Project

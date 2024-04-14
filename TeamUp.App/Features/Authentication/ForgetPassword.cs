@@ -8,15 +8,11 @@ namespace Authentication.IdentityApi;
 
 partial class AuthEndpoints
 {
-    async Task<Results<Ok,NotFound, ValidationProblem,StatusCodeHttpResult>> ForgetPassword
+    async Task<Results<Ok,NotFound, ValidationProblem,StatusCodeHttpResult>> ForgetPasswordAsync
             ([FromBody] ForgotPasswordRequest resetRequest,
             [FromServices] AppDbContext db,
-            [FromServices] IServiceProvider sp)
+            [FromServices] CustomUserManager userManager)
         {
-
-
-            var userManager = sp.GetRequiredService<CustomUserManager>();
-
             var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
 
             if(user is null) return TypedResults.NotFound();

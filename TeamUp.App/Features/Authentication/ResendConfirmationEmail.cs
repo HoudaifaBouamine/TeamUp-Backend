@@ -9,7 +9,7 @@ using Utils;
 namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
-    async Task<Results<Ok,NotFound<ErrorResponse>,StatusCodeHttpResult>> ResendConfirmationEmail
+    async Task<Results<Ok,NotFound<ErrorResponse>,StatusCodeHttpResult>> ResendConfirmationEmailAsync
         ([FromBody] ResendConfirmationEmailRequest resendRequest,
         [FromServices] CustomUserManager userManager)
 

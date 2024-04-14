@@ -10,7 +10,7 @@ namespace Users;
 partial class UserEndpoints
 {
     async Task<Results<Ok<UserReadDetailsDto>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> 
-        UpdateUser(
+        UpdateUserAsync(
             [FromBody] UserUpdateRequestDto userUpdate,
             ClaimsPrincipal currentUser,
             [FromServices] UserManager<User> userManager)

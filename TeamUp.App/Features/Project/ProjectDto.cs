@@ -1,4 +1,6 @@
-﻿namespace Features.Projects;
+﻿
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 public record ProjectCreateDto
 (
@@ -53,3 +55,8 @@ public record GetProjectsListResponse
     bool IsNextPageExist,
     IEnumerable<ProjectReadDto> Projects
 );
+
+public class GetProjectDetailsResponse
+{
+       [MinLength(5)] public string SearchPattern { get; set; } = "";
+}

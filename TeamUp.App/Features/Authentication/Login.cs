@@ -9,15 +9,14 @@ namespace Authentication.IdentityApi;
 
 partial class AuthEndpoints
 {
-    async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult,BadRequest<ErrorResponse>>> Login
+    async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult,UnauthorizedHttpResult,BadRequest<ErrorResponse>>> LoginAsync
         ([FromBody] UserLoginRequestDto login,
         [FromQuery] bool? useCookies,
         [FromQuery] bool? useSessionCookies,
-        [FromServices] IServiceProvider sp)
+        [FromServices] SignInManager<User> signInManager,
+        [FromServices] UserManager<User> userManager)
     {
-        var signInManager = sp.GetRequiredService<SignInManager<User>>();
-        var userManager = sp.GetRequiredService<UserManager<User>>();
-
+        
         var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
         var isPersistent = (useCookies == true) && (useSessionCookies != true);
         signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;

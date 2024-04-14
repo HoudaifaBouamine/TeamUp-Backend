@@ -9,7 +9,7 @@ namespace Users;
 partial class UserEndpoints
 {
     async Task<Results<Ok<UserReadDetailsDto>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> 
-        GetUser(
+        GetUserAsync(
         [FromRoute] Guid Id,
         [FromServices] AppDbContext db
     )

@@ -1,5 +1,7 @@
-﻿using Carter;
+﻿using System.ComponentModel.DataAnnotations;
+using Carter;
 using Configuration;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Users;
 
@@ -15,17 +17,18 @@ public partial class UserEndpoints : ICarterModule
             .WithSummary("In development")
             .WithOpenApi();
 
-        usersGroup.MapGet("/",GetUsers)
+        usersGroup.MapGet("/",GetUsersAsync)
             .Produces(StatusCodes.Status500InternalServerError);
 
-        usersGroup.MapGet("/{Id}",GetUser);
+        usersGroup.MapGet("/{Id}",GetUserAsync);
 
-        usersGroup.MapPut("/",UpdateUser)
+        usersGroup.MapPut("/",UpdateUserAsync)
             .Produces(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(p=>p.RequireAuthenticatedUser());
 
         usersGroup.MapDelete("/{Id}",DeleteUserAsync)
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
+
     }
 }
