@@ -22,7 +22,7 @@ public class ProjectControllerTests
         rep.Setup(rep=>rep.GetListWithFiltersAsync(
             It.IsAny<int?>(),
             It.IsAny<int?>(),
-            It.IsAny<string>()))
+            It.IsAny<string>(),null,null,null))
                 .ReturnsAsync(new GetProjectsListResponse(
                     0,
                     1,
@@ -40,6 +40,8 @@ public class ProjectControllerTests
         // Assert
 
         var okresponse  = Assert.IsType<OkObjectResult>(response);
+        System.Console.WriteLine("ok response " + okresponse?.Value);
+        
         var result = Assert.IsType<GetProjectsListResponse>(okresponse.Value);
         Assert.Empty(result.Projects);
     }

@@ -367,3 +367,4 @@ appsettings.json
 Migrations/
 Migrations/*
 */.key*
+*.db

@@ -13,9 +13,8 @@ partial class AuthEndpoints
 {
     
     async Task<Results< Ok <GetResetPasswordTokenResponseDto>, ValidationProblem, NotFound>> 
-        GetResetPasswordToken(
+        GetResetPasswordTokenAsync(
         [FromBody] GetResetPasswordTokenRequestDto resetRequest, 
-        [FromServices] IServiceProvider sp, 
         [FromServices] AppDbContext db,
         [FromServices] CustomUserManagerV2 userManager)
     {
@@ -31,7 +30,7 @@ partial class AuthEndpoints
     }
 
 
-    async Task<Results< Ok, ValidationProblem, NotFound>> ResetPasswordByToken(
+    async Task<Results< Ok, ValidationProblem, NotFound>> ResetPasswordByTokenAsync(
     [FromBody] ResetPasswordByTokenRequestDto resetRequest, 
     [FromServices] AppDbContext db,
     [FromServices] CustomUserManagerV2 userManager
@@ -75,12 +74,11 @@ partial class AuthEndpoints
 
 
 
-    async Task<Results<Ok, ValidationProblem,NotFound>> ResetPassword(
+    async Task<Results<Ok, ValidationProblem,NotFound>> ResetPasswordAsync(
         [FromBody] ResetPasswordRequest resetRequest, 
-        [FromServices] IServiceProvider sp, 
+        [FromServices] CustomUserManager userManager, 
         [FromServices] AppDbContext db)
     {
-        var userManager = sp.GetRequiredService<CustomUserManager>();
 
         var user = await db.Users.Include(u=>u.PasswordRestCode).FirstOrDefaultAsync(u=>u.Email == resetRequest.Email);
 

@@ -1,7 +1,4 @@
-
-
-using System.Linq.Expressions;
-using Features.Projects;
+using Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -23,6 +20,13 @@ public class ProjectRepository : IProjectRepository
         return MapProjectToProjectReadDto(project!);
     }
 
+    /// <summary>
+    /// get the list of projects, 
+    /// </summary>
+    /// <param name="PageSize">Max number of projects to return</param>
+    /// <param name="PageNumber">The index of the page (if null is passed, return first page)</param>
+    /// <param name="SearchPattern">Search on this pattern in the project title and description (not-case sensitive)</param>
+    /// <returns></returns>
     public async Task<GetProjectsListResponse> GetListWithSearchAndPaginationAsync (int? PageSize,int? PageNumber, string? SearchPattern)
     {
         if(PageSize is null) PageNumber = null;
@@ -73,54 +77,14 @@ public class ProjectRepository : IProjectRepository
 
     }
 
-
-public static class ExpressionGenerator
-{
-    public static Expression<Func<Project, bool>> GenerateTeamSizeFilterExpression(string[] filters)
-    {
-        var parameter = Expression.Parameter(typeof(Project), "p");
-        var property = Expression.Property(parameter, "TeamSize");
-
-        Expression filterExpression = null;
-
-        foreach (var filter in filters)
-        {
-            var range = filter.Split('-');
-            if (range.Length == 1)
-            {
-                int minValue = int.Parse(range[0].Trim('+'));
-                var greaterThanOrEqual = Expression.GreaterThanOrEqual(property, Expression.Constant(minValue));
-                filterExpression = filterExpression == null ? greaterThanOrEqual : Expression.OrElse(filterExpression, greaterThanOrEqual);
-            }
-            else if (range.Length == 2)
-            {
-                int minValue = int.Parse(range[0]);
-                int maxValue = int.Parse(range[1]);
-                var greaterThanOrEqual = Expression.GreaterThanOrEqual(property, Expression.Constant(minValue));
-                var lessThanOrEqual = Expression.LessThanOrEqual(property, Expression.Constant(maxValue));
-                var rangeExpression = Expression.AndAlso(greaterThanOrEqual, lessThanOrEqual);
-                filterExpression = filterExpression == null ? rangeExpression : Expression.OrElse(filterExpression, rangeExpression);
-            }
-            else
-            {
-                throw new ArgumentException("Invalid filter range format.");
-            }
-        }
-
-        if (filterExpression == null)
-        {
-            throw new ArgumentException("At least one valid filter range is required.");
-        }
-
-        var lambda = Expression.Lambda<Func<Project, bool>>(filterExpression, parameter);
-        return lambda;
-    }
-
-}
-
-
-
-
+    /// <summary>
+    /// get the list of projects, 
+    /// </summary>
+    /// <param name="PageSize">Max number of projects to return</param>
+    /// <param name="PageNumber">The index of the page (if null is passed, return first page)</param>
+    /// <param name="SearchPattern">Search on this pattern in the project title and description (not-case sensitive)</param>
+    /// <param name="Durations"></param>
+    /// <returns></returns>
     public async Task<GetProjectsListResponse> GetListWithFiltersAsync(int? PageSize, int? PageNumber, string? SearchPattern, string[]? TeamSizes, string[]? Categories, string[]? Durations)
     {
         if(PageSize is null) PageNumber = null;
@@ -177,6 +141,12 @@ public static class ExpressionGenerator
         );
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="projectDto"></param>
+    /// <param name="user"></param>
+    /// <returns>Project Id</returns>
     public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
     {
         var project = new Project

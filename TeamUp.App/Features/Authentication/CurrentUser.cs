@@ -8,11 +8,11 @@ namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
     
-    async Task<Results<Ok<UserInfoResponseDto>, ValidationProblem, NotFound>> CurrentUser
+    public async Task<Results<Ok<UserInfoResponseDto>, ValidationProblem, NotFound>> CurrentUserAsync
             (ClaimsPrincipal claimsPrincipal,
-            [FromServices] IServiceProvider sp) 
+            [FromServices] UserManager<User> userManager) 
     {
-        var userManager = sp.GetRequiredService<UserManager<User>>();
+
         if (await userManager.GetUserAsync(claimsPrincipal) is not { } user)
         {
             return TypedResults.NotFound();

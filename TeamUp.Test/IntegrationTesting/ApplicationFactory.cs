@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Castle.Core.Smtp;
+using EmailServices;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -20,6 +22,9 @@ internal class ApplicationFactory : WebApplicationFactory<Program>
             services.AddDbContext<AppDbContext>(op=>{
                 op.UseInMemoryDatabase("TeamUpDb-Testing");
             });
+
+            services.RemoveAll(typeof(IEmailSenderCustome));
+            services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
 
             var db = CreateDbContext(services);
             db.Database.EnsureDeleted();

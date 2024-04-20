@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using Asp.Versioning;
 using Bogus.DataSets;
+using CommandLine;
 using FluentEmail.Core;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -9,21 +12,19 @@ using Models;
 using Project = Models.Project;
 
 namespace Features.Projects;
+
 partial class ProjectsController
 {
-    [HttpGet("{id}/AddUser/{user_id}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(ProjectDetailsReadDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddUserToProjectAsync(int id,Guid user_id,[FromQuery] bool isMentor = false)
+    public async Task<IActionResult> GetProject(int id)
     {
-        var isAddedSuccessfuly = await _projectRepository.AddUserToProjectAsync(id, user_id,isMentor);
-        if(isAddedSuccessfuly)
+        var project = await _projectRepository.GetDetailsAsync(id);
+        if (project == null)
         {
-            return Ok();
+            return NotFound();
         }
-        else
-        {
-            return BadRequest();
-        }
+        return Ok(project);
     }
 }

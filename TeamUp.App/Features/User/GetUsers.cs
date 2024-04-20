@@ -10,7 +10,7 @@ partial class UserEndpoints
 {
 
     async Task<Results<Ok<GetUsersListResponse>,StatusCodeHttpResult>> 
-        GetUsers(
+        GetUsersAsync(
         [FromQuery] string? SearchPattern,
         [FromQuery] int? PageNumber,
         [FromQuery] int? PageSize,
