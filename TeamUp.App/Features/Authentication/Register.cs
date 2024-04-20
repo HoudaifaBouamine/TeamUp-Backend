@@ -1,7 +1,6 @@
 using Authentication.UserManager;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Models;
 using Serilog;
 using Utils;

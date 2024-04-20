@@ -10,7 +10,7 @@ namespace EndpointsManager
     public static class HelpersEndpoints
     {
         /// <summary>
-        /// Containes endpoints for testing and documentations 
+        /// Contains endpoints for testing and documentations 
         /// </summary>
         /// <param name="app"></param>
         public static void MapHelpersEndpoints(this IEndpointRouteBuilder app)

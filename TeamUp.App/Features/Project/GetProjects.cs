@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using Asp.Versioning;
 using Bogus.DataSets;
-using CommandLine;
 using FluentEmail.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;

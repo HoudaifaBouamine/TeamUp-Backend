@@ -1,5 +1,4 @@
 using Authentication.UserManager;
-using CommandLine;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;

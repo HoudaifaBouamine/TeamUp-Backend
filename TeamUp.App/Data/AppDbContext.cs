@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using System.Reflection.Emit;
 
 public class AppDbContext : IdentityDbContext<User>
 {
@@ -25,6 +26,21 @@ public class AppDbContext : IdentityDbContext<User>
         //             l => l.HasOne<Project>().WithMany(p=>p.ProjectsUsers),
         //             r => r.HasOne<User>().WithMany(u=>u.UsersProjects)
         //         );
+
+
+        //
+      /*  builder.Entity<User>()
+                .HasMany(u => u.UserSkills)
+                .WithMany(s => s.Users)
+                .UsingEntity<UserSkill>(
+                    j => j
+                        .HasOne(us => us.Skill)
+                        .WithMany(),
+                    j => j
+                        .HasOne(us => us.User)
+                        .WithMany())
+                .HasKey(us => new { us.UserId, us.SkillId });*/
+        //
 
 
         builder.Entity<UsersProject>()
@@ -59,5 +75,10 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Project> Projects { get; set; }
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<UsersProject> UsersProjects { get; set; }
+    public DbSet<Skill> Skills { get; set; }
+    public DbSet<UserSkill> UserSkills { get; set; }
+    public DbSet<User> Users { get; set; }
+
+
 
 }
