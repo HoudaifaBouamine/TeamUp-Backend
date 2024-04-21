@@ -1,15 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using Asp.Versioning;
-using Bogus.DataSets;
-using CommandLine;
 using Features.Projects.Contracts;
-using FluentEmail.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Models;
 using Utils;
 using Project = Models.Project;
 

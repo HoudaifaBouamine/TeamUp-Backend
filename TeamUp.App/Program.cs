@@ -15,6 +15,7 @@ using Models;
 using Utils;
 using Features.Projects.Contracts;
 using Features.Projects;
+using Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +123,8 @@ builder.Services.AddScoped<CustomUserManagerV2>();
 builder.Services.AddScoped<GoogleAuthService>();
 builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));
+builder.Services.AddScoped<IUserRepository,UserRepository>();
+builder.Services.AddScoped<ISkillRepository,SkillRepository>();
 
 
 ///////////////////////////////////////////////////
