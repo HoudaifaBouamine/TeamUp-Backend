@@ -3,12 +3,14 @@ using System.Linq.Expressions;
 using Asp.Versioning;
 using Bogus.DataSets;
 using CommandLine;
+using Features.Projects.Contracts;
 using FluentEmail.Core;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Utils;
 using Project = Models.Project;
 
 namespace Features.Projects;
@@ -42,5 +44,132 @@ partial class ProjectsController
 
             return Ok(projects);
     }
+
+}
+
+
+partial class ProjectRepository
+{
+    /// <summary>
+    /// get the list of projects, 
+    /// </summary>
+    /// <param name="PageSize">Max number of projects to return</param>
+    /// <param name="PageNumber">The index of the page (if null is passed, return first page)</param>
+    /// <param name="SearchPattern">Search on this pattern in the project title and description (not-case sensitive)</param>
+    /// <returns></returns>
+    public async Task<GetProjectsListResponse> GetListWithSearchAndPaginationAsync (int? PageSize,int? PageNumber, string? SearchPattern)
+    {
+        if(PageSize is null) PageNumber = null;
+
+        IQueryable<Project> projects = _context.Projects;
+
+        if(SearchPattern is not null)
+            projects = projects.Where(p=>
+                p.Description.ToLower().Contains(SearchPattern.ToLower()) ||
+                p.Name.ToLower().Contains(SearchPattern.ToLower()));
+
+        int TotalCount = projects.Count();
+
+        if(PageSize is not null && PageNumber is not null)
+            projects = projects
+                .Skip(PageSize.Value * (PageNumber.Value -1))
+                .Take(PageSize.Value);
+        else if (PageSize is not null)
+            projects = projects
+                .Take(PageSize.Value);
+
+        var projectsDto = await projects
+            .Include(p=>p.Users)
+            .Select(p => new ProjectReadDto
+            (
+                p.Id,
+                p.Name,
+                p.Description,
+                p.StartDate,
+                p.EndDate,
+                p.Users.Count(),
+                p.Users.Take(3).Select(u => new ProjecUserShortDto
+                (
+                    u.Id,
+                    u.ProfilePicture            
+                )).ToList()
+            )).ToListAsync();
+
+        return new GetProjectsListResponse
+        (
+            TotalCount : TotalCount,
+            PageNumber : PageNumber??=1,
+            PageSize : PageSize??=TotalCount,
+            IsPrevPageExist : PageNumber > 1,
+            IsNextPageExist : PageNumber * PageSize < TotalCount, 
+            Projects: projectsDto
+        );
+
+    }
+
+    /// <summary>
+    /// get the list of projects, 
+    /// </summary>
+    /// <param name="PageSize">Max number of projects to return</param>
+    /// <param name="PageNumber">The index of the page (if null is passed, return first page)</param>
+    /// <param name="SearchPattern">Search on this pattern in the project title and description (not-case sensitive)</param>
+    /// <param name="Durations"></param>
+    /// <returns></returns>
+    public async Task<GetProjectsListResponse> GetListWithFiltersAsync(int? PageSize, int? PageNumber, string? SearchPattern, string[]? TeamSizes, string[]? Categories, string[]? Durations)
+    {
+        if(PageSize is null) PageNumber = null;
+
+        IQueryable<Project> projects = _context.Projects;
+
+        if(TeamSizes is not null)
+        {        
+            var filterExpression = ExpressionGenerator.GenerateTeamSizeFilterExpression(TeamSizes);
+            projects = projects.Where(filterExpression);
+        }
+
+        if(SearchPattern is not null)
+            projects = projects.Where(p=>
+                p.Description.ToLower().Contains(SearchPattern.ToLower()) ||
+                p.Name.ToLower().Contains(SearchPattern.ToLower()));
+
+        int TotalCount = projects.Count();
+
+        if(PageSize is not null && PageNumber is not null)
+            projects = projects
+                .Skip(PageSize.Value * (PageNumber.Value -1))
+                .Take(PageSize.Value);
+        else if (PageSize is not null)
+            projects = projects
+                .Take(PageSize.Value);
+
+        var projectsDto = await projects
+            .Include(p=>p.ProjectsUsers)
+            .Include(p=>p.Users)    
+            .Select(p => new ProjectReadDto
+            (
+                p.Id,
+                p.Name,
+                p.Description,
+                p.StartDate,
+                p.EndDate,
+                p.ProjectsUsers.Count(),
+                p.Users.Take(3).Select(u => new ProjecUserShortDto
+                (
+                    u.Id,
+                    u.ProfilePicture            
+                )).ToList()
+            )).ToListAsync();
+
+        return new GetProjectsListResponse
+        (
+            TotalCount : TotalCount,
+            PageNumber : PageNumber??=1,
+            PageSize : PageSize??=TotalCount,
+            IsPrevPageExist : PageNumber > 1,
+            IsNextPageExist : PageNumber * PageSize < TotalCount, 
+            Projects: projectsDto
+        );
+    }
+
 
 }

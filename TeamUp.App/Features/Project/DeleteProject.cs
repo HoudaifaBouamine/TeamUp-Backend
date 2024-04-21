@@ -8,12 +8,27 @@ partial class ProjectsController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteProjectAsync(int id)
     {
-        var existingProject = await _projectRepository.GetByIdAsync(id);
-        if (existingProject is null)
-        {
-            return NotFound();
-        }
-        await _projectRepository.DeleteAsync(id);
-        return NoContent();
+
+        var success = await _projectRepository.DeleteAsync(id);
+        
+        if(success) return NoContent();
+
+        return NotFound();
+    }
+}
+
+partial class ProjectRepository
+{
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        
+        if (project is null)
+            return false;
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }

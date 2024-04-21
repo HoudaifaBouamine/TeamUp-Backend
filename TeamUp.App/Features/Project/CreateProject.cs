@@ -1,4 +1,5 @@
 using Authentication.UserManager;
+using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -36,4 +37,38 @@ partial class ProjectsController
         );
         return CreatedAtAction(nameof(GetProject), new { id = projectId }, projectReadDto);
     }
+}
+
+partial class ProjectRepository
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="projectDto"></param>
+    /// <param name="user"></param>
+    /// <returns>Project Id</returns>
+    public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
+    {
+        var project = new Project
+        {
+            Name = projectDto.Name,
+            Description = projectDto.Description,
+            StartDate = projectDto.StartDate,
+            ChatRoom = new (),
+            Users = [user]
+        };
+
+
+        project.ProjectsUsers.Add(new UsersProject
+        {
+            IsMentor = true,
+            User = user
+        });
+        project.TeamSize = 1;
+
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+        return project.Id;
+    }
+    
 }

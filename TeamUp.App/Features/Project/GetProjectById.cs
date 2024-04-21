@@ -1,15 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using Asp.Versioning;
-using Bogus.DataSets;
-using CommandLine;
-using FluentEmail.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Models;
-using Project = Models.Project;
 
 namespace Features.Projects;
 
@@ -28,3 +18,15 @@ partial class ProjectsController
         return Ok(project);
     }
 }
+
+partial class ProjectRepository
+{
+    public async Task<ProjectReadDto> GetByIdAsync(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        return MapProjectToProjectReadDto(project!);
+    }
+}
+
+    
+

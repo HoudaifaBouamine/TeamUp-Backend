@@ -13,7 +13,8 @@ using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using Models;
 using Utils;
-using Repositories;
+using Features.Projects.Contracts;
+using Features.Projects;
 
 var builder = WebApplication.CreateBuilder(args);
 

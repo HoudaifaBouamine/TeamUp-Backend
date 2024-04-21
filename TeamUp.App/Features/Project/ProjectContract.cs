@@ -1,0 +1,80 @@
+﻿using Models;
+
+namespace Features.Projects.Contracts;
+
+public interface IProjectRepository
+{
+    Task<ProjectReadDto> GetByIdAsync(int id);
+    Task<GetProjectsListResponse> GetListWithSearchAndPaginationAsync (
+        int? PageSize,int? PageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse> GetListWithFiltersAsync (
+        int? PageSize,int? PageNumber, string? SearchPattern, 
+        string[]? TeamSizes, string[]? Categories, string[]? Durations);
+    Task<int> CreateAsync(ProjectCreateDto projectDto,User user);
+    Task <bool>UpdateAsync(int id, ProjectCreateDto projectDto);
+    Task<bool> DeleteAsync(int id);
+    Task<int> GetUsersCountAsync(int projectId);
+    Task<IEnumerable<ProjecUserShortDto>> GetUsersSampleAsync(int projectId);
+    Task<ProjectDetailsReadDto> GetDetailsAsync(int projectId);
+
+    Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
+}
+
+public record ProjectCreateDto
+(
+    string Name,
+    string Description,
+    DateOnly StartDate
+);
+
+public record ProjectReadDto
+(
+    int Id,
+    string Name,
+    string Description,
+    DateOnly StartDate,
+    DateOnly? EndDate,
+    int UsersCount,
+    List<ProjecUserShortDto> UsersSample
+);
+
+public record ProjecUserShortDto
+(
+    string Id, 
+    string ProfilePicture
+);
+
+public record ProjectDetailsReadDto
+(
+    int Id,
+    string Name,
+    string Description,
+    DateOnly StartDate,
+    DateOnly? EndDate,
+    int UsersCount,
+    List<ProjecUserLongDto> Users
+);
+
+public record ProjecUserLongDto
+(
+    string Id, 
+    string DisplayName, 
+    string Handler, 
+    string ProfilePicture,
+    bool IsMentor
+);
+
+public record GetProjectsListResponse
+(
+    int TotalCount,
+    int PageNumber,
+    int PageSize,
+    bool IsPrevPageExist,
+    bool IsNextPageExist,
+    IEnumerable<ProjectReadDto> Projects
+);
+
+public class GetProjectDetailsResponse
+{
+    public string SearchPattern { get; set; } = "";
+}

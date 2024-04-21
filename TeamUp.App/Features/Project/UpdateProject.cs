@@ -1,3 +1,4 @@
+using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Features.Projects;
@@ -15,5 +16,25 @@ partial class ProjectsController
             return NotFound();
         }
         return Ok(updatedProject);
+    }
+}
+
+partial class ProjectRepository
+{
+    public async Task<bool> UpdateAsync(int id, ProjectCreateDto projectDto)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        
+        if (project is not null)
+        {
+            project.Name = projectDto.Name;
+            project.Description = projectDto.Description;
+            project.StartDate = projectDto.StartDate;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
     }
 }
