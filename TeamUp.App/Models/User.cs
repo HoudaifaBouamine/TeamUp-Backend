@@ -18,7 +18,7 @@ public partial class User : IdentityUser
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string Handler {get;set;} = string.Empty;
-    [Required] public string DisplayName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
     public VerificationCode? EmailVerificationCode { get; set; }
     public VerificationCode? PasswordRestCode { get; set; }
     public string? PasswordResetToken { get; set; } 
@@ -26,12 +26,10 @@ public partial class User : IdentityUser
     public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
     public string? FullAddress { get; set; }
 
-    // Project have many users, users have many projects, so we declare a list of users in project, and list of projects in user
-    public List<Project> Projects { get; set; } = [];
-    public List<UsersProject> UsersProjects { get; set; } = [];
-    //users have many skills so we declare a list of UserSkill 
-    public virtual ICollection<UserSkill> UserSkills { get; set; } = new List<UserSkill>();
-
+    public ICollection<Project> Projects { get; set; } = [];
+    public ICollection<UsersProject> UsersProjects { get; set; } = [];
+    public ICollection<UserSkill> UserSkills { get; set; } = [];
+    public ICollection<Skill> Skills { get; set; } = [];
 }
 
 
@@ -39,6 +37,60 @@ public partial class User : IdentityUser
 partial class User
 {
 
+    public User(string firstName, string lastName, string email, string profilePicture)
+    {
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
+        DisplayName = FirstName + " " + LastName;
+        Email = email.Trim();
+        UserName = Email;
+        ProfilePicture = profilePicture.Trim();
+    }
+
+    public User(string displayName,string email)
+    {
+        DisplayName = displayName.Trim();
+        Email = email.Trim();
+        UserName = Email;
+    }
+    public User() {}
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static bool operator == (User user1,User user2)
+    {
+        return user1.Equals(user2);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        User? user2 = (User?) obj;
+        User? user1 = this;
+
+        if(user1 is null && user2 is null)
+            return true;
+
+        if(user1 is null || user2 is null)
+            return false;
+        
+        if(base.Equals(user2))
+        {
+            return true;
+        }
+
+        if(user1.Id == user2.Id)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    public static bool operator != (User user1,User user2)
+    {
+        return ! user1.Equals(user2);
+    }
     const int MaxRate = 5;
 
     public string GetFullName()

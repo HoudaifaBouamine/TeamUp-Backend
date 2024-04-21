@@ -70,6 +70,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
+
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireDigit = false;
@@ -125,7 +126,6 @@ builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<ISkillRepository,SkillRepository>();
-
 
 ///////////////////////////////////////////////////
 

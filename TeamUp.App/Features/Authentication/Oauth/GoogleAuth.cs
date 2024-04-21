@@ -53,16 +53,15 @@ public static class CreateUserFromSocialLoginExtension
         if (user is null)
         {
             user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                UserName = model.Email,
-                ProfilePicture = model.ProfilePicture,
-            };
+            (
+                email: model.Email,
+                firstName: model.FirstName,
+                lastName: model.LastName,
+                profilePicture: model.ProfilePicture
+            );
             
             if(user.FirstName is null && user.LastName is null)
-                user.DisplayName = user.Email.Split("@")[0];
+                user.DisplayName = user.Email!.Split("@")[0];
             else
                 user.DisplayName = user.GetFullName().Trim();
 
