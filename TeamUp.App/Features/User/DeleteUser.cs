@@ -14,7 +14,7 @@ partial class UserEndpoints
         [FromRoute] Guid Id
     )
     {
-        var deletedRowsCount = await db.Users.Where(u=>u.Id == Id.ToString()).ExecuteDeleteAsync();
+        var deletedRowsCount = await db.Users.Where(u=>u.Id == Id).ExecuteDeleteAsync();
 
         if(deletedRowsCount == 0)
             return Results.NotFound(new ErrorResponse($"User with is {Id} is not found"));

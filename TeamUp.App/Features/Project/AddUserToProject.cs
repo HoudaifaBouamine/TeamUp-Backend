@@ -33,25 +33,26 @@ partial class ProjectRepository
             .Include(p => p.ProjectsUsers)
             .FirstOrDefaultAsync(p => p.Id == projectId);
 
-        if (project is not null)
+        if(project is null) return false;
+
+       
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return false;
+        
+        project.ProjectsUsers.Add(new UsersProject
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+            User = user,
+            IsMentor = isMentor
+        });
+        
+        project.TeamSize++;
 
-            if (user != null)
-            {
-                project.ProjectsUsers.Add(new UsersProject
-                {
-                    User = user,
-                    IsMentor = isMentor
-                });
-                project.TeamSize++;
-
-                await _context.SaveChangesAsync();
-                return true;
-            }
-        }
-        return false;
+        await _context.SaveChangesAsync();
+    
+        return true;    
     }
 
     /// <summary>
@@ -74,7 +75,7 @@ partial class ProjectRepository
         if(project is null) return -1;
 
         var users = await _context.Users
-            .Where(u => userIds.Contains(Guid.Parse(u.Id)))
+            .Where(u => userIds.Contains(u.Id))
             .ToListAsync();
 
         var prevUsersCount = project.Users.Count();

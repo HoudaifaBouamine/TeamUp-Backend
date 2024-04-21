@@ -13,7 +13,7 @@ namespace Models;
 
 
 
-public partial class User : IdentityUser
+public partial class User : IdentityUser<Guid>
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

@@ -18,7 +18,7 @@ public class UsersProject
     public int Id { get; set; }
     public User User { get; set; } = null!;
     public Project Project { get; set; } = null!;
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
     public int ProjectId { get; set; }
     public bool IsMentor { get; set; } = false;
 }

@@ -40,7 +40,7 @@ public record ProjectReadDto
 
 public record ProjecUserShortDto
 (
-    string Id, 
+    Guid Id, 
     string ProfilePicture
 );
 
@@ -57,7 +57,7 @@ public record ProjectDetailsReadDto
 
 public record ProjecUserLongDto
 (
-    string Id, 
+    Guid Id, 
     string DisplayName, 
     string Handler, 
     string ProfilePicture,
