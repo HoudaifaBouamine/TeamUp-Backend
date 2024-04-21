@@ -1,30 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 
 namespace Models;
 
-
-
-
-
 public partial class User : IdentityUser<Guid>
 {
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string Handler {get;set;} = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
-    public VerificationCode? EmailVerificationCode { get; set; }
-    public VerificationCode? PasswordRestCode { get; set; }
-    public string? PasswordResetToken { get; set; } 
-    public float Rate { get; set; } = MaxRate;
-    public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
-    public string? FullAddress { get; set; }
+    public string? FirstName { get; private set; }
+    public string? LastName { get; private set; }
+    public string Handler {get; private set;} = string.Empty;
+    public string DisplayName { get; private set; } = string.Empty;
+    public VerificationCode? EmailVerificationCode { get; private set; }
+    public VerificationCode? PasswordRestCode { get; private set; }
+    public string? PasswordResetToken { get; private set; } 
+    public float Rate { get; private set; } = MaxRate;
+    public string ProfilePicture { get; private set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
+    public string? FullAddress { get; private set; }
 
     public ICollection<Project> Projects { get; set; } = [];
     public ICollection<UsersProject> UsersProjects { get; set; } = [];
@@ -56,7 +46,12 @@ partial class User
     public User() {}
     public override int GetHashCode()
     {
-        throw new NotImplementedException();
+        return Id.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(new {Id = this.Id, Email = this.Email, DisplayName = this.DisplayName});
     }
 
     public static bool operator == (User user1,User user2)

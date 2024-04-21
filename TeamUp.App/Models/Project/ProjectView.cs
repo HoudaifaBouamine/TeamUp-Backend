@@ -1,15 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity ; 
 
+namespace Models;
 
-namespace Models {
- 
 [Table("ProjectViews")]
 public class ProjectView
 {
@@ -18,7 +10,4 @@ public class ProjectView
     public byte stars { get; set; } 
     public User? ReviewerUserId { get; set; } 
     public Project? ReviewedProjectId { get; set; }
-}
-
-
 }
