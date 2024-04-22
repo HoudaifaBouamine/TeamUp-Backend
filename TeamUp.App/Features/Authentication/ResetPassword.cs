@@ -24,7 +24,7 @@ partial class AuthEndpoints
             return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidToken()));
         
         var token = CreateResetPasswordToken();
-        user.PasswordResetToken = token;
+        user.SetPasswordRestToken(token);
         await userManager.UpdateAsync(user);
         return TypedResults.Ok(new GetResetPasswordTokenResponseDto(token));
     }

@@ -17,8 +17,8 @@ partial class AuthEndpoints
 
             if(user is null) return TypedResults.NotFound();
             
-            if(user.PasswordRestCode is null) user.PasswordRestCode = VerificationCode.CreatePasswordResetCode();
-            var code = user.PasswordRestCode.Code;
+            if(user.PasswordRestCode is null) user.CreateNewPasswordResetCode();
+            var code = user.GetPasswordResetCode();
             
             await db.SaveChangesAsync();
 

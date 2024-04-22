@@ -15,23 +15,23 @@ partial class AuthEndpoints
     {
         User userModel = userManager.Users.First(u=>u.Email == email);
 
-        userModel.EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
-        string code = userModel.EmailVerificationCode.Code!;
+        userModel.CreateNewEmailVerificationCode();
+        var code = userModel.EmailVerificationCode?.Code;
 
         await userManager.UpdateAsync(userModel);
 
-        return await emailSender.SendConfirmationCodeAsync(userModel, email, code);
+        return await emailSender.SendConfirmationCodeAsync(userModel, email, code!);
     }
 
     async Task<bool> SendPasswordResetCodeEmailAsync(AppDbContext db, string email, VerificationCode.VerificationCodeTypes verificationCodeType)
     {
         User userModel = db.Users.First(u=>u.Email == email);
 
-        userModel.PasswordRestCode = VerificationCode.CreatePasswordResetCode();
-        string code = userModel.PasswordRestCode.Code!;
+        userModel.CreateNewPasswordResetCode();
+        var code = userModel.GetPasswordResetCode();
 
         await db.SaveChangesAsync();
-        return await emailSender.SendPasswordResetCodeAsync(userModel, email, code);
+        return await emailSender.SendPasswordResetCodeAsync(userModel, email, code!);
     }
 
 

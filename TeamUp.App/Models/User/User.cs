@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 
@@ -26,6 +27,42 @@ public partial class User : IdentityUser<Guid>
 // Seperating Fields and Methods to 2 classes to simplify the work
 partial class User
 {
+    public bool SetDisplayName(string displayName)
+    {
+        displayName = displayName.Trim();
+
+        if(string.IsNullOrWhiteSpace(displayName)) return false;
+
+        DisplayName = displayName;
+        return true;
+    }
+    public string? GetPasswordResetCode()
+    {
+        return PasswordRestCode?.Code;
+    }
+    public void CreateNewPasswordResetCode()
+    {
+        PasswordRestCode = VerificationCode.CreatePasswordResetCode();
+    }
+
+    public string? GetEmailVerificationCode()
+    {
+        return PasswordRestCode?.Code;
+    }
+    public void CreateNewEmailVerificationCode()
+    {
+        EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
+    }
+
+    public void Update(string? firstName, string? lastName, string displayName, string handler, string? fullAddress, string? profilePicture)
+    {
+        this.FirstName = firstName ?? this.FirstName;
+        this.LastName = lastName ?? this.LastName;
+        this.DisplayName = displayName;
+        this.Handler = handler;
+        this.FullAddress = fullAddress;
+        this.ProfilePicture = profilePicture!;
+    }
 
     public User(string firstName, string lastName, string email, string profilePicture)
     {
@@ -44,6 +81,14 @@ partial class User
         UserName = Email;
     }
     public User() {}
+
+
+    public bool SetPasswordRestToken(string token)
+    {
+        PasswordResetToken = token;
+        return true;
+    }
+
     public override int GetHashCode()
     {
         return Id.GetHashCode();

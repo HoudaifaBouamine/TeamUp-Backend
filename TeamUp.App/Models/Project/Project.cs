@@ -2,20 +2,32 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Models;
 
-public class Project
+public partial class Project
 {
     public int Id { get; set;}
     [Required]
     public string Name { get; set; } = string.Empty;
-    // public string ProjectVersion { get; set; } may be i will add this column in the future , because we forget it  
     public string Description { get; set; } = string.Empty ;
     public DateOnly StartDate { get; set;}
     public DateOnly? EndDate { get; set;} = null;
     public ChatRoom ChatRoom { get; set;} = null!;
-
-    // Project have many users, users have many projects, so we declare a list of users in project, and list of projects in user 
     public int TeamSize { get; set; } = default;
     public List<User> Users { get; set;} = [];
     public List<UsersProject> ProjectsUsers { get; set; } = [];
 
+}
+
+partial class Project
+{
+    protected Project() {}
+
+    public Project(string name, string description, DateOnly startDate , User creator)
+    {
+        Name = name;
+        Description = description;
+        StartDate = startDate;
+        ChatRoom = new ChatRoom();
+        Users = [creator];
+        ProjectsUsers = [];
+    }
 }

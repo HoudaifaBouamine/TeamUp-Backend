@@ -50,14 +50,12 @@ partial class ProjectRepository
     public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
     {
         var project = new Project
-        {
-            Name = projectDto.Name,
-            Description = projectDto.Description,
-            StartDate = projectDto.StartDate,
-            ChatRoom = new (),
-            Users = [user]
-        };
-
+        (
+            name : projectDto.Name,
+            description : projectDto.Description,
+            startDate : projectDto.StartDate,
+            creator : user
+        );
 
         project.ProjectsUsers.Add(new UsersProject
         {
