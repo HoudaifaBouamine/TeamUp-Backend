@@ -2,7 +2,6 @@ using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Models;
 
 namespace Features.Projects;
 partial class ProjectsController
@@ -41,14 +40,8 @@ partial class ProjectRepository
 
         if (user is null)
             return false;
-        
-        project.ProjectsUsers.Add(new UsersProject
-        {
-            User = user,
-            IsMentor = isMentor
-        });
-        
-        project.TeamSize++;
+
+        project.AddUser(user);
 
         await _context.SaveChangesAsync();
     
@@ -78,14 +71,12 @@ partial class ProjectRepository
             .Where(u => userIds.Contains(u.Id))
             .ToListAsync();
 
-        var prevUsersCount = project.Users.Count();
-        project.Users.AddRange(users);
-        var newUsersCount = project.Users.Count();
-        project.TeamSize = newUsersCount;
+        var prevUsersCount = project.Users.DistinctBy(u=>u.Id).Count();
+        project.AddUsers(users);
 
         await _context.SaveChangesAsync();
         
-        return newUsersCount - prevUsersCount;
+        return project.TeamSize - prevUsersCount;
     }
 
 }

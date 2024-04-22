@@ -49,20 +49,13 @@ partial class ProjectRepository
     /// <returns>Project Id</returns>
     public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
     {
-        var project = new Project
+        var project = Project.Create
         (
             name : projectDto.Name,
             description : projectDto.Description,
             startDate : projectDto.StartDate,
             creator : user
         );
-
-        project.ProjectsUsers.Add(new UsersProject
-        {
-            IsMentor = true,
-            User = user
-        });
-        project.TeamSize = 1;
 
         _context.Projects.Add(project);
         await _context.SaveChangesAsync();

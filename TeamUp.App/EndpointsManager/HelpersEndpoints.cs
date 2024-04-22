@@ -92,7 +92,7 @@ namespace EndpointsManager
                 p.Description,
                 p.StartDate
             ),
-            users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
+                users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
             );
 
             for(int i = 0;i<rand.Next(5,20);i++)

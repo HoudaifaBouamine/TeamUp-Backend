@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,8 +18,29 @@ public partial class User : IdentityUser<Guid>
     public string ProfilePicture { get; private set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
     public string? FullAddress { get; private set; }
 
-    public ICollection<Project> Projects { get; set; } = [];
-    public ICollection<UsersProject> UsersProjects { get; set; } = [];
+
+    private List<Project> _projects { get; set; } = [];
+    [NotMapped]
+    public IEnumerable<Project> Projects
+    {
+        get
+        {
+            return _projects.AsReadOnly(); 
+        }
+    }
+    
+    private List<UsersProject> _usersProjects { get; set; } = [];
+
+    [NotMapped]
+    public IEnumerable<UsersProject> UsersProjects 
+    { 
+        get
+        {
+            return _usersProjects.AsReadOnly();
+        }
+    }
+ 
+
     public ICollection<UserSkill> UserSkills { get; set; } = [];
     public ICollection<Skill> Skills { get; set; } = [];
 }
