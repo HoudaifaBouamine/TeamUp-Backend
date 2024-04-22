@@ -24,8 +24,8 @@ public partial class Project
 
 
 
-    public List<User> Users { get; set; }
-    public List<UsersProject> ProjectsUsers { get; set; }
+    public List<User> Users { get; set; } = [];
+    public List<UsersProject> ProjectsUsers { get; set; } = [];
 
 }
 

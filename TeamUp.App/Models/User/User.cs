@@ -25,11 +25,11 @@ public partial class User : IdentityUser<Guid>
 
     
     // public IEnumerable<UsersProject> UsersProjects => _usersProjects.AsReadOnly();
+    
+    public List<UsersProject> UsersProjects { get; set; } = [];
+    public List<Project> Projects { get; set; } = [];
 
     public ICollection<UserSkill> UserSkills { get; set; } = [];
-    
-    public List<UsersProject> UsersProjects { get; set; }
-    public List<Project> Projects { get; set; }
     public ICollection<Skill> Skills { get; set; } = [];
 }
 

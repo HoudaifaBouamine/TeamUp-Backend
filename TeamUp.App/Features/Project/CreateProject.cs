@@ -13,6 +13,7 @@ partial class ProjectsController
     [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest,Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> CreateProjectAsync(
         [FromBody] ProjectCreateDto projectDto,
         [FromServices] CustomUserManager userManager
