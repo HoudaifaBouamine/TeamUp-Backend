@@ -16,27 +16,16 @@ public partial class Project
     public ChatRoom ChatRoom { get; set;} = null!;
     public int TeamSize { get; private set; } = 0;
 
-    private List<User> _users { get; set;} = [];
+    // private List<User> _users { get; set;} = [];
+    // public IEnumerable<User> Users => _users.AsReadOnly();
 
-    [NotMapped]
-    public IEnumerable<User> Users 
-    { 
-        get
-        {
-            return _users.AsReadOnly();
-        }
-    }
+    // private List<UsersProject> _projectsUsers { get; set; } = [];
+    // public IEnumerable<UsersProject> ProjectsUsers => _projectsUsers.AsReadOnly();
 
-    private List<UsersProject> _projectsUsers { get; set; } = [];
 
-    [NotMapped]
-    public IEnumerable<UsersProject> ProjectsUsers 
-    {
-        get
-        {
-            return _projectsUsers.AsReadOnly();
-        }
-    }
+
+    public List<User> Users { get; set; }
+    public List<UsersProject> ProjectsUsers { get; set; }
 
 }
 
@@ -45,8 +34,8 @@ public partial class Project
 
     public void AddUser(User user, bool isMentor = false)
     {
-        _users.Add(user);
-        _projectsUsers.Add(new UsersProject
+        Users.Add(user);
+        ProjectsUsers.Add(new UsersProject
         {
             User = user,
             IsMentor = isMentor
@@ -57,8 +46,8 @@ public partial class Project
 
     public void AddUsers(IEnumerable<User> user)
     {
-        _users.AddRange(user);
-        _users = _users.DistinctBy(u=>u.Id).ToList();
+        Users.AddRange(user);
+        Users = Users.DistinctBy(u=>u.Id).ToList();
         TeamSize = user.Count();
     }
     public Project() {}
@@ -69,8 +58,8 @@ public partial class Project
         Description = description;
         StartDate = startDate;
         ChatRoom = new ChatRoom();
-        _users = [creator];
-        _projectsUsers = [];
+        Users = [creator];
+        ProjectsUsers = [];
     }
 
     public static Project Create(string name, string description, DateOnly startDate , User creator)

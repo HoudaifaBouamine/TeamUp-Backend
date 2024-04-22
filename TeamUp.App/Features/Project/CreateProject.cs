@@ -1,4 +1,5 @@
 using Authentication.UserManager;
+using Dia2Lib;
 using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,7 +58,7 @@ partial class ProjectRepository
             creator : user
         );
 
-        _context.Projects.Add(project);
+        _context.Add(project);
         await _context.SaveChangesAsync();
         return project.Id;
     }

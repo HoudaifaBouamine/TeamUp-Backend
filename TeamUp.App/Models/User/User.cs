@@ -19,29 +19,17 @@ public partial class User : IdentityUser<Guid>
     public string? FullAddress { get; private set; }
 
 
-    private List<Project> _projects { get; set; } = [];
-    [NotMapped]
-    public IEnumerable<Project> Projects
-    {
-        get
-        {
-            return _projects.AsReadOnly(); 
-        }
-    }
-    
-    private List<UsersProject> _usersProjects { get; set; } = [];
+    // private List<Project> _projects { get; set; } = [];
+    // public IEnumerable<Project> Projects => _projects.AsReadOnly();
+    // private List<UsersProject> _usersProjects { get; set; } = [];
 
-    [NotMapped]
-    public IEnumerable<UsersProject> UsersProjects 
-    { 
-        get
-        {
-            return _usersProjects.AsReadOnly();
-        }
-    }
- 
+    
+    // public IEnumerable<UsersProject> UsersProjects => _usersProjects.AsReadOnly();
 
     public ICollection<UserSkill> UserSkills { get; set; } = [];
+    
+    public List<UsersProject> UsersProjects { get; set; }
+    public List<Project> Projects { get; set; }
     public ICollection<Skill> Skills { get; set; } = [];
 }
 
