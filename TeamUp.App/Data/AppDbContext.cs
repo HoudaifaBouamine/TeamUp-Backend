@@ -29,19 +29,7 @@ public class AppDbContext : IdentityDbContext<User>
 
 
         //
-      /*  builder.Entity<User>()
-                .HasMany(u => u.UserSkills)
-                .WithMany(s => s.Users)
-                .UsingEntity<UserSkill>(
-                    j => j
-                        .HasOne(us => us.Skill)
-                        .WithMany(),
-                    j => j
-                        .HasOne(us => us.User)
-                        .WithMany())
-                .HasKey(us => new { us.UserId, us.SkillId });*/
-        //
-
+    
 
         builder.Entity<UsersProject>()
             .HasOne(up => up.User)
@@ -78,8 +66,8 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
 
-    // NOTE (HOUDAIFA) : No need for users table declaration because it is already defined inside the base class => IdentityDbContext<User>
-    // public DbSet<User> Users { get; set; }
+    // NOTE (HOUDAIFA) : No need for users table declaration because it is already defined inside the base class => IdentityDbContext<User>  => ok 
+    // public DbSet<User> Users { get; set; } 
 
 
 
