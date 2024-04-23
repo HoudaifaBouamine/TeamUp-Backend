@@ -69,8 +69,8 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     //     return CreatedAtAction("GetSkillById", new { id = skill.Id }, skill);
     // }
 
-
         [HttpGet("{id}")]
+
         public async Task<IActionResult> GetSkillById(int id)
         {
             var skill = await _skillRepository.GetByIdAsync(id);
@@ -78,10 +78,14 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
             {
                 return NotFound(new ErrorResponse("Skill not found"));
             }
-            return Ok(skill);
+            var skillDto = new GetSkillDto
+            {
+                Id = skill.Id,
+                Name = skill.Name,
+            };
+            return Ok(skillDto);
         }
 
-        
 
 
 
