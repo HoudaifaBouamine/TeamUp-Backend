@@ -3,6 +3,7 @@ using Repositories;
 using Asp.Versioning;
 using Utils;
 using Models;
+using DTos;
 namespace Controllers;
 
 [Tags("Skills Group")]
@@ -15,16 +16,20 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     private readonly ISkillRepository _skillRepository = skillRepository;
 
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllSkills()
+       public async Task<IActionResult> GetAllSkills()
         {
             var skills = await _skillRepository.GetAllAsync();
-            return Ok(skills);
+            var skillDtos = new List<GetSkillDto>();
+            foreach (var skill in skills)
+            {
+                skillDtos.Add(new GetSkillDto
+                {
+                    Id = skill.Id,
+                    Name = skill.Name
+                });
+            }
+            return Ok(skillDtos);
         }
-
-
-
 
 
 
@@ -61,7 +66,7 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     //     }
 
     //     await _skillRepository.AddAsync(skill);
-    //     return CreatedAtAction(nameof(GetSkillById), new { id = skill.Id }, skill);
+    //     return CreatedAtAction("GetSkillById", new { id = skill.Id }, skill);
     // }
 
 
@@ -75,6 +80,10 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
             }
             return Ok(skill);
         }
+
+        
+
+
 
     [HttpDelete("{userId}/{skillId}")]
     public async Task<IActionResult> RemoveSkillFromUser(string userId, int skillId)
