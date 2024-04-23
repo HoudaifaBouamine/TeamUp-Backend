@@ -15,7 +15,7 @@ partial class UserEndpoints
     )
     {
 
-        User? user = await db.Users.FirstOrDefaultAsync(u=>u.Id == Id.ToString());
+        User? user = await db.Users.FirstOrDefaultAsync(u=>u.Id == Id);
 
         if(user is null)
         {

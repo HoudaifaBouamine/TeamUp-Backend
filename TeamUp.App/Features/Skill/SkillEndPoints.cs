@@ -1,63 +1,85 @@
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Repositories;
-using Users;
 using Asp.Versioning;
-
+using Utils;
+using Models;
 namespace Controllers;
 
 [Tags("Skills Group")]
 [ApiVersion(1)]
 [ApiController]
 [Route("api/v{version:apiVersion}/skills")]
-public class SkillController : ControllerBase
+public class SkillController(IUserRepository userRepository, ISkillRepository skillRepository) : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
-    private readonly ISkillRepository _skillRepository;
-
-    public SkillController(IUserRepository userRepository, ISkillRepository skillRepository)
-    {
-        _userRepository = userRepository;
-        _skillRepository = skillRepository;
-    }
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly ISkillRepository _skillRepository = skillRepository;
 
 
-    [HttpPost("{userId}/skills/{skillId}")]
-    public async Task<ActionResult> AddSkillToUser(string userId, int skillId)
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllSkills()
+        {
+            var skills = await _skillRepository.GetAllAsync();
+            return Ok(skills);
+        }
+
+
+
+
+
+
+
+    [HttpPost("{userId}/{skillId}")]
+    public async Task<IActionResult> AddSkillToUser(string userId, int skillId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
+        if (user is null)
         {
-            return NotFound("User not found");
+            return NotFound(new ErrorResponse("User not found"));
         }
 
         var skill = await _skillRepository.GetByIdAsync(skillId);
-        if (skill == null)
+        if (skill is null)
         {
-            return NotFound("Skill not found");
+            return NotFound(new ErrorResponse("Skill not found"));
         }
 
-        //user.UserSkills.Add(skill);
+        user.Skills.Add(skill);
 
         await _userRepository.UpdateAsync(user);
         return Ok();
     }
 
-    [HttpDelete("{userId}/skills/{skillId}")]
-    public async Task<ActionResult> RemoveSkillFromUser(string userId, int skillId)
+
+
+    // [HttpPost]
+    // public async Task<IActionResult> CreateSkill([FromBody] Skill skill)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+
+    //     await _skillRepository.AddAsync(skill);
+    //     return CreatedAtAction(nameof(GetSkillById), new { id = skill.Id }, skill);
+    // }
+
+
+
+
+    [HttpDelete("{userId}/{skillId}")]
+    public async Task<IActionResult> RemoveSkillFromUser(string userId, int skillId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
+        if (user is null)
         {
-            return NotFound("User not found");
+            return NotFound(new ErrorResponse("User not found"));
         }
 
         var skill = user.UserSkills.FirstOrDefault(s => s.Id == skillId);
-        if (skill == null)
+        if (skill is null)
         {
-            return NotFound("Skill not found for the user");
+            return NotFound(new ErrorResponse("Skill not found for the user"));
         }
 
         user.UserSkills.Remove(skill);

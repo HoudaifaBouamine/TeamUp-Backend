@@ -24,146 +24,214 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome
             { "CodeLifeTime", ((int)VerificationCode.CodeMaxLifeInMin.EmailVerification).ToString() }
         };
 
-//         string body = @"
-// <html lang=""en"">
-// <head>
-//     <meta charset=""UTF-8"">
-//     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-//     <title></title>
-//     <style>
-//         * {
-//             margin: 0;
-//             padding: 0;
-//             box-sizing: border-box;
-//         }
-//         .header {
-//             width: 700px;
-//             height: 120px;
-//             align-self: stretch;
-//             background: var(--Main-piccolo, #682DFE);
-//         }
-//         .header .welcome {
-//             height: 63px;
-//             flex-shrink: 0;
-//             color: var(--Main-goten, #FFF);
-//             text-align: center;
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 32px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px;
-//             text-align: center;
-//             vertical-align: middle;
-//             line-height: 120px;
-//         }
-//         .body {
-//             height: 571px;
-//             align-self: stretch;
-//             background: var(--Main-goten, #FFF);
-//             padding-left: 79px;
-//             padding-right: 79px;
-//         }
-//         .footer {
-//             height: 158px;
-//             align-self: stretch;
-//             background: var(--black-night, #070707);
-//         }
-//         .container {
-//             width: 700px;
-//         }
-//         .confrm-your-email {
-//             flex-shrink: 0;
-//             color: var(--Main-trunks, #595D62);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 32px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px;
-//             text-align: center;
-//             vertical-align: middle;
-//             line-height: 120px;
-//         }
-//         .Hi {
-//             width: 383px;
-//             height: 65px;
-//             color: var(--Main-bulma, #000);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 24px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px;
-//         }
-//         .Code {
-//             width: 436px;
-//             height: 112px;
-//             flex-shrink: 0;
-//             color: var(--Main-bulma, #000);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: ""DM Sans"";
-//             font-size: 64px;
-//             font-style: normal;
-//             font-weight: 700;
-//             line-height: 72px;
-//             text-align: center;
-//             vertical-align: middle;
-//             margin-top: 80px;
-//             margin-bottom: 80px;
-//         }
-//         .expires-in {
-//             color: var(--Main-bulma, #000);
-//             text-align: center;
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 16px;
-//             font-style: normal;
-//             font-weight: 400;
-//             line-height: 30px;
-//             text-align: center;
-//             vertical-align: middle;
-//         }
-//         .logo {
-//             margin: 47px;
-//         }
-//         .teamup-com {
-//             display: inline-block;
-//             width: 112px;
-//             height: 23px;
-//             color: rgba(255, 255, 255, 0.60);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 13px;
-//             font-style: normal;
-//             font-weight: 400;
-//             line-height: 30px;
-//             letter-spacing: 2px;
-//         }
-//     </style>
-// </head>
-// <body>
-//     <div class=""container"">
-//         <div class=""header"">
-//             <p class=""welcome"">Welcome To TeamUp !</p>
-//         </div>
-//         <div class=""body"">
-//             <div class=""confrm-your-email"">Confirm Your Email</div>
-//             <div class=""Hi"">Hi, @{DisplayName}</div>
-//             Thanks for signing up for TeamUp! To access all the features and start building your dream team, please verify your email address by entering the PIN code
-//             <div class=""Code"">@{Code}</div>
-//             <div class=""expires-in"">The code expires in @{CodeLifeTime} minutes.</div>
-//         </div>
-//         <div class=""footer"">
-//             <img src=""https://i.ibb.co/GJKb5b3/Primery-1.png"" alt="""" class=""logo"">
-//             <p class=""teamup-com"">TeamUp.com</p>
-//         </div>
-//     </div>
-// </body>
-// </html>
-// ";
+#region HTML
+    string body = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+<meta charset=""UTF-8"">
+<meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+<title>Email Template</title>
 
-    var body = File.ReadAllText("Features/EmailService/Templets/VerifyEmail.htm");
+<style>
+
+/* Define web-safe fonts */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+  background: #F5F5F5;
+  padding: 48px;
+}
+
+.card {
+  width: 600px;
+  border-radius: 32px;
+  overflow: hidden;
+  margin: 0;
+  padding: 96px 48px;
+  background-color: white;
+}
+
+.headline {
+  text-align: center;
+  color: #141414;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 48px;
+  margin-bottom: 24px;
+  max-width: 60ch;
+}
+
+.eyebrow {
+  text-align: center;
+  color: #3A00E5;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  margin-bottom: 16px;
+}
+
+.body-text {
+  text-align: center;
+  color: #595959;
+  font-size: 20px;
+  font-weight: 400;
+  max-width: 50ch;
+  line-height: 34px;
+  margin: 0 auto; /* Center align horizontally */
+  width: 100%; /* Fill the container */
+  max-width: none; /* Remove the maximum width constraint */
+}
+
+.pin-code {
+  text-align: center;
+  color: black;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 56px;
+  letter-spacing: 4.80px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.caption {
+  text-align: center;
+  color: #8C8C8C;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 30px;
+  max-width: 60ch;
+  margin: 0 auto;
+}
+
+.footer {
+    width: 696px;
+    text-align: center;
+    padding: 64px 0; /* Increased padding for extra negative space (8 units) */
+    
+}
+
+.logo img {
+  height: 48px;
+  width: auto;
+
+}
+
+.social-media {
+  margin-top: 32px; /* Increased margin-top for extra space (4 units) */
+}
+
+.social-icon {
+  display: inline-block;
+  margin: 0 24px; /* Increased margin between social links (4 units) */
+}
+
+.social-icon img {
+  width: 32px;
+  height: auto;
+}
+
+
+.copyrights {
+  color: #777777;
+  font-size: 12px;
+  margin-top: 24px;
+  line-height: 24px;
+}
+
+@media only screen and (max-width: 600px) {
+  .card {
+    border-radius: 12px;
+    padding: 48px;
+    width: 360px;
+  }
+
+  .headline {
+    font-size: 24px;
+    line-height: 28px;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .body-text {
+    font-size: 14px;
+    line-height: 22px;
+    max-width: 40ch;
+    margin-bottom: 24px;
+  }
+
+  .pin-code {
+    font-size: 20px;
+    line-height: 28px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .caption {
+    font-size: 12px;
+    line-height: 16px;
+    max-width: 90%;
+    margin-bottom: 16px;
+  }
+
+  .footer {
+/* Increased margin-top for extra space (8 units) */
+    padding: 32px 0; 
+    width: 465px;
+    /* Increased padding for extra negative space (4 units) */
+  }
+
+  .logo img {
+  height: 32px;
+  width: auto;
+}
+
+  .social-icon img {
+    width: 24px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class=""container"">
+
+  <div class=""card"" id=""email-card"">
+        <div class=""eyebrow"">Welcome To TeamUp!</div>
+      <div class=""headline"" >Confirm your email</div>
+      <div class=""body-text"">Hi @{DisplayName}!<br/><br/>Thanks for signing up for TeamUp! To access all the features at TeamUp, verify your email address by entering the PIN code</div>
+      <div class=""pin-code"">@{Code}</div>
+      <div class=""caption"">The code expires in 10 minutes.</div>
+   
+  </div>
+
+  <div class=""footer"" id=""email-footer"">
+    <div class=""logo"">
+      <img src=""https://drive.google.com/thumbnail?sz=w1000&id=1raH-Wmf4GRR8vIQgz9p0M4Z1tRnk7GLF"" alt="""">
+    </div>
+    <div class=""social-media"">
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1kXKgsoVMLY7LRA2_0C6d7b-plwxQfUvB""></div>
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1DdyHzrCZWGpQw7qYJtEtrTqaqfjJ6JHJ""></div>
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1JoCCQ_wOW4oMHdG504rwZgEprTpT0ieO""></div>
+    </div>
+    <div class=""copyrights"">Copyright © 2024 TeamUp, All rights reserved.<br>You are receiving this email because you opted-in via our website.</div>
+  </div>
+</div>
+</body>
+</html>
+";
+#endregion
+
+    // var body = File.ReadAllText("Features/EmailService/Templets/VerifyEmail.htm");
 
         var emailBody = EmailService.CreateEmailFromStringWithParamters(body, parameters);
 
@@ -188,195 +256,214 @@ public class EmailSender(EmailService emailService) : IEmailSenderCustome
             { "Code", resetCode.ToString() },
             { "CodeLifeTime", ((int)VerificationCode.CodeMaxLifeInMin.PasswordRest).ToString() }
         };
+#region HTML
+        string htmlCode = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+<meta charset=""UTF-8"">
+<meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+<title>Email Template</title>
 
-// string htmlCode = @"
-// <html lang=""en"">
-// <head>
-//     <meta charset=""UTF-8"">
-//     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-//     <title></title>
+<style>
 
-//     <style>
-//         *{
-//             margin:0;
-//             padding: 0;
-//             box-sizing: border-box;
-            
-//         }
+/* Define web-safe fonts */
+body {
+    font-family: Arial, sans-serif;
+}
 
-//         .header
-//         {
-//             width: 700px;
-//             height: 120px;
-//             align-self: stretch;
-//             background: var(--Main-piccolo, #682DFE); 
-//         }
+.container {
+  width: 100%;
+  margin: 0 auto;
+  background: #F5F5F5;
+  padding: 48px;
+}
 
-//         .header .welcome
-//         {
-//             height: 63px;
-//             flex-shrink: 0;
-//             color: var(--Main-goten, #FFF);
-//             text-align: center;
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 32px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px;
-//             text-align: center;
-//             vertical-align: middle;
-//             line-height: 120px;
-//         }
+.card {
+  width: 600px;
+  border-radius: 32px;
+  overflow: hidden;
+  margin: 0;
+  padding: 96px 48px;
+  background-color: white;
+}
 
-//         .body
-//         {
-//             height: 571px;
-//             align-self: stretch; 
-//             background: var(--Main-goten, #FFF); 
+.headline {
+  text-align: center;
+  color: #141414;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 48px;
+  margin-bottom: 24px;
+  max-width: 60ch;
+}
 
-//             padding-left: 79px;
-//             padding-right: 79px;
+.eyebrow {
+  text-align: center;
+  color: #3A00E5;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  margin-bottom: 16px;
+}
 
-//         }
+.body-text {
+  text-align: center;
+  color: #595959;
+  font-size: 20px;
+  font-weight: 400;
+  max-width: 50ch;
+  line-height: 34px;
+  margin: 0 auto; /* Center align horizontally */
+  width: 100%; /* Fill the container */
+  max-width: none; /* Remove the maximum width constraint */
+}
 
-//         .footer
-//         {
-//             height: 158px;
-//             align-self: stretch; 
-//             background: var(--black-night, #070707); 
-//         }
+.pin-code {
+  text-align: center;
+  color: black;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 56px;
+  letter-spacing: 4.80px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
 
-//         .container
-//         {
-//             width: 700px;
-//         }
+.caption {
+  text-align: center;
+  color: #8C8C8C;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 28px;
+  max-width: 50ch;
+  margin: 0 auto;
+}
 
-//         .confrm-your-email
-//         {
-//             flex-shrink: 0; 
-//             color: var(--Main-trunks, #595D62);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 32px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px; /* 200% */ 
-//             text-align: center;
-//             vertical-align: middle;
-//             line-height: 120px;
-//         }
-
-//         .Hi
-//         {
-//             width: 383px;
-//             height: 65px;
-//             color: var(--Main-bulma, #000);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 24px;
-//             font-style: normal;
-//             font-weight: 600;
-//             line-height: 64px; /* 266.667% */
-//         }
-
-//         .Code
-//         {
-//             width: 436px;
-//             height: 112px;
-//             flex-shrink: 0; 
-//             color: var(--Main-bulma, #000);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: ""DM Sans"";
-//             font-size: 64px;
-//             font-style: normal;
-//             font-weight: 700;
-//             line-height: 72px; /* 112.5% */
-
-//             text-align: center;
-//             vertical-align: middle;
-            
-//             margin-top: 80px;
-//             margin-bottom: 80px;
-
-//         }
-
-//         .expires-in
-//         {
-//             color: var(--Main-bulma, #000);
-//             text-align: center;
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 16px;
-//             font-style: normal;
-//             font-weight: 400;
-//             line-height: 30px; /* 187.5% */ 
-
-//             text-align: center;
-//             vertical-align: middle;
-
-            
-//         }
-
-//         .logo
-//         {
-//             margin: 47px;
-//         }
-
-//         .teamup-com
-//         {
-//             display: inline-block;
-//             width: 112px;
-//             height: 23px;
-//             color: rgba(255, 255, 255, 0.60);
-//             font-feature-settings: 'clig' off, 'liga' off;
-//             font-family: Montserrat;
-//             font-size: 13px;
-//             font-style: normal;
-//             font-weight: 400;
-//             line-height: 30px; /* 230.769% */
-//             letter-spacing: 2px;
-//         }
-//     </style>
-// </head>
-// <body>
-
-//     <div class=""container"">
-
+.footer {
+    width: 696px;
+    text-align: center;
+    padding: 64px 0; /* Increased padding for extra negative space (8 units) */
     
+}
 
-//     <div class=""header"">
-//         <p class=""welcome"">Welcome To TeamUp !</p>
-//     </div>
+.logo img {
+  height: 48px;
+  width: auto;
 
-//     <div class=""body"">
+}
 
-//         <div class=""confrm-your-email"">
-//             Teset Your Password
-//         </div>
+.social-media {
+  margin-top: 32px; /* Increased margin-top for extra space (4 units) */
+}
 
-//         <div class=""Hi"">Hi, @{DisplayName}</div>
-//         You have requested password reset code , please past the following code there :
-        
-//         <div class=""Code"">@{Code}</div>
+.social-icon {
+  display: inline-block;
+  margin: 0 24px; /* Increased margin between social links (4 units) */
+}
 
-//         <div class=""expires-in"">
-//             The code expires in @{CodeLifeTime} minutes.
+.social-icon img {
+  width: 32px;
+  height: auto;
+}
 
-//         </div>
-//     </div>
 
-//     <div class=""footer"">
-//         <img src=""https://i.ibb.co/GJKb5b3/Primery-1.png"" alt="""" class=""logo"">
-//         <p class=""teamup-com"">TeamUp.com</p>
-//     </div>
+.copyrights {
+  color: #777777;
+  font-size: 12px;
+  margin-top: 24px;
+  line-height: 24px;
+}
 
-//     </div>
-// </body>
-// </html>
-// ";
+@media only screen and (max-width: 600px) {
+  .card {
+    border-radius: 12px;
+    padding: 48px;
+    width: 360px;
+  }
 
-        var htmlCode = File.ReadAllText("Features/EmailService/Templets/ResetPassword.htm");
+  .headline {
+    font-size: 24px;
+    line-height: 28px;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .body-text {
+    font-size: 14px;
+    line-height: 22px;
+    max-width: 40ch;
+    margin-bottom: 24px;
+  }
+
+  .pin-code {
+    font-size: 20px;
+    line-height: 28px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .caption {
+    font-size: 12px;
+    line-height: 16px;
+    max-width: 90%;
+    margin-bottom: 16px;
+  }
+
+  .footer {
+/* Increased margin-top for extra space (8 units) */
+    padding: 32px 0; 
+    width: 465px;
+    /* Increased padding for extra negative space (4 units) */
+  }
+
+  .logo img {
+  height: 32px;
+  width: auto;
+}
+
+  .social-icon img {
+    width: 24px;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class=""container"">
+
+  <div class=""card"" id=""email-card"">
+        <div class=""eyebrow"">Reset Your Password</div>
+      <div class=""headline"" >Forgot your password?</div>
+      <div class=""body-text"">Hi @{DisplayName}!<br/><br/>If you've forgotten your password. Follow the instructions below to reset your password and regain access to your account.</div>
+      <div class=""pin-code"">@{Code}</div>
+      <div class=""caption"">This code expires in 10 minutes.</div>
+   
+  </div>
+
+  <div class=""footer"" id=""email-footer"">
+    <div class=""logo"">
+      <img src=""https://drive.google.com/thumbnail?sz=w1000&id=1raH-Wmf4GRR8vIQgz9p0M4Z1tRnk7GLF"" alt="""">
+    </div>
+    <div class=""social-media"">
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1kXKgsoVMLY7LRA2_0C6d7b-plwxQfUvB""></div>
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1DdyHzrCZWGpQw7qYJtEtrTqaqfjJ6JHJ""></div>
+      <div class=""social-icon""><img src=""https://drive.google.com/thumbnail?sz=w1000&id=1JoCCQ_wOW4oMHdG504rwZgEprTpT0ieO""></div>
+    </div>
+    <div class=""copyrights"">Copyright © 2024 TeamUp, All rights reserved.<br>You are receiving this email because you requested a password reset.</div>
+  </div>
+</div>
+</body>
+</html>
+";
+#endregion
+
+        // var htmlCode = File.ReadAllText("Features/EmailService/Templets/ResetPassword.htm");
 
 
         var emailBody = EmailService.CreateEmailFromStringWithParamters(htmlCode, parameters);

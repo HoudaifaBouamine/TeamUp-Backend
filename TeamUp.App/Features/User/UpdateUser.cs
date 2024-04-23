@@ -19,13 +19,8 @@ partial class UserEndpoints
         
         if(user is null) return TypedResults.BadRequest(new ErrorResponse("User not found, this should not happen because this endpoint require authenticated user"));
 
-        user.FirstName = userUpdate.FirstName ?? user.FirstName;
-        user.LastName = userUpdate.LastName ?? user.LastName;
-        user.DisplayName = userUpdate.DisplayName;
-        user.Handler = userUpdate.Handler;
-        user.FullAddress = userUpdate.FullAddress;
-        user.ProfilePicture = userUpdate.ProfilePicture!;
-
+        user.Update(userUpdate.FirstName, userUpdate.LastName, userUpdate.DisplayName, userUpdate.Handler, userUpdate.FullAddress, userUpdate.ProfilePicture);
+        
         var result = await userManager.UpdateAsync(user);
         
         if (result.Succeeded)

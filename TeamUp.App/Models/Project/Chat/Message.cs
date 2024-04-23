@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
-namespace Models {
+namespace Models;
 
 [Table("Messages")]
 public class Message
@@ -21,9 +15,5 @@ public class Message
     
     public required User UserID { get; set; }
     public bool pinned { get; set; } 
-
-}
-
-
 
 }

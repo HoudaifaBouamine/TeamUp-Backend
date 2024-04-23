@@ -53,20 +53,20 @@ public static class CreateUserFromSocialLoginExtension
         if (user is null)
         {
             user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                UserName = model.Email,
-                ProfilePicture = model.ProfilePicture,
-            };
+            (
+                email: model.Email,
+                firstName: model.FirstName,
+                lastName: model.LastName,
+                profilePicture: model.ProfilePicture
+            );
             
             if(user.FirstName is null && user.LastName is null)
-                user.DisplayName = user.Email.Split("@")[0];
+                user.SetDisplayName(user.Email!.Split("@")[0]);
             else
-                user.DisplayName = user.GetFullName().Trim();
+                user.SetDisplayName(user.GetFullName());
 
             var wow = await userManager.CreateAsync(user);
+            
             if(wow.Succeeded)
             {
                 //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER

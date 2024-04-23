@@ -92,12 +92,12 @@ namespace EndpointsManager
                 p.Description,
                 p.StartDate
             ),
-            users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
+                users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
             );
 
             for(int i = 0;i<rand.Next(5,20);i++)
             {
-                await pr.AddUserToProjectAsync(id,Guid.Parse(users[i].Id) , rand.Next(0,10) == 0);
+                await pr.AddUserToProjectAsync(id, users[i].Id, rand.Next(0,10) == 0);
             }
         }
 

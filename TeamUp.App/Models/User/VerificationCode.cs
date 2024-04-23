@@ -16,13 +16,13 @@ public partial class VerificationCode
 
 partial class VerificationCode
 {
+    private VerificationCode() {}
+
+
     public enum CodeMaxLifeInMin { EmailVerification = 10, PasswordRest = 5 }
     public enum CodeMaxTries { EmailVerification = 4, PasswordRest = 3 }
     public enum VerificationCodeTypes {EmailVerification = 1, PasswordRest = 2}
-    protected VerificationCode()
-    {
 
-    }
 
     public static VerificationCode CreateEmailVerificationCode()
     {

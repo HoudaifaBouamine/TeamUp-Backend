@@ -2,7 +2,6 @@ using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Models;
 
 namespace Features.Projects;
 partial class ProjectsController
@@ -33,25 +32,20 @@ partial class ProjectRepository
             .Include(p => p.ProjectsUsers)
             .FirstOrDefaultAsync(p => p.Id == projectId);
 
-        if (project is not null)
-        {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == userId.ToString());
+        if(project is null) return false;
 
-            if (user != null)
-            {
-                project.ProjectsUsers.Add(new UsersProject
-                {
-                    User = user,
-                    IsMentor = isMentor
-                });
-                project.TeamSize++;
+       
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
 
-                await _context.SaveChangesAsync();
-                return true;
-            }
-        }
-        return false;
+        if (user is null)
+            return false;
+
+        project.AddUser(user);
+
+        await _context.SaveChangesAsync();
+    
+        return true;    
     }
 
     /// <summary>
@@ -74,17 +68,15 @@ partial class ProjectRepository
         if(project is null) return -1;
 
         var users = await _context.Users
-            .Where(u => userIds.Contains(Guid.Parse(u.Id)))
+            .Where(u => userIds.Contains(u.Id))
             .ToListAsync();
 
-        var prevUsersCount = project.Users.Count();
-        project.Users.AddRange(users);
-        var newUsersCount = project.Users.Count();
-        project.TeamSize = newUsersCount;
+        var prevUsersCount = project.Users.DistinctBy(u=>u.Id).Count();
+        project.AddUsers(users);
 
         await _context.SaveChangesAsync();
         
-        return newUsersCount - prevUsersCount;
+        return project.TeamSize - prevUsersCount;
     }
 
 }

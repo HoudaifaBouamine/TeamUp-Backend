@@ -20,7 +20,6 @@ partial class AuthEndpoints
         }
         
         var email = registration.Email;
-        var userName = registration.Email;
         var displayName = registration.DisplayName;
 
         if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
@@ -28,12 +27,8 @@ partial class AuthEndpoints
             return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
         }
 
-        var user = new User
-        {
-            DisplayName = displayName,
-            Email = email,
-            UserName = userName
-        };
+        var user = new User (displayName,email);
+
         IdentityResult result = await userManager.CreateAsync(user, registration.Password);
 
         if (!result.Succeeded)

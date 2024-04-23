@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Storage;
+
 namespace Users;
 
 record GetUsersListResponse
@@ -12,7 +14,7 @@ record GetUsersListResponse
 
 record UserReadDto
 (
-    string Id,
+    Guid Id,
     string Email,
     string DisplayName,
     string Handler,
@@ -22,7 +24,7 @@ record UserReadDto
 
 record UserReadDetailsDto
 (
-    string Id,
+    Guid Id,
     string Email,
     string? FirstName,
     string? LastName,

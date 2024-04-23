@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Authentication.UserManager;
 using Features.Projects;
+using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models;
@@ -17,8 +18,9 @@ public class ProjectControllerTests
     public async void TestGetAllProjects()
     {
         // Arrange
-                
+        
         var rep = new Mock<IProjectRepository>();
+
         rep.Setup(rep=>rep.GetListWithFiltersAsync(
             It.IsAny<int?>(),
             It.IsAny<int?>(),
@@ -30,6 +32,10 @@ public class ProjectControllerTests
                     false,
                     false,
                     Array.Empty<ProjectReadDto>()));
+
+
+
+
 
         var cont = new ProjectsController(rep.Object);
         

@@ -6,7 +6,7 @@ partial class AuthEndpoints
 {
     public record UserInfoResponseDto
     (
-        string Id, 
+        Guid Id, 
         string UserName,
         [EmailAddress]
         string Email,
