@@ -65,7 +65,16 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     // }
 
 
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSkillById(int id)
+        {
+            var skill = await _skillRepository.GetByIdAsync(id);
+            if (skill == null)
+            {
+                return NotFound(new ErrorResponse("Skill not found"));
+            }
+            return Ok(skill);
+        }
 
     [HttpDelete("{userId}/{skillId}")]
     public async Task<IActionResult> RemoveSkillFromUser(string userId, int skillId)
