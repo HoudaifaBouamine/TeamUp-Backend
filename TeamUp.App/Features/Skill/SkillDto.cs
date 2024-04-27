@@ -9,4 +9,9 @@ namespace DTos ;
         public string Name { get; set; } = string.Empty;
         public List<User> Users { get; set; } = [];
 
-}
+    }
+    public class GetSkillDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }

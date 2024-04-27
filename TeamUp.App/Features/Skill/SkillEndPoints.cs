@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Asp.Versioning;
 using Utils;
-
+using Models;
+using DTos;
 namespace Controllers;
 
 [Tags("Skills Group")]
@@ -13,6 +14,25 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ISkillRepository _skillRepository = skillRepository;
+
+
+       public async Task<IActionResult> GetAllSkills()
+        {
+            var skills = await _skillRepository.GetAllAsync();
+            var skillDtos = new List<GetSkillDto>();
+            foreach (var skill in skills)
+            {
+                skillDtos.Add(new GetSkillDto
+                {
+                    Id = skill.Id,
+                    Name = skill.Name
+                });
+            }
+            return Ok(skillDtos);
+        }
+
+
+
 
     [HttpPost("{userId}/{skillId}")]
     public async Task<IActionResult> AddSkillToUser(string userId, int skillId)
@@ -34,6 +54,40 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
         await _userRepository.UpdateAsync(user);
         return Ok();
     }
+
+
+
+    // [HttpPost]
+    // public async Task<IActionResult> CreateSkill([FromBody] Skill skill)
+    // {
+    //     if (!ModelState.IsValid)
+    //     {
+    //         return BadRequest(ModelState);
+    //     }
+
+    //     await _skillRepository.AddAsync(skill);
+    //     return CreatedAtAction("GetSkillById", new { id = skill.Id }, skill);
+    // }
+
+        [HttpGet("{id}")]
+
+        public async Task<IActionResult> GetSkillById(int id)
+        {
+            var skill = await _skillRepository.GetByIdAsync(id);
+            if (skill == null)
+            {
+                return NotFound(new ErrorResponse("Skill not found"));
+            }
+            var skillDto = new GetSkillDto
+            {
+                Id = skill.Id,
+                Name = skill.Name,
+            };
+            return Ok(skillDto);
+        }
+
+
+
 
     [HttpDelete("{userId}/{skillId}")]
     public async Task<IActionResult> RemoveSkillFromUser(string userId, int skillId)
