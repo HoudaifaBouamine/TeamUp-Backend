@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Carter;
+﻿using Carter;
 using Configuration;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Users;
 

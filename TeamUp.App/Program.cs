@@ -16,6 +16,7 @@ using Utils;
 using Features.Projects.Contracts;
 using Features.Projects;
 using Repositories;
+using TeamUp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -126,6 +127,7 @@ builder.Services.AddScoped<IProjectRepository,ProjectRepository>();
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Authentication:Google"));
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<ISkillRepository,SkillRepository>();
+builder.Services.AddScoped<IMentorRepository,MentorRepository>();
 
 ///////////////////////////////////////////////////
 
@@ -178,5 +180,5 @@ app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
 
-app.Run();
+app.Run("http://localhost:8080");
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);

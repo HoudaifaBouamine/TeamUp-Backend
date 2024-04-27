@@ -26,7 +26,9 @@ partial class ProjectsController
 
         if (user.EmailConfirmed is false)
             return BadRequest(new ErrorResponse("User email is not confirmed"));
+
         var projectId = await _projectRepository.CreateAsync(projectDto,user);
+
         var projectReadDto = new ProjectReadDto
         (
             Id : projectId,
@@ -59,7 +61,14 @@ partial class ProjectRepository
             creator : user
         );
 
-        _context.Add(project);
+        _context.Projects.Add(project);
+
+        _context.UsersProjects.Add(new UsersProject
+        {
+            UserId = user.Id,
+            ProjectId = project.Id
+        });
+
         await _context.SaveChangesAsync();
         return project.Id;
     }
