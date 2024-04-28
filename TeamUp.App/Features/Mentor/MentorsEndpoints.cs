@@ -1,10 +1,16 @@
-using Carter;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace TeamUp;
+namespace Mentor;
 
-public class MentorController : Contero
+
+[Tags("Mentors Group")]
+[ApiVersion(1)]
+[Route("api/v{v:apiVersion}/mentors")]
+[ApiController]
+
+public class MentorController : ControllerBase
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

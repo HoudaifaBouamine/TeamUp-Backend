@@ -6,16 +6,17 @@ using Models;
 using DTos;
 namespace Controllers;
 
+
 [Tags("Skills Group")]
 [ApiVersion(1)]
+[Route("api/v{v:apiVersion}/skills")]
 [ApiController]
-[Route("api/v{version:apiVersion}/skills")]
 public class SkillController(IUserRepository userRepository, ISkillRepository skillRepository) : ControllerBase
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ISkillRepository _skillRepository = skillRepository;
 
-
+        [HttpGet]
        public async Task<IActionResult> GetAllSkills()
         {
             var skills = await _skillRepository.GetAllAsync();

@@ -16,7 +16,7 @@ using Utils;
 using Features.Projects.Contracts;
 using Features.Projects;
 using Repositories;
-using TeamUp;
+using Mentor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,8 +105,7 @@ builder.Services.AddRateLimiter(options=>
                 PermitLimit = 10,
                 Window = TimeSpan.FromSeconds(5)
             }
-        ));
-
+        ));             
 });
 
 
@@ -180,5 +179,5 @@ app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
 
-app.Run("http://localhost:8080");
+app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
