@@ -59,7 +59,12 @@ public partial class Project
         StartDate = startDate;
         ChatRoom = new ChatRoom();
         Users = [creator];
-        ProjectsUsers = [];
+        ProjectsUsers = [new UsersProject
+        {
+            UserId = creator.Id,
+            ProjectId = Id,
+            IsMentor = true
+        }];
     }
 
     public static Project Create(string name, string description, DateOnly startDate , User creator)

@@ -63,12 +63,6 @@ partial class ProjectRepository
 
         _context.Projects.Add(project);
 
-        _context.UsersProjects.Add(new UsersProject
-        {
-            UserId = user.Id,
-            ProjectId = project.Id
-        });
-
         await _context.SaveChangesAsync();
         return project.Id;
     }

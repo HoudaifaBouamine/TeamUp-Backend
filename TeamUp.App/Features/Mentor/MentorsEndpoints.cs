@@ -9,26 +9,21 @@ namespace Mentor;
 [ApiVersion(1)]
 [Route("api/v{v:apiVersion}/mentors")]
 [ApiController]
-
-public class MentorController : ControllerBase
+public class MentorsEndpoints : ControllerBase
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+
+    private readonly IMentorRepository repo;
+    public MentorsEndpoints([FromServices] IMentorRepository mentorRepository) 
     {
-        var mentorsGroup = 
-            app.MapGroup("mentors")
-               .WithTags("Mentors Group")
-               .HasApiVersion(1);
-
-        mentorsGroup.MapGet("/", GetMentorsAsync);    
+        repo = mentorRepository;
     }
-
-    private async Task<IResult> GetMentorsAsync(
+    [HttpGet]
+    public async Task<IResult> GetMentorsAsync(
         [FromQuery] string? SearchPattern,
         [FromQuery] int? PageSize,
-        [FromQuery] int? PageNumber,
-        [FromServices] IMentorRepository mentorRepository)
+        [FromQuery] int? PageNumber)
     {
-        var mentors = await mentorRepository.GetMentorsAsync(SearchPattern!, PageSize ?? 10, PageNumber ?? 1);
+        var mentors = await repo.GetMentorsAsync(SearchPattern!, PageSize ?? 10, PageNumber ?? 1);
         return Results.Ok(mentors);
     }
 }

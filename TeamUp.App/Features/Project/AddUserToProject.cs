@@ -41,7 +41,7 @@ partial class ProjectRepository
         if (user is null)
             return false;
 
-        project.AddUser(user);
+        project.AddUser(user, isMentor);
 
         await _context.SaveChangesAsync();
     
