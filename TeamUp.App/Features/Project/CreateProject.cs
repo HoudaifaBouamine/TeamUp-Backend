@@ -1,5 +1,4 @@
 using Authentication.UserManager;
-using Dia2Lib;
 using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

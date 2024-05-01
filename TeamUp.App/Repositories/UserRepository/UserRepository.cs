@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(AppDbContext db) : IUserRepository
 {
+    AppDbContext db = db;
     public Task AddAsync(User user)
     {
         throw new NotImplementedException();
@@ -26,9 +28,9 @@ public class UserRepository : IUserRepository
         throw new NotImplementedException();
     }
 
-    public Task<User> GetByIdAsync(string id)
+    public Task<User?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return db.Users.FirstOrDefaultAsync(u=>u.Id == id);
     }
 
     public Task<IEnumerable<Skill>> GetSkillsAsync(string userId)

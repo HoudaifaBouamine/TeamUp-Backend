@@ -18,6 +18,7 @@ using Features.Projects;
 using Repositories;
 using Mentor;
 using Duende.IdentityServer;
+using TeamUp;
 
 var builder = WebApplication.CreateBuilder(args);
 

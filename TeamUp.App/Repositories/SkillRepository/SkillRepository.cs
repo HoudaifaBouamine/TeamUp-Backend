@@ -20,12 +20,6 @@ namespace Repositories
             return await _context.Skills.ToListAsync();
         }
 
-        public async Task<Skill?> GetByIdAsync(int id)
-        {
-            // NOTE (HOUDAIFA) using FirstOrDefaultAsync instead of FindAsync to handle the case where the id does not exist
-            return await _context.Skills.FirstOrDefaultAsync(s=>s.Id == id);
-        }
-
         public async Task AddAsync(Skill skill)
         {
             _context.Skills.Add(skill);

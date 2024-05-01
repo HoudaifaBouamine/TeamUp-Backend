@@ -16,7 +16,15 @@ public class ProjectPost
     public Project? Project { get; private init; } = null;
     public User Creator { get; private init; } = null!;
 
-    public ProjectPost(User creator, string title, string summary, TimeSpan expextedDuration, int expectedTeamSize, string scenario, string learningGoals, string teamAndRols)
+    public ProjectPost(User creator,
+                       string title,
+                       string summary,
+                       TimeSpan expextedDuration,
+                       int expectedTeamSize,
+                       string scenario,
+                       string learningGoals,
+                       string teamAndRols,
+                       List<Skill> skills)
     {
         this.Creator = creator;
         this.LearningGoals = learningGoals;
@@ -26,6 +34,7 @@ public class ProjectPost
         this.TeamAndRols = teamAndRols;
         this.ExpectedTeamSize = expectedTeamSize;
         this.ExpextedDuration = expextedDuration;
+        this.RequiredSkills = skills;
     }
 
     protected ProjectPost(){} // for ef core

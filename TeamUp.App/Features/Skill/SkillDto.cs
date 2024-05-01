@@ -12,6 +12,7 @@ namespace DTos ;
     }
     public class GetSkillDto
     {
-        public int Id { get; set; }
+        public int ProjectsCount { get; set; }
+        public int UsersCount { get; set; }
         public string Name { get; set; } = string.Empty;
     }

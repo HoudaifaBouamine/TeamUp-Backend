@@ -5,6 +5,7 @@ using Features.Projects;
 using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using TeamUp;
 
 namespace EndpointsManager
 {
@@ -16,6 +17,9 @@ namespace EndpointsManager
         /// <param name="app"></param>
         public static void MapHelpersEndpoints(this IEndpointRouteBuilder app)
         {
+
+
+
             var testingGroup = app.MapGroup("/").WithTags("Testing");
 
             testingGroup.MapGet("/",  ()=>
@@ -40,6 +44,11 @@ namespace EndpointsManager
             {
                 await db.Database.EnsureDeletedAsync();
                 await db.Database.EnsureCreatedAsync();   
+            });
+
+            testingGroup.MapGet("/seed-skills",(AppDbContext db)=>
+            {
+                DataSeeder.SeedSkillsData(db);
             });
 
             testingGroup.MapGet("/generate-fake-data",async ([FromServices] AppDbContext db,[FromServices] IProjectRepository pr)=>
