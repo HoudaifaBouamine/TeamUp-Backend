@@ -59,6 +59,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
     // Users table is declared in the base class 'IdentityDbContext<User>'
     public DbSet<VerificationCode> VerificationCodes { get; set; }
+    public DbSet<ProjectPost> ProjectPosts { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<UsersProject> UsersProjects { get; set; }

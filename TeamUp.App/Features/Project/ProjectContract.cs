@@ -18,7 +18,11 @@ public interface IProjectRepository
     Task<ProjectDetailsReadDto> GetDetailsAsync(int projectId);
 
     Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
+
+    Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? PageSize,int? PageNumber, string? SearchPattern);
 }
+
+#region V1
 
 public record ProjectCreateDto
 (
@@ -78,3 +82,35 @@ public class GetProjectDetailsResponse
 {
     public string SearchPattern { get; set; } = "";
 }
+
+#endregion
+
+#region V2
+
+public record GetProjectsListResponse2
+(
+    int TotalCount,
+    int PageNumber,
+    int PageSize,
+    bool IsPrevPageExist,
+    bool IsNextPageExist,
+    IEnumerable<ProjectReadDto2> Projects
+);
+
+public record ProjectReadDto2
+(
+    int Id,
+    string Title,
+    string Summary,
+    string Scenario,
+    string LearningGoals,
+    string TeamAndRols,
+    List<string> RequiredSkills,
+    DateOnly StartDate,
+    DateOnly? EndDate,
+    int UsersCount,
+    List<ProjecUserShortDto> UsersSample
+);
+
+
+#endregion

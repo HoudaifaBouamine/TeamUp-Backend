@@ -1,8 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices.Marshalling;
-using MimeKit.IO.Filters;
-
 namespace Models;
 
 public partial class Project
@@ -16,14 +12,8 @@ public partial class Project
     public ChatRoom ChatRoom { get; set;} = null!;
     public int TeamSize { get; private set; } = 0;
 
-    // private List<User> _users { get; set;} = [];
-    // public IEnumerable<User> Users => _users.AsReadOnly();
-
-    // private List<UsersProject> _projectsUsers { get; set; } = [];
-    // public IEnumerable<UsersProject> ProjectsUsers => _projectsUsers.AsReadOnly();
-
-
-
+    public int ProjectPostId { get; init;}
+    public ProjectPost ProjectPost { get; init; } = null!;
     public List<User> Users { get; set; } = [];
     public List<UsersProject> ProjectsUsers { get; set; } = [];
 
@@ -65,6 +55,34 @@ public partial class Project
             ProjectId = Id,
             IsMentor = true
         }];
+    }
+
+    public static Project Create(ProjectPost projectPost, List<User> acceptedUsers)
+    {
+        var project = new Project()
+        {
+            ChatRoom = new ChatRoom(),
+            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            ProjectPost = projectPost,
+            Users = [projectPost.Creator, ..acceptedUsers],
+        };
+
+        project.ProjectsUsers.Add(new UsersProject
+        {
+            User = projectPost.Creator,
+            Project = project,
+            IsMentor = true
+        });
+
+        project.ProjectsUsers.AddRange(acceptedUsers.Select(u => new UsersProject
+        {
+            User = u,
+            Project = project,
+            IsMentor = false,
+            
+        }).ToList());
+
+        return project;
     }
 
     public static Project Create(string name, string description, DateOnly startDate , User creator)

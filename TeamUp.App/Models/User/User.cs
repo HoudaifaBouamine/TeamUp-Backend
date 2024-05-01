@@ -9,13 +9,28 @@ public partial class User : IdentityUser<Guid>
 {
     public string? FirstName { get; private set; }
     public string? LastName { get; private set; }
-    public string Handler {get; private set;} = string.Empty;
-    public string DisplayName { get; private set; } = string.Empty;
+    public string Handler {get; set;} = string.Empty;
+    private string _displayName = string.Empty;
+    public string DisplayName
+    {
+        get 
+        {
+            return _displayName; 
+        }
+        set 
+        { 
+            value = value.Trim();
+
+            if(!string.IsNullOrWhiteSpace(value)) 
+                _displayName = value; 
+        }
+    }
+    
     public VerificationCode? EmailVerificationCode { get; private set; }
     public VerificationCode? PasswordRestCode { get; private set; }
     public string? PasswordResetToken { get; private set; } 
     public float Rate { get; private set; } = MaxRate;
-    public string ProfilePicture { get; private set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
+    public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
     public string? FullAddress { get; private set; }
 
 
@@ -39,12 +54,8 @@ partial class User
 {
     public bool SetDisplayName(string displayName)
     {
-        displayName = displayName.Trim();
-
-        if(string.IsNullOrWhiteSpace(displayName)) return false;
-
         DisplayName = displayName;
-        return true;
+        return displayName == DisplayName;
     }
     public string? GetPasswordResetCode()
     {

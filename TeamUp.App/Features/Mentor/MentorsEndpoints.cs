@@ -18,6 +18,7 @@ public class MentorsEndpoints : ControllerBase
         repo = mentorRepository;
     }
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMentorsListResponse))]
     public async Task<IResult> GetMentorsAsync(
         [FromQuery] string? SearchPattern,
         [FromQuery] int? PageSize,
@@ -100,5 +101,5 @@ public record GetMentorsListResponse
     int PageSize,
     bool IsPrevPageExist,
     bool IsNextPageExist,
-    IEnumerable<MentorReadDto> Users
+    IEnumerable<MentorReadDto> Mentors
 );
