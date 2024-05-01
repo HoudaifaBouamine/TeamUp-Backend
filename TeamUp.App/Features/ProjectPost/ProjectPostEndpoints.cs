@@ -1,19 +1,21 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Mentor;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using TeamUp;
 using Utils;
 namespace Features;
 
 
 ///// Planning
 ///////////////
-// Get Project's posts list, with pagination and search
-// Add new post, required authenticated user, verified email
-// send join request, will be notified to the publicher to accept or reject the request
+// [Done] Get Project's posts list, with pagination and search
+// [Done] Add new post, required authenticated user, 
+// [In Progress] send join request, will be notified to the publicher to accept or reject the request
 // get project join requests list, with pagination and search
 // get project join request by id,
 // response to project join request
@@ -26,6 +28,146 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 {
     private readonly AppDbContext db = db;
     private readonly UserManager<User> userManager = userManager;
+
+
+    [HttpPost("join-requests/{requestId}")]
+    public async Task<IActionResult> AnswerProjectJoinRequestAsync([FromRoute] int requestId, [FromQuery][AllowedValues("accept", "reject")] string answer)
+    {
+        var currentUser = await userManager.GetUserAsync(User);
+        if(currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
+
+        var request = await db.ProjectJoinRequests
+            .Where(r=>r.Id == requestId)
+            .Include(r=>r.Project)
+            .Include(r=>r.Project.Creator)
+            .Where(r=>r.Project.Creator.Id == currentUser.Id)
+            .FirstOrDefaultAsync();
+
+        if(request is null) return NotFound(new ErrorResponse("Request not found or can not be answered by the current user"));
+
+        if(answer == "accept") request.Accept();
+        if(answer == "reject") request.Refuse();
+
+        return Ok(new ProjectJoinRequestReadDto(request));
+    }
+
+
+
+    [HttpGet("join-requests")]
+    // send join request
+    public async Task<IActionResult> GetProjectJoinRequestsAsync([FromQuery] int ProjectPostId)
+    {
+        Guid id;
+
+        {  
+            var currentUser = await userManager.GetUserAsync(User);
+            if(currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
+            id = currentUser.Id;
+        }
+        
+        var post = await db.ProjectPosts
+            .Where(p=>p.Id == ProjectPostId)
+            .Include(p=>p.Creator)
+            .Where(p=>p.Creator.Id == id)
+            .Include(p=>p.ProjectJoinRequests)
+            .FirstOrDefaultAsync();
+            
+        if(post is null) return NotFound(new ErrorResponse("Project not found"));
+
+        return Ok(post.ProjectJoinRequests.Select(r=>new ProjectJoinRequestReadDto(r)));
+    }
+
+    //// No Need For Pagination Now
+    // // create pagination class named GetProjectJoinRequestListReadDto
+    // public class GetProjectJoinRequestListReadDto
+    // {
+    //     public int TotalCount { get; set; }
+    //     public int PageNumber { get; set; }
+    //     public int PageSize { get; set; }
+    //     public bool IsPrevPageExist { get; set; }
+    //     public bool IsNextPageExist { get; set; }
+
+    //     public List<ProjectJoinRequestReadDto> JoinRequests { get; set; } = [];
+
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    [HttpPost("join-requests")]
+    public async Task<IActionResult> CreateProjectJoinRequestAsync([FromBody] ProjectJoinRequestCreateDto joinRequestDto)
+    {
+        var currentUser = await userManager.GetUserAsync(User);
+        if(currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
+
+        var post = await db.ProjectPosts
+            .Include(p => p.Creator)
+            .Include(p => p.Project)
+            .FirstOrDefaultAsync(p=>p.Id == joinRequestDto.ProjectPostId);
+        
+        if(post is null) return NotFound(new ErrorResponse("Project not found"));
+
+        var joinRequest = ProjectJoinRequest.Create(currentUser, post);
+        
+        db.ProjectJoinRequests.Add(joinRequest);
+        await db.SaveChangesAsync();
+
+        return Ok(new ProjectJoinRequestReadDto(joinRequest));
+    }
+
+    public record ProjectJoinRequestCreateDto(int ProjectPostId, string Message);
+
+    public class ProjectJoinRequestReadDto
+    {
+        public int Id { get; set; }
+        public int ProjectId {get;set;}
+        public bool IsAccepted { get; set; }
+        public bool IsClosed { get; set; }
+        public DateTime CreatedAt {get;set;}
+        public DateTime? RespondAt {get;set;}
+
+        public ProjectJoinRequestReadDto(ProjectJoinRequest joinRequest)
+        {
+            Id = joinRequest.Id;
+            ProjectId = joinRequest.Project.Id;
+            IsAccepted = joinRequest.IsAccepted;
+            IsClosed = joinRequest.IsClosed;
+            CreatedAt = joinRequest.CreatedAt;
+            RespondAt = joinRequest.RespondAt;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [HttpPost]
     public async Task<IActionResult> CreateProjectPostAsync([FromBody] ProjectPostCreateDto postDto)
@@ -53,36 +195,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             await db.SaveChangesAsync();
             return Ok(new ProjectPostReadDto(post));
         }   
-        
-        public class ProjectPostCreateDto
-        {
-            [Required]
-            public string Title { get; set; } = string.Empty;
-
-            [Required]
-            public string Summary { get; set; } = string.Empty;
-
-            [Required]
-            public string Scenario { get; set; } = string.Empty;
-
-            [Required]
-            public string LearningGoals { get; set; } = string.Empty;
-
-        [Required]
-        public string TeamAndRols { get; set; } = string.Empty;
-
-        [Required]
-        public int ExpectedTeamSize { get; set; }
-
-        [Required]
-        public int ExpectedDurationInDays { get; set; }
-
-        [Required]
-        public List<string> RequiredSkills { get; set;}  = [];
-    }
-
-
-
+        public record ProjectPostCreateDto(string Title, string Summary, string Scenario, string LearningGoals, string TeamAndRols, int ExpectedTeamSize, int ExpectedDurationInDays, List<string> RequiredSkills)
 
 
 
