@@ -17,18 +17,18 @@ internal class ApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureTestServices(services=>
         {
-            services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
+            // services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
 
-            services.AddDbContext<AppDbContext>(op=>{
-                op.UseInMemoryDatabase("TeamUpDb-Testing");
-            });
+            // services.AddDbContext<AppDbContext>(op=>{
+            //     op.UseInMemoryDatabase("TeamUpDb-Testing");
+            // });
 
             services.RemoveAll(typeof(IEmailSenderCustome));
             services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
 
             var db = CreateDbContext(services);
             db.Database.EnsureDeleted();
-
+            db.Database.EnsureCreated();
         });
     }
 

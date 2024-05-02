@@ -6,7 +6,7 @@ public partial class ProjectJoinRequest
 {
     public int Id { get; private init; }
     public User User { get; private init; } = null!;
-    public ProjectPost Project { get; private init; } = null!;
+    public ProjectPost ProjectPost { get; private init; } = null!;
     public bool IsAccepted { get; private set; } = false;
     public bool IsClosed { get; private set; } = false;
     public DateTime CreatedAt { get; private init; }
@@ -22,7 +22,7 @@ partial class ProjectJoinRequest
         return new ProjectJoinRequest
         {
             User = user,
-            Project = project,
+            ProjectPost = project,
             CreatedAt = DateTime.UtcNow,
         };
     }

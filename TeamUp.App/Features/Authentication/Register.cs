@@ -1,4 +1,5 @@
 using Authentication.UserManager;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Models;
@@ -8,7 +9,7 @@ using Utils;
 namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
-    public async Task<Results<Ok, ValidationProblem,BadRequest<ErrorResponse>>> 
+    public async Task<Results<Ok<AccessTokenResponse>,Ok, ValidationProblem,BadRequest<ErrorResponse>>> 
     RegisterAsync(
         [FromBody] UserRegisterRequestDto registration,
         [FromServices] CustomUserManager userManager

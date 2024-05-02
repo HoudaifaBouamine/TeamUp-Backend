@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Mentor;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using TeamUp;
 using Utils;
 namespace Features;
 
@@ -15,10 +13,10 @@ namespace Features;
 ///////////////
 // [Done] Get Project's posts list, with pagination and search
 // [Done] Add new post, required authenticated user, 
-// [In Progress] send join request, will be notified to the publicher to accept or reject the request
-// get project join requests list, with pagination and search
-// get project join request by id,
-// response to project join request
+// [Done] send join request,
+// [Done] get project join requests list,
+// [Done] get project join request by id,
+// [Done] response to project join request
 
 [Tags("Project Posts Group")]
 [ApiVersion(4)]
@@ -38,9 +36,9 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         var request = await db.ProjectJoinRequests
             .Where(r=>r.Id == requestId)
-            .Include(r=>r.Project)
-            .Include(r=>r.Project.Creator)
-            .Where(r=>r.Project.Creator.Id == currentUser.Id)
+            .Include(r=>r.ProjectPost)
+            .Include(r=>r.ProjectPost.Creator)
+            .Where(r=>r.ProjectPost.Creator.Id == currentUser.Id)
             .FirstOrDefaultAsync();
 
         if(request is null) return NotFound(new ErrorResponse("Request not found or can not be answered by the current user"));
@@ -54,7 +52,6 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
     [HttpGet("join-requests")]
-    // send join request
     public async Task<IActionResult> GetProjectJoinRequestsAsync([FromQuery] int ProjectPostId)
     {
         Guid id;
@@ -127,6 +124,19 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         return Ok(new ProjectJoinRequestReadDto(joinRequest));
     }
 
+    [HttpGet("join-requests/{requestId}")]
+    public async Task<IActionResult> GetProjectJoinRequestAsync([FromRoute] int requestId)
+    {
+        var request = await db.ProjectJoinRequests
+            .Where(r=>r.Id == requestId)
+            .Include(r=>r.ProjectPost)
+            .Include(r=>r.ProjectPost.Creator)
+            .FirstOrDefaultAsync();
+
+        if(request is null) return NotFound(new ErrorResponse("Request not found"));
+        return Ok(new ProjectJoinRequestReadDto(request));
+    }
+
     public record ProjectJoinRequestCreateDto(int ProjectPostId, string Message);
 
     public class ProjectJoinRequestReadDto
@@ -141,7 +151,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public ProjectJoinRequestReadDto(ProjectJoinRequest joinRequest)
         {
             Id = joinRequest.Id;
-            ProjectId = joinRequest.Project.Id;
+            ProjectId = joinRequest.ProjectPost.Id;
             IsAccepted = joinRequest.IsAccepted;
             IsClosed = joinRequest.IsClosed;
             CreatedAt = joinRequest.CreatedAt;
@@ -187,7 +197,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
                 expectedTeamSize : postDto.ExpectedTeamSize,
                 scenario : postDto.Scenario,
                 learningGoals : postDto.LearningGoals,
-                teamAndRols : postDto.TeamAndRols,
+                teamAndRoles : postDto.TeamAndRoles,
                 skills: skills
             );
 
@@ -195,7 +205,14 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             await db.SaveChangesAsync();
             return Ok(new ProjectPostReadDto(post));
         }   
-        public record ProjectPostCreateDto(string Title, string Summary, string Scenario, string LearningGoals, string TeamAndRols, int ExpectedTeamSize, int ExpectedDurationInDays, List<string> RequiredSkills)
+        public record ProjectPostCreateDto(string Title,
+                                           string Summary,
+                                           string Scenario,
+                                           string LearningGoals,
+                                           string TeamAndRoles,
+                                           int ExpectedTeamSize,
+                                           int ExpectedDurationInDays,
+                                           List<string> RequiredSkills);
 
 
 

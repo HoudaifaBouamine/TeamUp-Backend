@@ -50,7 +50,7 @@ partial class ProjectPost
                        int expectedTeamSize,
                        string scenario,
                        string learningGoals,
-                       string teamAndRols,
+                       string teamAndRoles,
                        List<Skill> skills)
     {
         this.Creator = creator;
@@ -58,7 +58,7 @@ partial class ProjectPost
         this.Scenario = scenario;
         this.Summary = summary;
         this.Title = title;
-        this.TeamAndRols = teamAndRols;
+        this.TeamAndRols = teamAndRoles;
         this.ExpectedTeamSize = expectedTeamSize;
         this.ExpextedDuration = expextedDuration;
         this.RequiredSkills = skills;
