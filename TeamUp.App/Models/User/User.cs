@@ -26,6 +26,7 @@ public partial class User : IdentityUser<Guid>
         }
     }
     
+    // public override string? Email { get; set; }
     public VerificationCode? EmailVerificationCode { get; private set; }
     public VerificationCode? PasswordRestCode { get; private set; }
     public string? PasswordResetToken { get; private set; } 

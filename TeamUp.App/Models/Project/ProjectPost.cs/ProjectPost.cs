@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Models;
 
 namespace Models;
@@ -11,15 +12,17 @@ public partial class ProjectPost
     public string LearningGoals { get; set; } = string.Empty;
     public string TeamAndRols { get; set; } = string.Empty;
     public List<Skill> RequiredSkills { get; private set; } = [];
+    public List<Skill> Categories { get; set; } = [];
     public List<ProjectJoinRequest> ProjectJoinRequests { get; private set; } = [];
-    public TimeSpan ExpextedDuration { get; set; } 
+
+    [AllowedValues("1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months")]
+    public string ExpextedDuration { get; set; }
     public int ExpectedTeamSize { get; set; }
     public Project? Project { get; private set; } = null;
 
     public Guid CreatorId { get; set; }
     public User Creator { get; private init; } = null!;
     public bool IsStarted {get; private set;} = false;
-
 }
 
 
@@ -46,12 +49,13 @@ partial class ProjectPost
     public ProjectPost(User creator,
                        string title,
                        string summary,
-                       TimeSpan expextedDuration,
+                       string expextedDuration,
                        int expectedTeamSize,
                        string scenario,
                        string learningGoals,
                        string teamAndRoles,
-                       List<Skill> skills)
+                       List<Skill> skills,
+                       List<Skill> categories)
     {
         this.Creator = creator;
         this.LearningGoals = learningGoals;
@@ -62,6 +66,7 @@ partial class ProjectPost
         this.ExpectedTeamSize = expectedTeamSize;
         this.ExpextedDuration = expextedDuration;
         this.RequiredSkills = skills;
+        this.Categories = categories;
     }
 
     protected ProjectPost(){} // for ef core

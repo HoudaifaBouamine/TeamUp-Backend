@@ -17,8 +17,6 @@ using Features.Projects.Contracts;
 using Features.Projects;
 using Repositories;
 using Mentor;
-using Duende.IdentityServer;
-using TeamUp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +63,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
         // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-        // options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        // options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));                           
     
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -116,9 +114,9 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 // if(builder.Environment.IsDevelopment())
-//     builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
+    // builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
 // else
-    builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
+     builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();

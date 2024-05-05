@@ -1,22 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
 using Mentor;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Utils;
 namespace Features;
-
-
-///// Planning
-///////////////
-// [Done] Get Project's posts list, with pagination and search
-// [Done] Add new post, required authenticated user, 
-// [Done] send join request,
-// [Done] get project join requests list,
-// [Done] get project join request by id,
-// [Done] response to project join request
 
 [Tags("Project Posts Group")]
 [ApiVersion(4)]
@@ -180,6 +171,9 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
     [HttpPost]
+    [Authorize]
+    [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(ProjectPostReadDto) )]
+    [ProducesResponseType( StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse) )]
     public async Task<IActionResult> CreateProjectPostAsync([FromBody] ProjectPostCreateDto postDto)
     {
         var currentUser = await userManager.GetUserAsync(User);
@@ -187,18 +181,20 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         if(currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
 
         var skills = await db.Skills.Where(s=>postDto.RequiredSkills.Contains(s.Name)).ToListAsync();
+        var categories = await db.Skills.Where(s=>postDto.Categories.Contains(s.Name)).ToListAsync();
 
             var post = new ProjectPost
             (
                 creator : currentUser,
                 title : postDto.Title,
                 summary : postDto.Summary,
-                expextedDuration : new TimeSpan(postDto.ExpectedDurationInDays,0,0,0),
+                expextedDuration : postDto.ExpectedDuration, 
                 expectedTeamSize : postDto.ExpectedTeamSize,
                 scenario : postDto.Scenario,
                 learningGoals : postDto.LearningGoals,
                 teamAndRoles : postDto.TeamAndRoles,
-                skills: skills
+                skills: skills,
+                categories: categories
             );
 
             await db.ProjectPosts.AddAsync(post);
@@ -211,8 +207,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
                                            string LearningGoals,
                                            string TeamAndRoles,
                                            int ExpectedTeamSize,
-                                           int ExpectedDurationInDays,
-                                           List<string> RequiredSkills);
+                                           [AllowedValues("1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months")]
+                                           string ExpectedDuration,
+                                           List<string> RequiredSkills,
+                                           List<string> Categories);
 
 
 
@@ -228,6 +226,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
     [HttpGet]
+    [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
     public async Task<IActionResult> GetProjectPostsAsync(string? SearchPattern, int PageSize = 10, int PageNumber = 1)
         {
         IQueryable<ProjectPost> posts = db.ProjectPosts;
@@ -281,10 +280,15 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string LearningGoals { get; set; } = string.Empty;
         public string TeamAndRols { get; set; } = string.Empty;
         public List<string> RequiredSkills { get; set; } = [];
-        public TimeSpan ExpextedDuration { get; set; } 
+        public List<string> Categories { get; set; } = [];
+        public string ExpextedDuration { get; set; } 
         public int ExpectedTeamSize { get; set; }
-        public MentorReadDto Mentor { get; set; } = null!;    
+        public MentorReadDto Mentor { get; set; } = null!;
 
+        public ProjectPostReadDto()
+        {
+            
+        }
         public ProjectPostReadDto(ProjectPost projectPost)
         {
             this.Id = projectPost.Id;
@@ -294,6 +298,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.LearningGoals = projectPost.LearningGoals;
             this.TeamAndRols = projectPost.TeamAndRols;
             this.RequiredSkills = projectPost.RequiredSkills.Select(s=>s.Name).ToList();
+            this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
             this.ExpextedDuration = projectPost.ExpextedDuration;
             this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
             this.Mentor = new MentorReadDto(projectPost.Creator.Id,
