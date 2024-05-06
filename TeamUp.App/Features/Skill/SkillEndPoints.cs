@@ -20,19 +20,36 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     private readonly ISkillRepository _skillRepository = skillRepository;
 
         [HttpGet]
-       public async Task<IActionResult> GetAllSkills()
-        {
+    public async Task<IActionResult> GetAllSkills(int pageNumber = 1, int pageSize = 5)
+    {
             var skills = await _skillRepository.GetAllAsync();
-            var skillDtos = new List<GetSkillDto>();
-            foreach (var skill in skills)
+
+            var totalItems = skills.Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var paginatedSkills = skills.Skip((pageNumber - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToList();
+            var skillDtos = paginatedSkills.Select(skill => new GetSkillDto
             {
-                skillDtos.Add(new GetSkillDto
-                {
-                    Name = skill.Name
-                });
-            }
+                Name = skill.Name
+            }).ToList();
+
+            var paginationMetadata = new
+            {
+                totalItems,
+                totalPages,
+                pageSize,
+                pageNumber,
+                hasPreviousPage = pageNumber > 1,
+                hasNextPage = pageNumber < totalPages
+            };
+
+            Response.Headers.Append("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetadata));
+
             return Ok(skillDtos);
-        }
+    }
+
 
 
 
