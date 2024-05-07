@@ -9,23 +9,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Models/Skills/Category.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Data/AppDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EndpointsManager/HelpersEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/EndpointsManager/HelpersEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Authentication/Google.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Google.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Authentication/IdentityApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/IdentityApi.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Authentication/Login.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Login.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Authentication/Register.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Register.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Util/DataSeeder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Util/DataSeeder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/ApplicationFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/ApplicationFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/AuthTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/AuthTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/FullAuthTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/FullAuthTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/TestAuthHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Authentication/TestAuthHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/Projects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/Projects.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/User/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User/User.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,15 +27,18 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0706dcfabddf4241b89dd5a90ab7061526a828/41/9535ffe8/InternalDbSet`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/105b6864eb8d402e91d4f8d20b8744e3c2ce00/a6/39378239/InvalidOperationException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/6f155c4dde744bd685f09553bb48727531a600/2c/764e62b2/SwaggerUIMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/72fd76809b1546cbb33eb87ad53892b416e00/6f/3f82113b/WebApplication.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7316c9fa494a4937a8cd15d48bb166707ee00/47/6427e692/OrderedImplicitlyStableEnumerable`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7316c9fa494a4937a8cd15d48bb166707ee00/ac/cdad0ace/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b658d4c0b36a496b8d7887db6cb46b702b6a0/d3/68be4366/UserManager`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d13b08f4778b441d95bd058754755330a7600/89/64a3d86c/RequestDelegateFactory.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d54e1a38fa0a472abff44887fcfde2b6e800/27/1a892f55/AuthorizationMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3684e888fd93508450e2f4b0d7d38bee648cba98882592491596fc79375185f/SwaggerMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/781ebca67bd71532948352c2c24f8db410449e3c21f7191a17bf21348cd4fed4/SwaggerUIMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c33dc61ee1f8ae72ddca822c7e1e5978d9ddda4d42dd69feaa07925886918/Faker[T].cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/houdaifa/projects/TeamUp-Backend/TeamUp.Test/IntegrationTesting/ApplicationFactory.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/houdaifa/projects/TeamUp-Backend/TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/houdaifa/projects/TeamUp-Backend/TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -60,7 +51,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.TeamUp.App: http.executor": "Run",
+    ".NET Launch Settings Profile.TeamUp.App: http.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
@@ -125,6 +116,7 @@
       <workItem from="1714979364194" duration="4009000" />
       <workItem from="1714989296854" duration="4541000" />
       <workItem from="1715032195721" duration="1273000" />
+      <workItem from="1715089687715" duration="7275000" />
     </task>
     <servers />
   </component>
@@ -135,5 +127,24 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Features/Authentication/Login.cs</url>
+          <line>34</line>
+          <properties documentPath="$PROJECT_DIR$/Features/Authentication/Login.cs" containingFunctionPresentation="Method 'LoginAsync'">
+            <startOffsets>
+              <option value="1296" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1412" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

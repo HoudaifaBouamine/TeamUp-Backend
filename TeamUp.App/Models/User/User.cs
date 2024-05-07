@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 
 namespace Models;
 
@@ -13,7 +14,7 @@ public partial class User : IdentityUser<Guid>
     private string _displayName = string.Empty;
     public string DisplayName
     {
-        get 
+        get
         {
             return _displayName; 
         }
@@ -53,6 +54,57 @@ public partial class User : IdentityUser<Guid>
 // Seperating Fields and Methods to 2 classes to simplify the work
 partial class User
 {
+    public bool SetPassword(string password)
+    {
+        PasswordHasher<User> hasher = new();
+
+        if (this.PasswordHash is not null)
+        {
+            Log.Error("PasswordHash is not null, use ChangePassword function instead");
+            return false;
+        }
+
+        this.PasswordHash = hasher.HashPassword(this, password);
+        return true;
+    }
+
+    public bool CheckPassword(string password)
+    {
+        if (PasswordHash is null)
+        {
+            Log.Error("Password hash is null, password can not be checked");
+            return false;
+        }
+        
+        PasswordHasher<User> hasher = new();
+        var result = hasher.VerifyHashedPassword(this, this.PasswordHash,password);
+
+        if (result != PasswordVerificationResult.Failed)
+            return true;
+
+        return false;
+    }
+    public bool ChangePassword(string prevPassword, string newPassword)
+    {
+        if (this.PasswordHash is null) return false;
+        
+        PasswordHasher<User> hasher = new();
+        var result = hasher.VerifyHashedPassword(this, this.PasswordHash, prevPassword);
+        
+        if (result == PasswordVerificationResult.Success)
+        {
+             var newPasswordHash = hasher.HashPassword(this, newPassword);
+             this.PasswordHash = newPasswordHash;
+             return true;
+        }
+
+        if (result == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            Log.Error("result == PasswordVerificationResult.SuccessRehashNeeded");
+        }
+
+        return false;
+    }
     public bool SetDisplayName(string displayName)
     {
         DisplayName = displayName;
