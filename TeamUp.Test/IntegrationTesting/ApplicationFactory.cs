@@ -1,15 +1,14 @@
-﻿using Castle.Core.Smtp;
-using EmailServices;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using static TeamUp.Test.IntegrationTesting.Authentication.FullAuthTests;
+using Serilog;
 
-namespace TeamUp.Test;
+// using static TeamUp.Test.IntegrationTesting.Authentication.FullAuthTests;
+
+namespace TeamUp.Test.IntegrationTesting;
 
 internal class ApplicationFactory : WebApplicationFactory<Program>
 {
@@ -17,18 +16,15 @@ internal class ApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureTestServices(services=>
         {
-            // services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
+            services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
 
-            // services.AddDbContext<AppDbContext>(op=>{
-            //     op.UseInMemoryDatabase("TeamUpDb-Testing");
-            // });
-
-            services.RemoveAll(typeof(IEmailSenderCustome));
-            services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
-
-            var db = CreateDbContext(services);
-            db.Database.EnsureDeleted();
-            db.Database.EnsureCreated();
+            services.AddDbContext<AppDbContext>(op=>{
+                op.UseInMemoryDatabase("TeamUpDb-Testing");
+            });
+            
+                var db = CreateDbContext(services);
+                db.Database.EnsureDeleted();
+            
         });
     }
 

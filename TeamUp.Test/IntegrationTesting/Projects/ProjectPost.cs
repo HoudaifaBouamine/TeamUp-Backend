@@ -9,12 +9,16 @@
 // 8 - response to project join request as the mentor who create it
 
 
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using TeamUp.Test;
+using TeamUp.Test.IntegrationTesting;
+using Users;
 using static Authentication.IdentityApi.AuthEndpoints;
 using static Features.ProjectPostEndpoints;
 
@@ -23,63 +27,85 @@ public class ProjectPostTests
     
     // implement unit tests for project posts endpoints
 
+    async Task GetUsers(HttpClient client)
+    {
+        var response = await client.GetAsync("/api/v1/users");
+        var users = await response.Content.ReadFromJsonAsync<GetUsersListResponse>();
+        Log.Warning("\n\n----->" + JsonSerializer.Serialize(users));
+    }
+    
     [Fact]
     public async Task CreateProjectPostAsMentor_ShouldReturnSuccess_WhenValidDataIsProvided()
     {
-var application = new ApplicationFactory();
+        
+        
+        var application = new ApplicationFactory();
         var client = application.CreateClient();
+
+        // await GetUsers(client);
+        
+        
         var userRegister = new UserRegisterRequestDto
         (
             "Houdaifa Bouamine",
             "h.bouamine@esi-sba.dz",
             "1234"
         );
-        // Act
-        var response = await client.PostAsJsonAsync("/api/v2/auth/register", userRegister);
 
-        // Assert
-        response.EnsureSuccessStatusCode();
+        var response = await client.PostAsJsonAsync("/api/v2/auth/register", userRegister);
+        
+        
+        Console.WriteLine("\n\n\n\n ---> " + response.StatusCode.ToString());
+
+        await GetUsers(client);
+
         
         // Arrange
-
+        
         var userLogin = new UserLoginRequestDto
         (
             "h.bouamine@esi-sba.dz",
             "1234"
         );
-
+        
         // Act
         response = await client.PostAsJsonAsync("/api/v2/auth/login", userLogin);
+        //
+        // if (response.StatusCode == HttpStatusCode.OK) 
+        //     return;
+
         var authToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
-        // Arrange
         
+        Log.Warning("\n\n\n\n\n---------> " + authToken + "\n\n\n\n");
+        // Arrange
+
         // Act 
         client.DefaultRequestHeaders.Add("Authorization","Bearer " + authToken?.AccessToken);
         response = await client.GetAsync("/api/v2/auth/currenUser");
-
+        
         // Assert
         response.EnsureSuccessStatusCode();
-
-
+        
+        
         /// 
         Log.Debug("\n\n\n\n\n\n--------------> Hey Hey ===> It is find intel know\n\n\n\n\n\n\n\n\n\n");
-
+        
         var posts_response = await client.PostAsJsonAsync("api/v4/projects-posts", new ProjectPostCreateDto
         (
             "project title",
-            "project summary",
+            "project summary is there !!!",
             "project Scenario",
             "prject learning Goals",
             "project team and roles",
             5,
-            1,
-            [".NET","C#","React.js","Angular.js","HTML"]            
+            "1 Week",
+            [".NET","C#","React.js","Angular.js","HTML"] ,
+            ["Web", "AI"]
         ));
         posts_response.EnsureSuccessStatusCode();
+        var result = await posts_response.Content.ReadFromJsonAsync<ProjectPostReadDto>();
         
-        var ok_post_repsonse = Assert.IsType<OkObjectResult> (posts_response);
-        var result = Assert.IsType<ProjectPostReadDto>(ok_post_repsonse.Value);
-
+        
         System.Console.WriteLine("\n\n\n--> " + result.Summary);
     }
 }

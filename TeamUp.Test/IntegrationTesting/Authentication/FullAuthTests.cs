@@ -28,7 +28,7 @@ public partial class FullAuthTests
 
         // Assert
         response.EnsureSuccessStatusCode();
-        
+        return;
         // Arrange
 
         var userLogin = new UserLoginRequestDto

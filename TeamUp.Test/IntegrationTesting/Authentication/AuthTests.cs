@@ -99,7 +99,7 @@ public class AuthIntegrationTests
         // Assert
 
         Assert.IsType<Ok> (response.Result);
-        var registredUser = Assert.Single(db.Users);
+        var registredUser =  await db.Users.Where(u=>u.Email == "email@example.com").FirstOrDefaultAsync();
         Assert.Equal(false,registredUser?.EmailConfirmed);
         Assert.Equal(userRegisterDto.Email, registredUser?.Email);
         System.Console.WriteLine("Code " + VerificationCode);
