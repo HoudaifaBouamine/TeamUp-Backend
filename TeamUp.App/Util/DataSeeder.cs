@@ -10,7 +10,7 @@ public static class DataSeeder
     public static async Task SeedCaterogyData(AppDbContext db)
     {  
         string[] categories = ["Web","AI","Programming","Mobile"];
-        db.Categories.AddRangeAsync(categories.Select(c=>new Category(){Name = c}));
+        await db.Categories.AddRangeAsync(categories.Select(c=>new Category(){Name = c}));
         await db.SaveChangesAsync();
     }
     
@@ -63,7 +63,7 @@ public static class DataSeeder
             PostingTime = p.PostingTime
         });
 
-      await   db.ProjectPosts.AddRangeAsync(projects);
+      await db.ProjectPosts.AddRangeAsync(projects);
       await db.SaveChangesAsync();
     }
     class UserCreateFaker
@@ -72,6 +72,7 @@ public static class DataSeeder
         public string LastName { get; set; }
         public string Email { get; set; }
         public string PictureUrl { get; set; }
+        public string Handler { get; set; }
     }
 
     // record UserCreateFake(string FirstName, string LastName, string Email, string PicureUrl);
@@ -83,11 +84,15 @@ public static class DataSeeder
             .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
             .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
             .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
-            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar);
+            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
+            .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName());
 
         var usersToCreat = userFaker.Generate(100);
 
-        var users = usersToCreat.Select(u => new User(u.FirstName, u.LastName, u.Email, u.PictureUrl)).ToList();
+        var users = usersToCreat.Select(u => new User(u.FirstName, u.LastName, u.Email, u.PictureUrl)
+        {
+            Handler = u.Handler
+        }).ToList();
 
         await db.Users.AddRangeAsync(users);
         await db.SaveChangesAsync();

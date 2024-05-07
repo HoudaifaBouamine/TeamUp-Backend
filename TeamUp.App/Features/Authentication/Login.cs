@@ -32,7 +32,7 @@ partial class AuthEndpoints
         string userName = (await userManager.GetUserNameAsync(user))!; 
 
         var result = await signInManager.PasswordSignInAsync(userName,login.Password, isPersistent, lockoutOnFailure: true);
-
+        
         if (!result.Succeeded)
         {
             return TypedResults.Problem(result.ToString(), statusCode: StatusCodes.Status401Unauthorized);

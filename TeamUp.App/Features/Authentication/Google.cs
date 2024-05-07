@@ -58,7 +58,9 @@ partial class AuthEndpoints
         {
             await signInManager.ExternalLoginSignInAsync(LoginProvider.Google.GetDisplayName(),payload.Subject,true);
 
-            var token = await userManager.GenerateUserTokenAsync(user, LoginProvider.Google.GetDisplayName(), "access_token");
+            // var token = await userManager.GenerateUserTokenAsync(user, LoginProvider.Google.GetDisplayName(), "access_token");
+
+            // Console.WriteLine("google auth token = " + token);
             
             if (doesExistBefore)
                 return TypedResults.Ok((object)new { IsNewUser = false });

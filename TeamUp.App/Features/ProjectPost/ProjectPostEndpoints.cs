@@ -230,7 +230,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> GetProjectPostsByIdAsync(int id)
     {
-        var project = await db.ProjectPosts.Include(p=>p.Creator).FirstOrDefaultAsync(p => p.Id == id);
+        var project = await db.ProjectPosts.Include(p=>p.RequiredSkills).Include(p=>p.Categories).Include(p=>p.Creator).FirstOrDefaultAsync(p => p.Id == id);
         if (project is null) return NotFound(new ErrorResponse("Project not found"));
 
         return Ok(new ProjectPostDetailsReadDto(project));
@@ -238,12 +238,11 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
 
-
-    [HttpGet]
+    [HttpGet("for-user/{id:guid}")]
     [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
-    public async Task<IActionResult> GetProjectPostsAsync(string? SearchPattern, int PageSize = 10, int PageNumber = 1)
-        {
-        IQueryable<ProjectPost> posts = db.ProjectPosts;
+    public async Task<IActionResult> GetProjectPostsAsync(Guid id, string? SearchPattern, int PageSize = 10, int PageNumber = 1)
+    {
+        IQueryable<ProjectPost> posts = db.ProjectPosts.Where(p=>p.CreatorId == id);
 
         if(SearchPattern is not null)
             posts = posts.Where(p=>
@@ -275,6 +274,43 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     }
 
 
+    [HttpGet]
+    [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
+    public async Task<IActionResult> GetProjectPostsAsync(string? SearchPattern, int PageSize = 10, int PageNumber = 1)
+        {
+        IQueryable<ProjectPost> posts = db.ProjectPosts;
+
+        if(SearchPattern is not null)
+            posts = posts.Where(p=>
+                p.Summary.ToLower().Contains(SearchPattern.ToLower()) ||
+                p.LearningGoals.ToLower().Contains(SearchPattern.ToLower()));
+
+        int TotalCount = posts.Count();
+
+        posts = posts
+            .Skip(PageSize * (PageNumber - 1))
+            .Take(PageSize);
+    
+
+        var projectsDto = await posts
+            .Include(p=>p.Creator)
+            .Include(p=>p.RequiredSkills)
+            .Include(p=>p.Categories)
+            .Select(p => new ProjectPostReadDto(p)).ToListAsync();
+
+        return Ok(new GetProjectPostListResponse
+        {
+            TotalCount = TotalCount,
+            PageNumber = PageNumber,
+            PageSize = PageSize,
+            IsPrevPageExist = PageNumber > 1,
+            IsNextPageExist = PageNumber * PageSize < TotalCount, 
+            ProjectsPosts = projectsDto
+        });
+
+    }
+
+
     public class GetProjectPostListResponse
     {
         public int TotalCount { get; set; }
@@ -291,6 +327,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string Title { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
         public DateTime PostingTime { get; set; }
+
+        public string ProjectLevel { get; set; } = "Beginner";
+        public string ExpextedDuration { get; set; } 
+        public int ExpectedTeamSize { get; set; }
         public List<string> Categories { get; set; } = [];
         public MentorReadDto Mentor { get; set; } = null!;
 
@@ -301,6 +341,8 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.Summary = projectPost.Summary;
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
             this.PostingTime = projectPost.PostingTime;
+            this.ExpextedDuration = projectPost.ExpextedDuration;
+            this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
             this.Mentor = new MentorReadDto(projectPost.Creator.Id,
                 projectPost.Creator.DisplayName,
                 projectPost.Creator.Handler,
@@ -317,6 +359,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string Scenario { get; set; } = string.Empty;
         public string LearningGoals { get; set; } = string.Empty;
         public string TeamAndRols { get; set; } = string.Empty;
+        public string ProjectLevel { get; set; } = "Beginner";
         public string ExpextedDuration { get; set; } 
         public int ExpectedTeamSize { get; set; }
         public DateTime PostingTime { get; set; }

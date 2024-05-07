@@ -9,11 +9,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Data/AppDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Authentication/Google.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Google.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Authentication/Login.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Login.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Authentication/Register.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Register.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/User/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User/User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,27 +48,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.TeamUp.App: http.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "HotReloadSettingsPage",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.TeamUp.App: http.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;HotReloadSettingsPage&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache",
-      "/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache",
-      "/home/houdaifa/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache&quot;,
+      &quot;/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache&quot;,
+      &quot;/home/houdaifa/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.TeamUp.App: http">
     <configuration name="TeamUp.App: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/TeamUp.App.csproj" />
@@ -117,6 +116,7 @@
       <workItem from="1714989296854" duration="4541000" />
       <workItem from="1715032195721" duration="1273000" />
       <workItem from="1715089687715" duration="7275000" />
+      <workItem from="1715118827041" duration="3124000" />
     </task>
     <servers />
   </component>
@@ -132,17 +132,17 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Features/Authentication/Login.cs</url>
-          <line>34</line>
-          <properties documentPath="$PROJECT_DIR$/Features/Authentication/Login.cs" containingFunctionPresentation="Method 'LoginAsync'">
+          <url>file://$PROJECT_DIR$/Util/DataSeeder.cs</url>
+          <line>56</line>
+          <properties documentPath="$PROJECT_DIR$/Util/DataSeeder.cs" containingFunctionPresentation="Lambda expression inside Method 'SeedProjectPostData'">
             <startOffsets>
-              <option value="1296" />
+              <option value="2215" />
             </startOffsets>
             <endOffsets>
-              <option value="1412" />
+              <option value="2241" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="2" />
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
