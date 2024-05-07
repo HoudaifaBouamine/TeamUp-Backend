@@ -3,6 +3,7 @@ using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Org.BouncyCastle.Tls;
 using Utils;
 
 namespace Features.Projects;
@@ -18,7 +19,7 @@ partial class ProjectsController
         [FromServices] CustomUserManager userManager
     )
     {   
-        User? user = await userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         
         if(user is null) 
             return BadRequest(new ErrorResponse("User account does not exist any more"));

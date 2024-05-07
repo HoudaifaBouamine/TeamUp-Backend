@@ -2,6 +2,7 @@ using Authentication.Oauth.Google;
 using Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Extensions;
 using Models;
@@ -13,8 +14,8 @@ namespace Authentication.IdentityApi;
 
 partial class AuthEndpoints
 {
-    
-    async Task<Results<Ok,BadRequest<ErrorResponse>>> GoogleAsync(
+
+    async Task<Results<Ok<object>,BadRequest<ErrorResponse>>> GoogleAsync(
         [FromBody] GoogleLoginDto model,
         [FromServices] IServiceProvider sp,
         [FromServices] AppDbContext db,
@@ -47,13 +48,22 @@ partial class AuthEndpoints
             ProfilePicture = payload.Picture,
             LoginProviderSubject = payload.Subject,
         };
+
+         var doesExistBefore = await db.Users.AnyAsync(u => u.Email == userToBeCreated.Email);
+        
             
         var user = await userManager.CreateUserFromSocialLogin(db, userToBeCreated, LoginProvider.Google);
 
         if (user is not null)
         {
             await signInManager.ExternalLoginSignInAsync(LoginProvider.Google.GetDisplayName(),payload.Subject,true);
-            return TypedResults.Ok();
+
+            var token = await userManager.GenerateUserTokenAsync(user, LoginProvider.Google.GetDisplayName(), "access_token");
+            
+            if (doesExistBefore)
+                return TypedResults.Ok((object)new { IsNewUser = false });
+
+            return TypedResults.Ok((object)new { IsNewUser = true });
         }
         else
         {

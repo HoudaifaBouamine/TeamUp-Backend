@@ -63,7 +63,7 @@ public class MentorRepository(AppDbContext db) : IMentorRepository
 
         var usersResult = await mentors
             .Include(u=>u.Projects)
-            .Select(u => new MentorReadDto(u.Id,u.Email!,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))
+            .Select(u => new MentorReadDto(u.Id,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))
             .ToListAsync();
 
         return new GetMentorsListResponse
@@ -87,7 +87,6 @@ public interface IMentorRepository
 public record MentorReadDto
 (
     Guid Id,
-    string Email,
     string DisplayName,
     string Handler,
     float Rate,

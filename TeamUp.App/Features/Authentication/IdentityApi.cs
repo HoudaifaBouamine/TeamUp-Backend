@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using Authentication.UserManager;
 using EmailServices;
 using Carter;
+using Enums;
+using Microsoft.OpenApi.Extensions;
+using Models;
 
 namespace Authentication.IdentityApi;
 
@@ -55,7 +58,7 @@ public partial class AuthEndpoints(
         .WithOpenApi();
 
 
-        routeGroup.MapGet("/currenUser", CurrentUserAsync)
+        routeGroup.MapGet("/currentUser", CurrentUserAsync)
         .RequireAuthorization(p=>p.RequireAuthenticatedUser())
         .WithSummary("[C]")
         .WithOpenApi()
@@ -70,6 +73,19 @@ public partial class AuthEndpoints(
         .HasApiVersion(3)
         .WithSummary("D")
         .WithOpenApi();
+
+        routeGroup.MapGet("/test", async ([FromServices] CustomUserManager userManager, ClaimsPrincipal userCliams)=>
+        {
+
+            var user = await userManager.GetUserAsync(userCliams);
+
+            if (user is null) return Results.Unauthorized();
+            
+            var token = await userManager.GenerateUserTokenAsync(user, LoginProvider.Google.GetDisplayName(), "access_token");
+
+            return Results.Ok(new { Token = token });
+
+        });
 
     }
 

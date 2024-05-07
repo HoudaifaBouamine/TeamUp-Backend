@@ -4,6 +4,7 @@ using Configuration;
 using Features.Projects;
 using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using TeamUp;
 
@@ -46,9 +47,9 @@ namespace EndpointsManager
                 await db.Database.EnsureCreatedAsync();   
             });
 
-            testingGroup.MapGet("/seed-skills",(AppDbContext db)=>
+            testingGroup.MapGet("/seed-skills" , async (AppDbContext db)=>
             {
-                DataSeeder.SeedSkillsData(db);
+                await DataSeeder.SeedSkillsData(db);
             });
 
             testingGroup.MapGet("/generate-fake-data",async ([FromServices] AppDbContext db,[FromServices] IProjectRepository pr)=>
@@ -74,48 +75,77 @@ namespace EndpointsManager
         await db.Users.AddRangeAsync(users);
         await db.SaveChangesAsync();
 
-        users = db.Users.ToList();
+        users = await db.Users.ToListAsync();
 
-        var projectFaker = new Faker<Project>()
-        .RuleFor(p=>p.Name, (f,p)=>f.Company.CompanyName())
-        .RuleFor(p=>p.Description, f=>f.Lorem.Paragraphs(2,5))
-        .RuleFor(p=>p.StartDate,f=>f.Date.BetweenDateOnly(new DateOnly(2023,5,4),new DateOnly(2025,3,6)))
-        .RuleFor(p=>p.EndDate,(f,p)=>{
-            
-            if(f.Random.Bool())
-            {
-                return f.Date.BetweenDateOnly(p.StartDate.AddDays(3),p.StartDate.AddDays(70));
-            }
-            return null;
-            });
+        string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
+        string[] category = ["Web", "AI", "Programming", "Mobile"];
 
-        var projects = projectFaker.Generate(30);
+        var skills = await db.Skills.ToListAsync();
 
-        var rand = new Random();
+        var projectPostsFaker = new Faker<ProjectPost>();
+        
+            // .RuleFor(p => p.Summary, (f, p) => f.Commerce.ProductDescription())
+            // .RuleFor(p => p.Scenario, (f, p) => f.Commerce.ProductAdjective())
+            // .RuleFor(p => p.Title, p => p.Commerce.ProductName())
+            // .RuleFor(p => p.ExpextedDuration, p => expectedDuration[p.Random.Int(5)])
+            // .RuleFor(p => p.ExpectedTeamSize, p => p.Random.Int(20) + 2)
+            // .RuleFor(p => p.Categories,
+            //     p =>
+            //     [
+            //         new Skill() { Name = skills[p.Random.Int(skills.Count())].Name },
+            //         new Skill() { Name = skills[p.Random.Int(skills.Count())].Name }
+            //     ])
+            // .RuleFor(p => p.IsStarted, f => f.Random.Bool())
+            // .RuleFor(p => p.Creator, f => users[f.Random.Int(users.Count() / 2)])
+            // .RuleFor(p => p.TeamAndRols, f => f.Lorem.Paragraphs())
+            // .RuleFor(p => p.LearningGoals, f => f.Lorem.Paragraph(4))
+            // .RuleFor(p => p.RequiredSkills, f => skills.Skip(f.Random.Int(300)).Take(f.Random.Int(10) + 5));
+            //
+        var projectsPosts = projectPostsFaker.Generate(200);
 
-        foreach(var p in projects)
-        {
-            int id = await pr.CreateAsync(new ProjectCreateDto
-            (
-                p.Name,
-                p.Description,
-                p.StartDate
-            ),
-                users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
-            );
-
-            for(int i = 0;i<rand.Next(5,20);i++)
-            {
-                await pr.AddUserToProjectAsync(id, users[i].Id, rand.Next(0,10) == 0);
-            }
-        }
-
-
-
+        await db.ProjectPosts.AddRangeAsync(projectsPosts);
         await db.SaveChangesAsync();
+        //
+        // var projectFaker = new Faker<Project>()
+        // .RuleFor(p=>p.Name, (f,p)=>f.Company.CompanyName())
+        // .RuleFor(p=>p.Description, f=>f.Lorem.Paragraphs(2,5))
+        // .RuleFor(p=>p.StartDate,f=>f.Date.BetweenDateOnly(new DateOnly(2023,5,4),new DateOnly(2025,3,6)))
+        // .RuleFor(p=>p.EndDate,(f,p)=>{
+        //     
+        //     if(f.Random.Bool())
+        //     {
+        //         return f.Date.BetweenDateOnly(p.StartDate.AddDays(3),p.StartDate.AddDays(70));
+        //     }
+        //     return null;
+        //     });
+        //
+        // var projects = projectFaker.Generate(30);
+        //
+        // var rand = new Random();
+        //
+        // foreach(var p in projects)
+        // {
+        //     int id = await pr.CreateAsync(new ProjectCreateDto
+        //     (
+        //         p.Name,
+        //         p.Description,
+        //         p.StartDate
+        //     ),
+        //         users.Where(u=>u.EmailConfirmed).ToList()[rand.Next(0,20)]    
+        //     );
+        //
+        //     for(int i = 0;i<rand.Next(5,20);i++)
+        //     {
+        //         await pr.AddUserToProjectAsync(id, users[i].Id, rand.Next(0,10) == 0);
+        //     }
+        // }
+        //
+        //
+        //
+        // await db.SaveChangesAsync();
 
-    
-        });
+
+            });
         }
     }
 }

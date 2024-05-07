@@ -1,13 +1,101 @@
+using Bogus;
+using FluentEmail.Core;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace TeamUp;
 
 public static class DataSeeder
 {
+    public static async Task SeedCaterogyData(AppDbContext db)
+    {  
+        string[] categories = ["Web","AI","Programming","Mobile"];
+        db.Categories.AddRangeAsync(categories.Select(c=>new Category(){Name = c}));
+        await db.SaveChangesAsync();
+    }
+    
+    class ProjectPostFaker
+    {
+        public User Creator { get; set; }
+        public string Title { get; set; }
+        public string Summary { get; set; }
+        public string Sinarios { get; set; }
+        public string learningGoals { get; set; }
+        public string teamAndRols { get; set; }
+
+    }
+    public static async Task SeedProjectPostData(AppDbContext db)
+    {
+        var users = await db.Users.ToListAsync();
+        var skills = await db.Skills.ToListAsync();
+        var categories = await db.Categories.ToListAsync();
+        var projectFaker = new Faker<ProjectPostFaker>();
+
+        projectFaker
+            .RuleFor(u => u.Creator, (f, p) => users.Where((u,index)=>new Random().Next(10) == 0 || index == 0).First())
+            .RuleFor(u => u.Title, (f, p) => f.Commerce.ProductName())
+            .RuleFor(u => u.Sinarios, (f, p) => f.Lorem.Paragraph())
+            .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
+            .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
+            .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5));
+        var projectsToCreat = projectFaker.Generate(30);
+        
+        string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
+
+        var projects = projectsToCreat.Select(p => new ProjectPost(
+            p.Creator,
+            p.Title,
+            p.Summary,
+            expectedDuration[new Random().Next(expectedDuration.Length)],
+            new Random().Next(20) + 5,
+            p.Sinarios, 
+            p.learningGoals,
+            p.teamAndRols,
+            skills.Where(s=> new Random().Next(70) == 0).ToList(),
+            categories
+            // skills.Skip(new Random().Next(3)).Where(s=>category.Contains(s.Name)).ToList()
+            
+        ));
+
+      await   db.ProjectPosts.AddRangeAsync(projects);
+      await db.SaveChangesAsync();
+    }
+    class UserCreateFaker
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string PictureUrl { get; set; }
+    }
+
+    // record UserCreateFake(string FirstName, string LastName, string Email, string PicureUrl);
+    public static async Task SeedUsersData(AppDbContext db)
+    {
+        var userFaker = new Faker<UserCreateFaker>();
+
+        userFaker
+            .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
+            .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
+            .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
+            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar);
+
+        var usersToCreat = userFaker.Generate(100);
+
+        var users = usersToCreat.Select(u => new User(u.FirstName, u.LastName, u.Email, u.PictureUrl)).ToList();
+
+        await db.Users.AddRangeAsync(users);
+        await db.SaveChangesAsync();
+    }
+    
+    
     public static async Task SeedSkillsData(AppDbContext db)
     {
         List<string> skills = new List<string>
 {
+    "AI",
+    "Web",
+    "Programming",
+    "Mobile",
     ".NET",
     "360-degree video",
     "3D Animation",
@@ -685,7 +773,6 @@ public static class DataSeeder
     "Product Design",
     "Product Management",
     "Product Sourcing",
-    "Programming",
     "Project Management",
     "Project Scheduling",
     "Prolog",
@@ -949,6 +1036,6 @@ public static class DataSeeder
 };
 
         await db.Skills.AddRangeAsync(skills.Select(s=>new Skill{Name = s}));
-        await db.SaveChangesAsync();    
+        await db.SaveChangesAsync();
     }
 }

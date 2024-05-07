@@ -1,3 +1,4 @@
+using Authentication.UserManager;
 using Bogus.DataSets;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,8 +15,10 @@ partial class AuthEndpoints
         [FromQuery] bool? useCookies,
         [FromQuery] bool? useSessionCookies,
         [FromServices] SignInManager<User> signInManager,
-        [FromServices] UserManager<User> userManager)
+        [FromServices] CustomUserManager userManager)
     {
+
+        Console.WriteLine("\n\n\nloging ....\n\n\n");
         
         var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
         var isPersistent = (useCookies == true) && (useSessionCookies != true);
@@ -23,7 +26,6 @@ partial class AuthEndpoints
 
         if (await userManager.FindByEmailAsync(login.Email) is not { } user)
         {
-            // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
             return TypedResults.Unauthorized();
         }
 

@@ -7,7 +7,13 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        Database.EnsureDeleted();
         Database.EnsureCreated();
+        //
+        // DataSeeder.SeedCaterogyData(this).Wait();
+        // DataSeeder.SeedSkillsData(this).Wait();
+        // DataSeeder.SeedUsersData(this).Wait();
+        // DataSeeder.SeedProjectPostData(this).Wait();
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -18,18 +24,6 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .HasOne(p => p.ChatRoom)
             .WithOne(ch => ch.Project)
             .HasForeignKey<Project>("ChatRoom_Id");
-
-        // builder.Entity<User>()
-        //     .HasMany(u=>u.Projects)
-        //     .WithMany(p=>p.Users)
-        //     .UsingEntity<UsersProject>(
-        //             l => l.HasOne<Project>().WithMany(p=>p.ProjectsUsers),
-        //             r => r.HasOne<User>().WithMany(u=>u.UsersProjects)
-        //         );
-
-
-        //
-    
 
         builder.Entity<UsersProject>()
             .HasOne(up => up.User)
@@ -65,12 +59,10 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Project> Projects { get; set; }
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<UsersProject> UsersProjects { get; set; }
+    
+    public DbSet<Category> Categories { get; set; }
+
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
-
-    // NOTE (HOUDAIFA) : No need for users table declaration because it is already defined inside the base class => IdentityDbContext<User>  => ok 
-    // public DbSet<User> Users { get; set; } 
-
-
-
+    
 }

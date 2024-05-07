@@ -9,7 +9,7 @@ using Utils;
 namespace Authentication.IdentityApi;
 partial class AuthEndpoints
 {
-    public async Task<Results<Ok<AccessTokenResponse>,Ok, ValidationProblem,BadRequest<ErrorResponse>>> 
+    public async Task<Results<Ok, ValidationProblem,BadRequest<ErrorResponse>>> 
     RegisterAsync(
         [FromBody] UserRegisterRequestDto registration,
         [FromServices] CustomUserManager userManager
@@ -36,9 +36,9 @@ partial class AuthEndpoints
         {
             return CreateValidationProblem(result);
         }
-
+        
         var success = await SendEmailConfirmationCodeEmailAsync(userManager,email,VerificationCode.VerificationCodeTypes.EmailVerification);
-
+        
         if(success)
         {
             return TypedResults.Ok();

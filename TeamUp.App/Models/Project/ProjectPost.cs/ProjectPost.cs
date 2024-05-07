@@ -12,7 +12,7 @@ public partial class ProjectPost
     public string LearningGoals { get; set; } = string.Empty;
     public string TeamAndRols { get; set; } = string.Empty;
     public List<Skill> RequiredSkills { get; private set; } = [];
-    public List<Skill> Categories { get; set; } = [];
+    public List<Category> Categories { get; set; } = [];
     public List<ProjectJoinRequest> ProjectJoinRequests { get; private set; } = [];
 
     [AllowedValues("1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months")]
@@ -55,7 +55,7 @@ partial class ProjectPost
                        string learningGoals,
                        string teamAndRoles,
                        List<Skill> skills,
-                       List<Skill> categories)
+                       List<Category> categories)
     {
         this.Creator = creator;
         this.LearningGoals = learningGoals;
@@ -69,5 +69,5 @@ partial class ProjectPost
         this.Categories = categories;
     }
 
-    protected ProjectPost(){} // for ef core
+    private ProjectPost(){} // for ef core
 }
