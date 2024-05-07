@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Users;
@@ -37,10 +38,10 @@ record UserReadDetailsDto
 
 record UserUpdateRequestDto
 (
-    string? FirstName,
-    string? LastName,
-    string DisplayName,
-    string Handler,
-    string? FullAddress,
-    string? ProfilePicture
+    [Required,MinLength(2)] string FirstName,
+    [Required,MinLength(2)] string LastName,
+    [Required,MinLength(5)] string DisplayName,
+    [Required] string Handler,
+    [Required] string FullAddress,
+    [Required,Url] string ProfilePicture
 );

@@ -23,6 +23,7 @@ public static class DataSeeder
         public string learningGoals { get; set; }
         public string teamAndRols { get; set; }
 
+        public DateTime PostingTime { get; set; }
     }
     public static async Task SeedProjectPostData(AppDbContext db)
     {
@@ -32,12 +33,14 @@ public static class DataSeeder
         var projectFaker = new Faker<ProjectPostFaker>();
 
         projectFaker
-            .RuleFor(u => u.Creator, (f, p) => users.Where((u,index)=>new Random().Next(10) == 0 || index == 0).First())
+            .RuleFor(u => u.Creator,
+                (f, p) => users.Where((u, index) => new Random().Next(10) == 0 || index == 0).First())
             .RuleFor(u => u.Title, (f, p) => f.Commerce.ProductName())
             .RuleFor(u => u.Sinarios, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
-            .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5));
+            .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
+            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 6, 1), DateTime.UtcNow));
         var projectsToCreat = projectFaker.Generate(30);
         
         string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
@@ -55,7 +58,10 @@ public static class DataSeeder
             categories
             // skills.Skip(new Random().Next(3)).Where(s=>category.Contains(s.Name)).ToList()
             
-        ));
+        )
+        {
+            PostingTime = p.PostingTime
+        });
 
       await   db.ProjectPosts.AddRangeAsync(projects);
       await db.SaveChangesAsync();

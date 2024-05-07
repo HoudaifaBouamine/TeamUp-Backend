@@ -6,6 +6,7 @@ namespace Models;
 public partial class ProjectPost
 {
     public int Id { get; init; }
+    public DateTime PostingTime { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Summary { get; set; } = string.Empty;
     public string Scenario { get; set; } = string.Empty;
@@ -67,6 +68,7 @@ partial class ProjectPost
         this.ExpextedDuration = expextedDuration;
         this.RequiredSkills = skills;
         this.Categories = categories;
+        this.PostingTime = DateTime.UtcNow;
     }
 
     private ProjectPost(){} // for ef core

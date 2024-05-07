@@ -290,20 +290,17 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public int Id { get; init; }
         public string Title { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
+        public DateTime PostingTime { get; set; }
         public List<string> Categories { get; set; } = [];
         public MentorReadDto Mentor { get; set; } = null!;
-        
-        public ProjectPostReadDto()
-        {
-            
-        }
+
         public ProjectPostReadDto(ProjectPost projectPost)
         {
             this.Id = projectPost.Id;
             this.Title = projectPost.Title;
             this.Summary = projectPost.Summary;
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
-            
+            this.PostingTime = projectPost.PostingTime;
             this.Mentor = new MentorReadDto(projectPost.Creator.Id,
                 projectPost.Creator.DisplayName,
                 projectPost.Creator.Handler,
@@ -320,16 +317,12 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string Scenario { get; set; } = string.Empty;
         public string LearningGoals { get; set; } = string.Empty;
         public string TeamAndRols { get; set; } = string.Empty;
-        public List<string> RequiredSkills { get; set; } = [];
-        public List<string> Categories { get; set; } = [];
         public string ExpextedDuration { get; set; } 
         public int ExpectedTeamSize { get; set; }
+        public DateTime PostingTime { get; set; }
+        public List<string> Categories { get; set; } = [];
+        public List<string> RequiredSkills { get; set; } = [];
         public MentorReadDto Mentor { get; set; } = null!;
-
-        public ProjectPostDetailsReadDto()
-        {
-            
-        }
         public ProjectPostDetailsReadDto(ProjectPost projectPost)
         {
             this.Id = projectPost.Id;
@@ -342,6 +335,8 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
             this.ExpextedDuration = projectPost.ExpextedDuration;
             this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
+            this.PostingTime = projectPost.PostingTime;
+
             this.Mentor = new MentorReadDto(projectPost.Creator.Id,
                                             projectPost.Creator.DisplayName,
                                             projectPost.Creator.Handler,
