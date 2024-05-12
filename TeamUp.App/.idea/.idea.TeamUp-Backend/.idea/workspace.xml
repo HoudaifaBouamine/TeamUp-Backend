@@ -9,10 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Features/Authentication/Google.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Google.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Authentication/Login.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Login.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +29,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/72fd76809b1546cbb33eb87ad53892b416e00/6f/3f82113b/WebApplication.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7316c9fa494a4937a8cd15d48bb166707ee00/47/6427e692/OrderedImplicitlyStableEnumerable`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7316c9fa494a4937a8cd15d48bb166707ee00/ac/cdad0ace/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/73183ff2b01a48848d44c547b02593471e6428/89/9c780794/RelationalCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b658d4c0b36a496b8d7887db6cb46b702b6a0/d3/68be4366/UserManager`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d13b08f4778b441d95bd058754755330a7600/89/64a3d86c/RequestDelegateFactory.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d54e1a38fa0a472abff44887fcfde2b6e800/27/1a892f55/AuthorizationMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
@@ -50,7 +48,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.TeamUp.App: http.executor&quot;: &quot;Debug&quot;,
+    &quot;.NET Launch Settings Profile.TeamUp.App: http.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -116,7 +114,10 @@
       <workItem from="1714989296854" duration="4541000" />
       <workItem from="1715032195721" duration="1273000" />
       <workItem from="1715089687715" duration="7275000" />
-      <workItem from="1715118827041" duration="3124000" />
+      <workItem from="1715118827041" duration="6215000" />
+      <workItem from="1715168797564" duration="42000" />
+      <workItem from="1715250653614" duration="120000" />
+      <workItem from="1715526536081" duration="236000" />
     </task>
     <servers />
   </component>
@@ -127,24 +128,5 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Util/DataSeeder.cs</url>
-          <line>56</line>
-          <properties documentPath="$PROJECT_DIR$/Util/DataSeeder.cs" containingFunctionPresentation="Lambda expression inside Method 'SeedProjectPostData'">
-            <startOffsets>
-              <option value="2215" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2241" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

@@ -368,3 +368,4 @@ Migrations/
 Migrations/*
 */.key*
 *.db
+*/.idea/*
