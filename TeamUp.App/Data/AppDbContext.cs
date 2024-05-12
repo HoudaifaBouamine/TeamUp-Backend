@@ -67,5 +67,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
+    public DbSet<UserReview> ProjectViews{get ; set ; } 
+    public DbSet<UserReview> UserReviews{get ; set ; } 
     
 }
