@@ -36,4 +36,10 @@
   <ItemGroup>
     <InternalsVisibleTo Include="TeamUp.Test" />
   </ItemGroup>
+
+<PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+
+
 </Project>

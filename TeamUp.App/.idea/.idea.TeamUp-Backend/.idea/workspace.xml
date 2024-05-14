@@ -10,6 +10,19 @@
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Data/AppDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EndpointsManager/HelpersEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/EndpointsManager/HelpersEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Project/Project.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/Project.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectJoinRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectJoinRequest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Skills/Category.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Skills/Category.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SwaggerConfuration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SwaggerConfuration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TeamUp.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/TeamUp.App.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Util/DataSeeder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Util/DataSeeder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Util/Error.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Util/Error.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/ProjectPost.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,6 +131,9 @@
       <workItem from="1715168797564" duration="42000" />
       <workItem from="1715250653614" duration="120000" />
       <workItem from="1715526536081" duration="236000" />
+      <workItem from="1715621873749" duration="295000" />
+      <workItem from="1715622381365" duration="1857000" />
+      <workItem from="1715624709160" duration="3732000" />
     </task>
     <servers />
   </component>
@@ -128,5 +144,9 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

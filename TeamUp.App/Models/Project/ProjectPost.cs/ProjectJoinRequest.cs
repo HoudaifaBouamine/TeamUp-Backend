@@ -1,5 +1,3 @@
-using Models;
-
 namespace Models;
 
 public partial class ProjectJoinRequest

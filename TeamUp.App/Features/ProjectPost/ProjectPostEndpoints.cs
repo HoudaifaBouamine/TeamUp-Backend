@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Utils;
+
 namespace Features;
 
 [Tags("Project Posts Group")]
@@ -18,11 +19,21 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     private readonly AppDbContext db = db;
     private readonly UserManager<User> userManager = userManager;
 
-
-    [HttpPost("join-requests/{requestId}")]
-    public async Task<IActionResult> AnswerProjectJoinRequestAsync([FromRoute] int requestId,
-        [FromQuery] [AllowedValues("accept", "reject")] string answer)
+    /// <summary>
+    /// answer a join request
+    /// </summary>
+    /// <param name="requestId">request'id to be answered</param>
+    /// <param name="isAccepted">send true, if request is accepted, otherwise send false</param>
+    /// <returns></returns>
+    [HttpPost("join-requests/answer")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectJoinRequestReadDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> AnswerProjectJoinRequestAsync(
+        [FromQuery][Required] int requestId,
+        [FromQuery][Required] bool isAccepted = true)
     {
+
         var currentUser = await userManager.GetUserAsync(User);
         if (currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
 
@@ -36,16 +47,25 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         if (request is null)
             return NotFound(new ErrorResponse("Request not found or can not be answered by the current user"));
 
-        if (answer == "accept") request.Accept();
-        if (answer == "reject") request.Refuse();
+        if (isAccepted)
+            request.Accept();
 
+        request.Refuse();
+        
+        await db.SaveChangesAsync();
+        
         return Ok(new ProjectJoinRequestReadDto(request));
     }
-
-
-
+    
+    /// <summary>
+    /// Get the statuses of all join requests related to a specific project
+    /// </summary>
+    /// <param name="projectPostId"></param>
+    /// <returns></returns>
     [HttpGet("join-requests")]
-    public async Task<IActionResult> GetProjectJoinRequestsAsync([FromQuery] int ProjectPostId)
+    [ProducesResponseType< List<ProjectJoinRequestReadDto> >(StatusCodes.Status200OK)]
+    [ProducesResponseType( StatusCodes.Status401Unauthorized,Type = typeof(ErrorResponse))]
+    public async Task<IActionResult> GetProjectJoinRequestsAsync([FromQuery][Required] int projectPostId)
     {
         Guid id;
 
@@ -56,7 +76,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         }
 
         var post = await db.ProjectPosts
-            .Where(p => p.Id == ProjectPostId)
+            .Where(p => p.Id == projectPostId)
             .Include(p => p.Creator)
             .Where(p => p.Creator.Id == id)
             .Include(p => p.ProjectJoinRequests)
@@ -95,8 +115,15 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
 
-
+    /// <summary>
+    /// Creating join request to a project
+    /// </summary>
+    /// <param name="joinRequestDto"></param>
+    /// <returns></returns>
     [HttpPost("join-requests")]
+    [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(ProjectJoinRequestReadDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> CreateProjectJoinRequestAsync(
         [FromBody] ProjectJoinRequestCreateDto joinRequestDto)
     {
@@ -118,7 +145,14 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         return Ok(new ProjectJoinRequestReadDto(joinRequest));
     }
 
+    /// <summary>
+    /// Get single project join request by id
+    /// </summary>
+    /// <param name="requestId">join request's id</param>
+    /// <returns></returns>
     [HttpGet("join-requests/{requestId}")]
+    [ProducesResponseType<ProjectJoinRequestReadDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProjectJoinRequestAsync([FromRoute] int requestId)
     {
         var request = await db.ProjectJoinRequests
@@ -173,6 +207,11 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
 
+    /// <summary>
+    /// Create project post
+    /// </summary>
+    /// <param name="postDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectPostReadDto))]
@@ -225,6 +264,11 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
 
+    /// <summary>
+    /// Get single project post by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectPostDetailsReadDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
@@ -238,73 +282,90 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
 
 
+    /// <summary>
+    /// get the list of available project posts for specific user
+    /// </summary>
+    /// <param name="id">id of project's creator</param>
+    /// <param name="searchPattern">pattern to search for, not case sensitive</param>
+    /// <param name="pageSize">number of project posts to be returned in the response</param>
+    /// <param name="pageNumber">index of the page</param>
+    /// <returns></returns>
     [HttpGet("for-user/{id:guid}")]
-    [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
-    public async Task<IActionResult> GetProjectPostsAsync(Guid id, string? SearchPattern, int PageSize = 10, int PageNumber = 1)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
+    public async Task<IActionResult> GetProjectPostsAsync(Guid id, string? searchPattern, int pageSize = 10, int pageNumber = 1)
     {
         IQueryable<ProjectPost> posts = db.ProjectPosts.Where(p=>p.CreatorId == id);
 
-        if(SearchPattern is not null)
+        if(searchPattern is not null)
             posts = posts.Where(p=>
-                p.Summary.ToLower().Contains(SearchPattern.ToLower()) ||
-                p.LearningGoals.ToLower().Contains(SearchPattern.ToLower()));
+                p.Summary.ToLower().Contains(searchPattern.ToLower()) ||
+                p.LearningGoals.ToLower().Contains(searchPattern.ToLower()));
 
         int TotalCount = posts.Count();
 
         posts = posts
-            .Skip(PageSize * (PageNumber - 1))
-            .Take(PageSize);
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize);
     
 
         var projectsDto = await posts
             .Include(p=>p.Creator)
             .Include(p=>p.RequiredSkills)
+            .OrderByDescending(p=>p.PostingTime)
             .Select(p => new ProjectPostReadDto(p)).ToListAsync();
 
         return Ok(new GetProjectPostListResponse
         {
             TotalCount = TotalCount,
-            PageNumber = PageNumber,
-            PageSize = PageSize,
-            IsPrevPageExist = PageNumber > 1,
-            IsNextPageExist = PageNumber * PageSize < TotalCount, 
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            IsPrevPageExist = pageNumber > 1,
+            IsNextPageExist = pageNumber * pageSize < TotalCount, 
             ProjectsPosts = projectsDto
         });
 
     }
 
 
+    /// <summary>
+    /// get the list of all available project posts
+    /// </summary>
+    /// <param name="searchPattern">pattern to search for, not case sensitive</param>
+    /// <param name="pageSize">number of project posts to be returned in the response</param>
+    /// <param name="pageNumber">index of the page</param>
+    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType( StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
-    public async Task<IActionResult> GetProjectPostsAsync(string? SearchPattern, int PageSize = 10, int PageNumber = 1)
+    public async Task<IActionResult> GetProjectPostsAsync(string? searchPattern, int pageSize = 10, int pageNumber = 1)
         {
         IQueryable<ProjectPost> posts = db.ProjectPosts;
 
-        if(SearchPattern is not null)
+        if(searchPattern is not null)
             posts = posts.Where(p=>
-                p.Summary.ToLower().Contains(SearchPattern.ToLower()) ||
-                p.LearningGoals.ToLower().Contains(SearchPattern.ToLower()));
+                p.Summary.ToLower().Contains(searchPattern.ToLower()) ||
+                p.LearningGoals.ToLower().Contains(searchPattern.ToLower()));
 
         int TotalCount = posts.Count();
 
         posts = posts
-            .Skip(PageSize * (PageNumber - 1))
-            .Take(PageSize);
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize);
     
 
         var projectsDto = await posts
             .Include(p=>p.Creator)
             .Include(p=>p.RequiredSkills)
             .Include(p=>p.Categories)
+            .OrderByDescending(p=>p.PostingTime)
             .Select(p => new ProjectPostReadDto(p)).ToListAsync();
 
         return Ok(new GetProjectPostListResponse
         {
             TotalCount = TotalCount,
-            PageNumber = PageNumber,
-            PageSize = PageSize,
-            IsPrevPageExist = PageNumber > 1,
-            IsNextPageExist = PageNumber * PageSize < TotalCount, 
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            IsPrevPageExist = pageNumber > 1,
+            IsNextPageExist = pageNumber * pageSize < TotalCount, 
             ProjectsPosts = projectsDto
         });
 
@@ -329,7 +390,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public DateTime PostingTime { get; set; }
 
         public string ProjectLevel { get; set; } = "Beginner";
-        public string ExpextedDuration { get; set; } 
+        public string ExpectedDuration { get; set; }
         public int ExpectedTeamSize { get; set; }
         public List<string> Categories { get; set; } = [];
         public MentorReadDto Mentor { get; set; } = null!;
@@ -341,7 +402,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.Summary = projectPost.Summary;
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
             this.PostingTime = projectPost.PostingTime;
-            this.ExpextedDuration = projectPost.ExpextedDuration;
+            this.ExpectedDuration = projectPost.ExpextedDuration;
             this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
             this.Mentor = new MentorReadDto(projectPost.Creator.Id,
                 projectPost.Creator.DisplayName,
@@ -351,7 +412,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         }
     }
 
-    public class ProjectPostDetailsReadDto
+    class ProjectPostDetailsReadDto
     {
         public int Id { get; init; }
         public string Title { get; set; } = string.Empty;
@@ -360,7 +421,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string LearningGoals { get; set; } = string.Empty;
         public string TeamAndRols { get; set; } = string.Empty;
         public string ProjectLevel { get; set; } = "Beginner";
-        public string ExpextedDuration { get; set; } 
+        public string ExpectedDuration { get; set; }
         public int ExpectedTeamSize { get; set; }
         public DateTime PostingTime { get; set; }
         public List<string> Categories { get; set; } = [];
@@ -376,7 +437,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.TeamAndRols = projectPost.TeamAndRols;
             this.RequiredSkills = projectPost.RequiredSkills.Select(s=>s.Name).ToList();
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
-            this.ExpextedDuration = projectPost.ExpextedDuration;
+            this.ExpectedDuration = projectPost.ExpextedDuration;
             this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
             this.PostingTime = projectPost.PostingTime;
 

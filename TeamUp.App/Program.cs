@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Authentication.Oauth.Google;
@@ -32,6 +33,10 @@ builder.Services.AddSwaggerGen(options=>
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
 });
 
 builder.Services.AddApiVersioning(options=>

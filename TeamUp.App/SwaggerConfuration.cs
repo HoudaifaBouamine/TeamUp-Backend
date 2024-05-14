@@ -30,5 +30,7 @@ public class ConfugureSwaggerOptions : IConfigureNamedOptions<SwaggerGenOptions>
 
             options.SwaggerDoc(description.GroupName,openApiInfo);
         }
+        
+        
     }
 }

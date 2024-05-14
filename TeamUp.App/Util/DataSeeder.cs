@@ -1,16 +1,15 @@
 using Bogus;
-using FluentEmail.Core;
 using Microsoft.EntityFrameworkCore;
 using Models;
-
-namespace TeamUp;
-
 public static class DataSeeder
 {
     public static async Task SeedCaterogyData(AppDbContext db)
     {  
-        string[] categories = ["Web","AI","Programming","Mobile"];
-        await db.Categories.AddRangeAsync(categories.Select(c=>new Category(){Name = c}));
+        string[] categories = ["Mobile","Design","Web", "Cyber security","Ai", "Game", "Data Science"];
+        await db.Categories.AddRangeAsync(categories.Select(c=>new Category
+        {
+            Name = c
+        }));
         await db.SaveChangesAsync();
     }
     
@@ -23,6 +22,7 @@ public static class DataSeeder
         public string learningGoals { get; set; }
         public string teamAndRols { get; set; }
 
+        public List<Category> categories { get; set; }
         public DateTime PostingTime { get; set; }
     }
     public static async Task SeedProjectPostData(AppDbContext db)
@@ -34,34 +34,35 @@ public static class DataSeeder
 
         projectFaker
             .RuleFor(u => u.Creator,
-                (f, p) => users.Where((u, index) => new Random().Next(10) == 0 || index == 0).First())
+                (f, p) => users.Where((u, index) => new Random().Next(10) == 0 || index == 0).Last())
             .RuleFor(u => u.Title, (f, p) => f.Commerce.ProductName())
             .RuleFor(u => u.Sinarios, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
-            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 6, 1), DateTime.UtcNow));
+            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 6, 1), DateTime.UtcNow))
+            .RuleFor(u => u.categories, f=>categories.Where(c=>f.Random.Bool()));
         var projectsToCreat = projectFaker.Generate(30);
         
         string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
 
-        var projects = projectsToCreat.Select(p => new ProjectPost(
-            p.Creator,
-            p.Title,
-            p.Summary,
-            expectedDuration[new Random().Next(expectedDuration.Length)],
-            new Random().Next(20) + 5,
-            p.Sinarios, 
-            p.learningGoals,
-            p.teamAndRols,
-            skills.Where(s=> new Random().Next(70) == 0).ToList(),
-            categories
-            // skills.Skip(new Random().Next(3)).Where(s=>category.Contains(s.Name)).ToList()
-            
-        )
-        {
-            PostingTime = p.PostingTime
-        });
+        var projects = projectsToCreat
+            .Select(p => new ProjectPost
+            (
+                p.Creator,
+                p.Title,
+                p.Summary,
+                expectedDuration[new Random().Next(expectedDuration.Length)],
+                new Random().Next(20) + 5,
+                p.Sinarios, 
+                p.learningGoals,
+                p.teamAndRols,
+                skills.Where(s=> new Random().Next(70) == 0).ToList(), 
+                p.categories
+            )
+            {
+                PostingTime = p.PostingTime
+            });
 
       await db.ProjectPosts.AddRangeAsync(projects);
       await db.SaveChangesAsync();
@@ -84,7 +85,8 @@ public static class DataSeeder
             .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
             .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
             .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
-            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
+            // .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
+            .RuleFor(u => u.PictureUrl, f => "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTap6CR4Ge_5Wri3xUZxaibeNZsgJDSCwn7bw&s")
             .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName());
 
         var usersToCreat = userFaker.Generate(100);

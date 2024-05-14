@@ -1,11 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Models;
 
-[Table("Categories")]
+[Index(nameof(Name))]
 public class Category
 {
-    [Key]
+    public int Id { get; set; }
     public required string Name { get; set; }
 }

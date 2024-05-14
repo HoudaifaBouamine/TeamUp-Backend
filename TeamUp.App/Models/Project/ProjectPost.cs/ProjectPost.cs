@@ -19,7 +19,7 @@ public partial class ProjectPost
     [AllowedValues("1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months")]
     public string ExpextedDuration { get; set; }
     public int ExpectedTeamSize { get; set; }
-    public Project? Project { get; private set; } = null;
+    public global::Models.Project? Project { get; private set; } = null;
 
     public Guid CreatorId { get; set; }
     public User Creator { get; private init; } = null!;
@@ -41,7 +41,7 @@ partial class ProjectPost
             .Select(r => r.User)
             .ToList();
 
-        Project = Project.Create(this, acceptedUsers);
+        Project = global::Models.Project.Create(this, acceptedUsers);
         IsStarted = true;
 
         return true;
