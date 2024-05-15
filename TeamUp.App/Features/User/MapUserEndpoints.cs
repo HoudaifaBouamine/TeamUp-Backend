@@ -20,7 +20,7 @@ public partial class UserEndpoints : ICarterModule
 
         usersGroup.MapGet("/{Id:guid}",GetUserAsync);
 
-        usersGroup.MapPut("/",UpdateUserAsync)
+        usersGroup.MapPut("/",UpdateUser4Async)
             .HasApiVersion(4)
             .Produces(StatusCodes.Status500InternalServerError)
             .RequireAuthorization(p=>p.RequireAuthenticatedUser());

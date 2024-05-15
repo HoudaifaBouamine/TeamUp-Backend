@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,46 @@ namespace Users;
 
 partial class UserEndpoints
 {
+    
+    async Task<Results<Ok<UserReadDetails4Dto>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> 
+        UpdateUser4Async(
+            [FromBody] UserUpdateRequest4Dto userUpdate,
+            ClaimsPrincipal currentUser,
+            [FromServices] UserManager<User> userManager,
+            AppDbContext db)
+    {
+        var user = await userManager.GetUserAsync(currentUser);
+        
+        if(user is null) return TypedResults.BadRequest(new ErrorResponse("User not found, this should not happen because this endpoint require authenticated user"));
+
+        user.Update(null,null,userUpdate.Email,userUpdate.DisplayName, userUpdate.Handler, null, userUpdate.ProfilePicture);
+        user.UpdateSkills(db.Skills.Where(s=>userUpdate.Skills.Contains(s.Name)).ToList());
+        
+        var result = await userManager.UpdateAsync(user);
+        await db.SaveChangesAsync();
+        
+        if (result.Succeeded)
+        {
+            // Return the updated user details
+            var userReadDetailsDto = new UserReadDetails4Dto
+            (
+                Id : user.Id,
+                Email : user.Email!,
+                DisplayName : user.DisplayName,
+                Handler : user.Handler,
+                ProfilePicture : user.ProfilePicture,
+                Rate: user.Rate,
+                Skills:user.Skills.Select(s=>s.Name).AsEnumerable(),
+                Categories: user.Skills.Select(s=>s.Name).AsEnumerable()
+            );
+
+            return TypedResults.Ok(userReadDetailsDto);
+        }
+        else
+        {
+            return TypedResults.BadRequest(new ErrorResponse(result.Errors.First().Description));
+        }
+    }
 
     async Task<Results<Ok<UserReadDetailsDto>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> 
         UpdateUserAsync(
@@ -20,7 +61,7 @@ partial class UserEndpoints
         
         if(user is null) return TypedResults.BadRequest(new ErrorResponse("User not found, this should not happen because this endpoint require authenticated user"));
 
-        user.Update(userUpdate.FirstName, userUpdate.LastName, userUpdate.DisplayName, userUpdate.Handler, userUpdate.FullAddress, userUpdate.ProfilePicture);
+        user.Update(userUpdate.FirstName, userUpdate.LastName,null, userUpdate.DisplayName, userUpdate.Handler, userUpdate.FullAddress, userUpdate.ProfilePicture);
         
         var result = await userManager.UpdateAsync(user);
         
@@ -49,3 +90,13 @@ partial class UserEndpoints
     }
 }
 
+
+record UserUpdateRequest4Dto
+(
+    [MinLength(3)] string DisplayName,
+    [EmailAddress] string? Email,
+    string? Handler,
+    [Url] string? ProfilePicture,
+    List<string> Skills,
+    List<string> Categories
+    );

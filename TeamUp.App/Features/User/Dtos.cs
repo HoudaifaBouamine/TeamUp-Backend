@@ -23,8 +23,17 @@ record UserReadDto
     string? ProfilePicture
 );
 
-record UserReadDetailsDto
-(
+record UserReadDetails4Dto(
+    Guid Id,
+    string Email,
+    string DisplayName,
+    string Handler,
+    float Rate,
+    string ProfilePicture,
+    IEnumerable<string> Skills,
+    IEnumerable<string> Categories);
+
+record UserReadDetailsDto(
     Guid Id,
     string Email,
     string? FirstName,
@@ -35,7 +44,6 @@ record UserReadDetailsDto
     float Rate,
     string? ProfilePicture
 );
-
 record UserUpdateRequestDto
 (
     [Required,MinLength(2)] string FirstName,
