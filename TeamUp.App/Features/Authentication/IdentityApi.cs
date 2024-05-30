@@ -64,6 +64,13 @@ public partial class AuthEndpoints(
         .WithOpenApi()
         .Produces(StatusCodes.Status500InternalServerError);
 
+        routeGroup.MapGet("/currentUser", CurrentUserNewAsync)
+            .RequireAuthorization(p => p.RequireAuthenticatedUser())
+            .WithSummary("[D]")
+            .WithOpenApi()
+            .HasApiVersion(3);
+
+        
         routeGroup.MapPost("/exchangeResetCodeForToken", GetResetPasswordTokenAsync)
         .HasApiVersion(3)
         .WithSummary("D")

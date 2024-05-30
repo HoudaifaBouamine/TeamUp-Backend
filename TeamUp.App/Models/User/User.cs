@@ -128,14 +128,20 @@ partial class User
         EmailVerificationCode = VerificationCode.CreateEmailVerificationCode();
     }
 
-    public void Update(string? firstName, string? lastName, string displayName, string handler, string? fullAddress, string? profilePicture)
+    public void Update(string? firstName, string? lastName,string? email, string? displayName, string? handler, string? fullAddress, string? profilePicture)
     {
         this.FirstName = firstName ?? this.FirstName;
         this.LastName = lastName ?? this.LastName;
-        this.DisplayName = displayName;
-        this.Handler = handler;
-        this.FullAddress = fullAddress;
-        this.ProfilePicture = profilePicture!;
+        this.DisplayName = displayName?? this.DisplayName;
+        this.Handler = handler?? this.Handler;
+        this.FullAddress = fullAddress?? this.FullAddress;
+        this.ProfilePicture = profilePicture?? this.ProfilePicture;
+        this.Email = email?? this.Email;
+    }
+    
+    public void UpdateSkills(List<Skill> skills)
+    {
+        this.Skills = skills;
     }
 
     public User(string firstName, string lastName, string email, string profilePicture)
