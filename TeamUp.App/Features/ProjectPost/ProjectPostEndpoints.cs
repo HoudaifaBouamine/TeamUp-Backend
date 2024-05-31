@@ -65,6 +65,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     [HttpGet("join-requests")]
     [ProducesResponseType< List<ProjectJoinRequestReadDto> >(StatusCodes.Status200OK)]
     [ProducesResponseType( StatusCodes.Status401Unauthorized,Type = typeof(ErrorResponse))]
+    [ProducesResponseType( StatusCodes.Status404NotFound,Type = typeof(ErrorResponse))]
     public async Task<IActionResult> GetProjectJoinRequestsAsync([FromQuery][Required] int projectPostId)
     {
         Guid id;

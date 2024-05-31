@@ -1,3 +1,4 @@
+using Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,13 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-
-
+        builder.Entity<UserPicture>(b =>
+        {
+            b.Property(x => x.PictureDataId).IsRequired();
+            b.HasOne<Picture>().WithMany().HasForeignKey(o=>o.PictureDataId).IsRequired();
+            b.HasOne<User>().WithMany().HasForeignKey(o => o.UserId).IsRequired();
+        });
+        
         builder.Entity<Project>()
             .HasOne(p => p.ChatRoom)
             .WithOne(ch => ch.Project)
@@ -68,6 +74,9 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
     public DbSet<UserReview> ProjectViews{get ; set ; } 
-    public DbSet<UserReview> UserReviews{get ; set ; } 
+    public DbSet<UserReview> UserReviews {get ; set ; } 
     
+    public DbSet<Picture> Pictures {get ; set ; } 
+    public DbSet<UserPicture> UserPictures {get ; set ; } 
+
 }
