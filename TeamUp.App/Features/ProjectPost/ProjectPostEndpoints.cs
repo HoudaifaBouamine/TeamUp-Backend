@@ -402,6 +402,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public string ExpectedDuration { get; set; }
         public int ExpectedTeamSize { get; set; }
         public List<string> Categories { get; set; } = [];
+        public List<string> Skills { get; set; } = [];
         public MentorReadDto Mentor { get; set; } = null!;
 
         public ProjectPostReadDto(ProjectPost projectPost)
@@ -410,6 +411,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             this.Title = projectPost.Title;
             this.Summary = projectPost.Summary;
             this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
+            this.Skills = projectPost.RequiredSkills.Select(s => s.Name).ToList();
             this.PostingTime = projectPost.PostingTime;
             this.ExpectedDuration = projectPost.ExpextedDuration;
             this.ExpectedTeamSize = projectPost.ExpectedTeamSize;

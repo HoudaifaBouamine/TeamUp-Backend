@@ -7,6 +7,7 @@ using Carter;
 using Configuration;
 using EmailServices;
 using EndpointsManager;
+using Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -17,7 +18,6 @@ using Utils;
 using Features.Projects.Contracts;
 using Features.Projects;
 using Repositories;
-using Mentor;
 
 var builder = WebApplication.CreateBuilder(args);
 
