@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Mentor;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -224,6 +223,15 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         if (currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
 
         var skills = await db.Skills.Where(s => postDto.RequiredSkills.Contains(s.Name)).ToListAsync();
+
+        var newSkills = postDto.RequiredSkills
+            .Where(rs => skills.All(s => s.Name != rs))
+            .Select(s=>new Skill {Name = s});
+        
+        await db.Skills.AddRangeAsync(newSkills);
+        await db.SaveChangesAsync();
+        skills = await db.Skills.Where(s => postDto.RequiredSkills.Contains(s.Name)).ToListAsync();
+        
         var categories = await db.Categories.Where(s => postDto.Categories.Contains(s.Name)).ToListAsync();
 
         var post = new ProjectPost
