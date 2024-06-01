@@ -47,6 +47,26 @@ using Repositories ;
             }
         }
 
+        
+    public class ProjectReviewRepository : IProjectReviewRepository
+    {
+        private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
+
+        public ProjectReviewRepository(AppDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<ProjectReviewDto>> GetProjectReviewsAsync(int projectId)
+        {
+            var reviews = await _context.ProjectViews
+                .Where(pr => pr.ReviewedProjectId == projectId)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<ProjectReviewDto>>(reviews);
+        }
+    }
 }
 
    

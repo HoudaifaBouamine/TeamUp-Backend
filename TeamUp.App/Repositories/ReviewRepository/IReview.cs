@@ -7,3 +7,8 @@ public interface IUserReviewRepository
         Task UpdateAsync(UserReviewDto reviewDto);
         Task DeleteAsync(int reviewId);
 }
+
+public interface IProjectReviewRepository
+{
+        Task<IEnumerable<ProjectReviewDto>> GetProjectReviewsAsync(int projectId);
+}
