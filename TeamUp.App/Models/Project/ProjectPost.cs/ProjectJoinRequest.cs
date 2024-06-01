@@ -4,6 +4,7 @@ public partial class ProjectJoinRequest
 {
     public int Id { get; private init; }
     public User User { get; private init; } = null!;
+    public string JoinMessage { get; private init; } = null!;
     public ProjectPost ProjectPost { get; private init; } = null!;
     public bool IsAccepted { get; private set; } = false;
     public bool IsClosed { get; private set; } = false;
@@ -15,13 +16,14 @@ public partial class ProjectJoinRequest
 partial class ProjectJoinRequest
 {
 
-    public static ProjectJoinRequest Create(User user, ProjectPost project)
+    public static ProjectJoinRequest Create(User user, ProjectPost project, string joinMessage)
     {
         return new ProjectJoinRequest
         {
             User = user,
             ProjectPost = project,
             CreatedAt = DateTime.UtcNow,
+            JoinMessage = joinMessage
         };
     }
 

@@ -20,14 +20,20 @@ partial class UserEndpoints
             ClaimsPrincipal currentUser)
     {
 
-        var user = await userManager.GetUserAsync(currentUser);
-            
-        if (user is null)
-            return TypedResults.Unauthorized();
+        var userId = Guid.Parse(userManager.GetUserId(currentUser));
 
+        var user = await db.Users
+            .Include(u=>u.Skills)
+            .Include(u=>u.Categories)
+            .Include(u=>u.UsersProjects)
+            .Include(u=>u.Projects)
+            .FirstOrDefaultAsync(u=>u.Id == userId);
+
+        if (user is null) return TypedResults.Unauthorized();
+        
         var menteesCount = await db.UsersProjects
             .Include(up => up.User)
-            .Where(up => up.User.Id == user.Id)
+            .Where(up => up.User.Id == userId)
             .Where(up => up.IsMentor)
             .Include(up => up.Project)
             .Select(up => up.Project)
@@ -42,7 +48,8 @@ partial class UserEndpoints
             Handler: user.Handler,
             Rate: user.Rate,
             ProfilePicture: user.ProfilePicture!,
-            user.Skills.Select(s => s.Name),
+            user.Skills
+                .Select(s => s.Name),
             user.Categories.Select(c => c.Name),
             user.Projects.Count,
             menteesCount,

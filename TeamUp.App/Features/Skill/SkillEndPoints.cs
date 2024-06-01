@@ -19,7 +19,7 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ISkillRepository _skillRepository = skillRepository;
 
-        [HttpGet]
+    [HttpGet]
     public async Task<IActionResult> GetAllSkills(int pageNumber = 1, int pageSize = 5)
     {
             var skills = await _skillRepository.GetAllAsync();
@@ -69,10 +69,15 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
             return NotFound(new ErrorResponse("Skill not found"));
         }
 
-        user.Skills.Add(skill);
-
-        await userManager.UpdateAsync(user);
-        return Ok();
+        var userSkill = new UserSkill
+        {
+            Skill = skill,
+            User = user
+        };
+        
+        db.UserSkills.Add(userSkill);
+        await db.SaveChangesAsync();
+        return Ok(userSkill.Id);
     }
 
     [Authorize]

@@ -137,7 +137,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         if (post is null) return NotFound(new ErrorResponse("Project not found"));
 
-        var joinRequest = ProjectJoinRequest.Create(currentUser, post);
+        var joinRequest = ProjectJoinRequest.Create(currentUser, post, joinRequestDto.Message);
 
         db.ProjectJoinRequests.Add(joinRequest);
         await db.SaveChangesAsync();
@@ -175,6 +175,8 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         public bool IsClosed { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? RespondAt { get; set; }
+        
+        public string JoinMessage { get; private init; }
 
         public ProjectJoinRequestReadDto(ProjectJoinRequest joinRequest)
         {
@@ -184,6 +186,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             IsClosed = joinRequest.IsClosed;
             CreatedAt = joinRequest.CreatedAt;
             RespondAt = joinRequest.RespondAt;
+            JoinMessage = joinRequest.JoinMessage;
         }
     }
 
