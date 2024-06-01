@@ -15,7 +15,9 @@ partial class AuthEndpoints
     public record UserLoginRequestDto
     (
         [EmailAddress]
+        /// <example>string@gmail.com</example>
         string Email,
+        /// <example>1234</example>
         string Password
     );
     public record UserRegisterRequestDto

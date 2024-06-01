@@ -9,7 +9,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         Database.EnsureCreated();
-
+        
         if (Users.Count() == 0)
         {
             DataSeeder.SeedCaterogyData(this).Wait();

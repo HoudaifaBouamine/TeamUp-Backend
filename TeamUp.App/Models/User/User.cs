@@ -48,7 +48,7 @@ public partial class User : IdentityUser<Guid>
     public ICollection<UserSkill> UserSkills { get; set; } = [];
     public ICollection<Skill> Skills { get; set; } = [];
     
-    public ICollection<Category> Category { get; set; } = [];
+    public ICollection<Category> Categories { get; set; } = [];
 }
 
 

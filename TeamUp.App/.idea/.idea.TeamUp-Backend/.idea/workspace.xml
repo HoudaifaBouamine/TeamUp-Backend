@@ -10,8 +10,11 @@
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Data/AppDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Authentication/Dtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Authentication/Dtos.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/User/GetCurrentUser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/User/GetCurrentUser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/User/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User/User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Util/DataSeeder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Util/DataSeeder.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +136,7 @@
       <workItem from="1715814999784" duration="1960000" />
       <workItem from="1717108152096" duration="4439000" />
       <workItem from="1717188960069" duration="6044000" />
-      <workItem from="1717258648207" duration="5941000" />
+      <workItem from="1717258648207" duration="8745000" />
     </task>
     <servers />
   </component>
@@ -144,25 +147,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs</url>
-          <line>232</line>
-          <properties documentPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" containingFunctionPresentation="Method 'CreateProjectPostAsync'">
-            <startOffsets>
-              <option value="7849" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7940" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

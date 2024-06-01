@@ -33,7 +33,7 @@ partial class UserEndpoints
             Rate: user.Rate,
             ProfilePicture: user.ProfilePicture!,
             user.Skills.Select(s=>s.Name),
-            user.Category.Select(c=>c.Name));
+            user.Categories.Select(c=>c.Name));
 
         return TypedResults.Ok(userReadResult);
     }

@@ -1,4 +1,6 @@
+using Authentication.UserManager;
 using Bogus;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models;
 public static class DataSeeder
@@ -42,7 +44,7 @@ public static class DataSeeder
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
             .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 6, 1), DateTime.UtcNow))
-            .RuleFor(u => u.categories, f=>categories.Where(c=>f.Random.Bool()));
+            .RuleFor(u => u.categories, f=>categories.ToList().Where(c=>f.Random.Bool()).ToList());
         var projectsToCreat = projectFaker.Generate(10);
         
         string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
@@ -58,8 +60,8 @@ public static class DataSeeder
                 p.Sinarios, 
                 p.learningGoals,
                 p.teamAndRols,
-                skills.Where(s=> new Random().Next(70) == 0).ToList(), 
-                p.categories
+                skills.ToList().Where(s=> new Random().Next((int)Math.Ceiling(skills.Count * 70.0 / 1000.0)) == 0).ToList(), 
+                p.categories.ToList()
             )
             {
                 PostingTime = p.PostingTime
@@ -78,7 +80,7 @@ public static class DataSeeder
     }
 
     // record UserCreateFake(string FirstName, string LastName, string Email, string PicureUrl);
-    public static async Task SeedUsersData(AppDbContext db)
+    public static async Task SeedUsersData(AppDbContext db, UserManager<User> userManager = null)
     {
         var userFaker = new Faker<UserCreateFaker>();
 
@@ -98,6 +100,14 @@ public static class DataSeeder
         }).ToList();
 
         await db.Users.AddRangeAsync(users);
+        // var user = new User
+        // {
+        //     DisplayName = "string",
+        //     Handler = "string",
+        //     Skills = db.Skills.ToList().Where(s => new Random().Next(3) == 0).ToList(),
+        //     Categories = db.Categories.ToList().Where(s => new Random().Next(3) == 0).ToList()
+        // };
+        // await userManager.CreateAsync(user,"string");
         await db.SaveChangesAsync();
     }
     
