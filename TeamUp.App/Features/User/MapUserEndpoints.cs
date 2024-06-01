@@ -19,6 +19,8 @@ public partial class UserEndpoints : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError);
 
         usersGroup.MapGet("/{Id:guid}",GetUserAsync);
+        
+        usersGroup.MapGet("/currentUser",GetCurrentUserAsync);
 
         usersGroup.MapPut("/",UpdateUser4Async)
             .HasApiVersion(4)
