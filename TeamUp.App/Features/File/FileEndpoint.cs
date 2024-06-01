@@ -1,14 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Asp.Versioning;
+using AutoMapper;
 using Duende.IdentityServer.EntityFramework.Entities;
-using Mentor;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Serilog;
+using Users;
 using Utils;
 
 namespace Features;
@@ -19,15 +20,14 @@ namespace Features;
 [ApiController]
 public class FileEndpoints(AppDbContext db, UserManager<User> userManager) : ControllerBase
 {
-    
-    
     [HttpPost("user-picture")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PictureCreationDto))]
-
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> UploadUserImage(IFormFile image)
     {
-        var picture = await handleImageAsync(image);
+        var picture = await FileManager.HandleImageAsync(image);
         if (picture is null) return BadRequest(new ErrorResponse("Image not valid"));
 
         var user = await userManager.GetUserAsync(User);
@@ -45,12 +45,14 @@ public class FileEndpoints(AppDbContext db, UserManager<User> userManager) : Con
         db.Pictures.Add(picture);
         db.UserPictures.Add(userPicture);
         await db.SaveChangesAsync();
+        user.ProfilePicture = $"{HttpContext.Request.Host.Value}/api/v1/files/pictures/{picture.Id}";
 
-        return Ok(new  PictureCreationDto 
-            (
-                PictureId:picture.Id,
-                PictureUrl: $"{HttpContext.Request.Host.Value}/api/v1/files/pictures/{picture.Id}"
-                ));
+        if (!user.ProfilePicture.StartsWith("localhost"))
+            user.ProfilePicture = $"https://{user.ProfilePicture}";
+
+        await userManager.UpdateAsync(user);
+
+        return Ok(new PictureCreationDto(picture.Id,$"{HttpContext.Request.Host.Value}/api/v1/files/pictures/{picture.Id}"));
     }
 
     record PictureCreationDto(Guid PictureId, string PictureUrl);
@@ -66,8 +68,11 @@ public class FileEndpoints(AppDbContext db, UserManager<User> userManager) : Con
 
         return File(stream, picture.ContentType);
     }
+}
 
-    private async Task<Picture?> handleImageAsync(IFormFile file)
+public static class FileManager
+{
+    public static async Task<Picture?> HandleImageAsync(IFormFile file)
     {
         if (file.Length <= 0)
             return null;
@@ -90,7 +95,6 @@ public class FileEndpoints(AppDbContext db, UserManager<User> userManager) : Con
             };
     }
 }
-
 public class Picture
 {
     [Key]  

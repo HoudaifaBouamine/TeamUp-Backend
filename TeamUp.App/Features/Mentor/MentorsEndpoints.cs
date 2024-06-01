@@ -2,7 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Mentor;
+namespace Features;
 
 
 [Tags("Mentors Group")]
