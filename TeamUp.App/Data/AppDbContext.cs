@@ -68,15 +68,13 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Project> Projects { get; set; }
     public DbSet<ChatRoom> ChatRooms { get; set; }
     public DbSet<UsersProject> UsersProjects { get; set; }
-    
     public DbSet<Category> Categories { get; set; }
-
     public DbSet<Skill> Skills { get; set; }
     public DbSet<UserSkill> UserSkills { get; set; }
     public DbSet<ProjectReview> ProjectViews{get ; set ; } 
     public DbSet<UserReview> UserReviews {get ; set ; } 
-    
     public DbSet<Picture> Pictures {get ; set ; } 
     public DbSet<UserPicture> UserPictures {get ; set ; } 
+    public DbSet<Follow> Follows {get ; set ; } 
 
 }
