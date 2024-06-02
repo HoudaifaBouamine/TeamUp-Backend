@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Utils;
 
 namespace Features;
 
@@ -33,6 +34,7 @@ public class FollowEndpoints : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Follow(Guid userToFollowId)
     {
         var currentUser = await userManager.GetUserAsync(User);
@@ -40,6 +42,9 @@ public class FollowEndpoints : ControllerBase
         
         if (currentUser is null) return Unauthorized();
         if (userToFollow is null) return NotFound();
+
+        if (await db.Follows.AnyAsync(f => f.Follower == currentUser && f.Followee == userToFollow))
+            return BadRequest(new ErrorResponse("User already following"));
         
         var follow = new Follow()
         {
@@ -48,6 +53,7 @@ public class FollowEndpoints : ControllerBase
         };
         
         db.Follows.Add(follow);
+        await db.SaveChangesAsync();
         return NoContent();
     }
     

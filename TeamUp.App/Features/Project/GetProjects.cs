@@ -99,10 +99,10 @@ partial class ProjectRepository
                 .Take(PageSize.Value);
         
         var projectsDto = await projects
-            .Include(pp=>pp.Project)
-                .ThenInclude(p=>p.Users)
             .Include(pp=>pp.RequiredSkills)
             .Include(pp=>pp.Categories)
+            .Include(pp=>pp.Project)
+                .ThenInclude(p=>p!.Users)
             .Select(p => new ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
 
         return new GetProjectsListResponse4

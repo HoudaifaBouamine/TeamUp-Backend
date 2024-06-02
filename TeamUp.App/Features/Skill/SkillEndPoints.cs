@@ -74,7 +74,7 @@ public class SkillController(IUserRepository userRepository, ISkillRepository sk
             Skill = skill,
             User = user
         };
-        
+        user.Skills.Add(skill);
         db.UserSkills.Add(userSkill);
         await db.SaveChangesAsync();
         return Ok(userSkill.Id);

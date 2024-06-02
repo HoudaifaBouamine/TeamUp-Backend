@@ -87,7 +87,7 @@ partial class UserEndpoints
             );
         }
 
-        return Task.FromResult(userReadResult);
+        return userReadResult;
     }
     
     public record MentorSelfReadDetailsDto(
