@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace Models;
@@ -30,6 +31,10 @@ public partial class ProjectPost
 partial class ProjectPost
 {
 
+    /// <summary>
+    /// Start the project, require including of "ProjectJoinRequests" & "ProjectJoinRequest.User" properties to work
+    /// </summary>
+    /// <returns></returns>
     public bool Start()
     {
         if(IsStarted)
@@ -41,7 +46,7 @@ partial class ProjectPost
             .Select(r => r.User)
             .ToList();
 
-        Project = global::Models.Project.Create(this, acceptedUsers);
+        Project = Project.Create(this, acceptedUsers);
         IsStarted = true;
 
         return true;

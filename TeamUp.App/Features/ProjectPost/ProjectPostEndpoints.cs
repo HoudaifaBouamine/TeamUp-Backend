@@ -17,7 +17,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 {
     private readonly AppDbContext db = db;
     private readonly UserManager<User> userManager = userManager;
-
+    
     /// <summary>
     /// answer a join request
     /// </summary>
@@ -163,6 +163,24 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         if (request is null) return NotFound(new ErrorResponse("Request not found"));
         return Ok(new ProjectJoinRequestReadDto(request));
+    }
+    
+    [HttpGet("join-requests/for-current-user")]
+    [ProducesResponseType<List<ProjectJoinRequestReadDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetJoinRequestsForCurrentUser()
+    {
+        var user =  await userManager.GetUserAsync(User);
+        if (user is null) return NotFound(new ErrorResponse("user does not exist any more"));
+        
+        var requests = await db.ProjectJoinRequests
+            .Include(r=>r.User)
+            .Where(r => r.User.Id == user.Id)
+            .Include(r => r.ProjectPost)
+            .Include(r => r.ProjectPost.Creator)
+            .ToListAsync();
+        
+        return Ok(requests.Select(r=>new ProjectJoinRequestReadDto(r)));
     }
 
     public record ProjectJoinRequestCreateDto(int ProjectPostId, string Message);

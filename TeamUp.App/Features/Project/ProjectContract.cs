@@ -20,6 +20,7 @@ public interface IProjectRepository
     Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
 
     Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? PageSize,int? PageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? PageSize,int? PageNumber, string? SearchPattern);
 }
 
 #region V1
@@ -86,6 +87,16 @@ public class GetProjectDetailsResponse
 #endregion
 
 #region V2
+
+public record GetProjectsListResponse4
+(
+    int TotalCount,
+    int PageNumber,
+    int PageSize,
+    bool IsPrevPageExist,
+    bool IsNextPageExist,
+    IEnumerable<ProjectsController.ProjectDetailsReadDto> Projects
+);
 
 public record GetProjectsListResponse2
 (

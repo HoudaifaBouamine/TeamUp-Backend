@@ -3,6 +3,7 @@ using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using Utils;
 using Project = Models.Project;
 
@@ -10,6 +11,21 @@ namespace Features.Projects;
 
 partial class ProjectsController
 {
+    
+    [HttpGet]
+    [ApiVersion(4)]
+    [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(GetProjectsListResponse4))]
+    public async Task<IActionResult> GetProjectsDetailsAsync(
+        [FromQuery] int? PageSize,
+        [FromQuery] int? PageNumber,
+        [FromQuery] string? SearchPattern)
+    {
+        var projects = await _projectRepository
+            .GetListWithSearchAndPagination4Async(PageSize, PageNumber, SearchPattern);
+
+        return Ok(projects);
+    }
+
 
     [HttpGet]
     [ApiVersion(2)]
@@ -59,6 +75,51 @@ partial class ProjectsController
 
 partial class ProjectRepository
 {
+    public async Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? PageSize,int? PageNumber, string? SearchPattern)
+    {
+        if(PageSize is null) PageNumber = null;
+
+        IQueryable<ProjectPost> projects = _context.ProjectPosts
+            .Include(p=>p.Project)
+            .Where(p=>p.Project != null);
+
+        if (SearchPattern is not null)
+            projects = projects.Where(p =>
+                p.Title.ToLower().Contains(SearchPattern.ToLower()) ||
+                p.Summary.ToLower().Contains(SearchPattern.ToLower()));
+
+        int TotalCount = projects.Count();
+
+        if(PageSize is not null && PageNumber is not null)
+            projects = projects
+                .Skip(PageSize.Value * (PageNumber.Value -1))
+                .Take(PageSize.Value);
+        else if (PageSize is not null)
+            projects = projects
+                .Take(PageSize.Value);
+        
+        var projectsDto = await projects
+            .Include(pp=>pp.Project)
+                .ThenInclude(p=>p.Users)
+            .Include(pp=>pp.RequiredSkills)
+            .Include(pp=>pp.Categories)
+            .Select(p => new ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
+
+        return new GetProjectsListResponse4
+        (
+            TotalCount : TotalCount,
+            PageNumber : PageNumber??=1,
+            PageSize : PageSize??=TotalCount,
+            IsPrevPageExist : PageNumber > 1,
+            IsNextPageExist : PageNumber * PageSize < TotalCount, 
+            Projects: projectsDto
+        );
+
+    }
+
+
+    
+    
     /// <summary>
     /// get the list of projects, 
     /// </summary>
