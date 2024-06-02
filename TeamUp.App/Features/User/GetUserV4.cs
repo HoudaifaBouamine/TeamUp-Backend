@@ -12,24 +12,28 @@ namespace Users;
 partial class UserEndpoints
 {
 
-    async Task<Results<Ok<MentorSelfReadDetailsDto>,Ok<UserSelfReadDetailsDto>, UnauthorizedHttpResult>>
-        GetCurrentUserAsync(
+    /// <summary>
+    /// Get user/mentor data by Id (with if the current user follow him or not...)
+    /// </summary>
+    async Task<Results<Ok<MentorOtherReadDetailsDto>, Ok<UserOtherReadDetails5Dto>, UnauthorizedHttpResult>>
+        GetUserV4Async(
             [FromServices] AppDbContext db,
             [FromServices] UserManager<User> userManager,
-            ClaimsPrincipal currentUser)
+            ClaimsPrincipal currentUser,
+            [FromRoute] Guid userId)
     {
 
-        var userId = Guid.Parse(userManager.GetUserId(currentUser) ?? string.Empty);
-
+        var currentUserId = Guid.Parse(userManager.GetUserId(currentUser) ?? string.Empty);
+        
         var user = await db.Users
-            .Include(u=>u.Skills)
-            .Include(u=>u.Categories)
-            .Include(u=>u.UsersProjects)
-            .Include(u=>u.Projects)
-            .FirstOrDefaultAsync(u=>u.Id == userId);
+            .Include(u => u.Skills)
+            .Include(u => u.Categories)
+            .Include(u => u.UsersProjects)
+            .Include(u => u.Projects)
+            .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user is null) return TypedResults.Unauthorized();
-        
+
         var menteesCount = await db.UsersProjects
             .Include(up => up.User)
             .Where(up => up.User.Id == userId)
@@ -40,20 +44,26 @@ partial class UserEndpoints
                 .Count(pu => !pu.IsMentor))
             .SumAsync();
 
+        var isFollowed = await db.Follows
+            .Include(f => f.Followee)
+            .Include(f => f.Follower)
+            .Where(f => f.Followee.Id == user.Id && f.Follower.Id == currentUserId)
+            .AnyAsync();
+
         var followersCount = await db.Follows.CountAsync(f => f.Followee == user);
         
-        var userReadResult = GetSelfReadDto(user,menteesCount, followersCount);
-        
+        var userReadResult = GetOtherReadDto(user,isFollowed, menteesCount,followersCount);
+
         return TypedResults.Ok(userReadResult);
     }
 
-    dynamic GetSelfReadDto(User user,int menteesCount,int followersCount)
+    private dynamic GetOtherReadDto(User user,bool isFollowed,int menteesCount,int followersCount)
     {
         dynamic userReadResult;
         
         if (menteesCount == 0)
         {
-            userReadResult = new UserSelfReadDetailsDto
+            userReadResult = new UserOtherReadDetails5Dto
             (
                 Id: user.Id,
                 Email: user.Email!,
@@ -65,12 +75,13 @@ partial class UserEndpoints
                 Categories: user.Categories.Select(c => c.Name),
                 ProjectCount: user.Projects.Count,
                 FollowersCount: followersCount,
-                IsMentor:false
+                IsFollowed: isFollowed,
+                IsMentor: false
             );
         }
         else
         {
-            userReadResult = new MentorSelfReadDetailsDto
+            userReadResult = new MentorOtherReadDetailsDto
             (
                 Id: user.Id,
                 Email: user.Email!,
@@ -79,33 +90,20 @@ partial class UserEndpoints
                 Rate: user.Rate,
                 ProfilePicture: user.ProfilePicture!,
                 Skills: user.Skills.Select(s => s.Name),
+                MenteeCount: menteesCount,
                 Categories: user.Categories.Select(c => c.Name),
                 ProjectCount: user.Projects.Count,
-                MenteesCount: menteesCount,
                 FollowersCount: followersCount,
+                IsFollowed: isFollowed,
                 IsMentor:true
             );
         }
 
-        return Task.FromResult(userReadResult);
+        return userReadResult;
     }
+
     
-    public record MentorSelfReadDetailsDto(
-        Guid Id,
-        string Email,
-        string DisplayName,
-        string Handler,
-        float Rate,
-        string ProfilePicture,
-        IEnumerable<string> Skills,
-        IEnumerable<string> Categories,
-        int ProjectCount,
-        int MenteesCount,
-        int FollowersCount,
-        bool IsMentor = true
-    );
-
-    public record UserSelfReadDetailsDto(
+    public record UserOtherReadDetails5Dto(
         Guid Id,
         string Email,
         string DisplayName,
@@ -116,8 +114,24 @@ partial class UserEndpoints
         IEnumerable<string> Categories,
         int ProjectCount,
         int FollowersCount,
+        bool IsFollowed,
+        bool IsMentor = false
+    );
+    
+    public record MentorOtherReadDetailsDto(
+        Guid Id,
+        string Email,
+        string DisplayName,
+        string Handler,
+        float Rate,
+        string ProfilePicture,
+        IEnumerable<string> Skills,
+        IEnumerable<string> Categories,
+        int ProjectCount,
+        int MenteeCount,
+        int FollowersCount,
+        bool IsFollowed,
         bool IsMentor = true
     );
-
 }
 

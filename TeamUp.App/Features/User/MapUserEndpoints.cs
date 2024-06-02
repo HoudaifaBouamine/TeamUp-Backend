@@ -19,8 +19,13 @@ public partial class UserEndpoints : ICarterModule
             .Produces(StatusCodes.Status500InternalServerError);
 
         usersGroup.MapGet("/{Id:guid}",GetUserAsync);
-        
-        usersGroup.MapGet("/currentUser",GetCurrentUserAsync);
+        usersGroup.MapGet("/{userId:guid}", GetUserV4Async)
+            .HasApiVersion(4)
+            .RequireAuthorization(p=>p.RequireAuthenticatedUser());
+
+        usersGroup.MapGet("/currentUser",GetCurrentUserAsync)
+            .HasApiVersion(4)
+            .RequireAuthorization(p=>p.RequireAuthenticatedUser());
 
         usersGroup.MapPut("/",UpdateUser4Async)
             .HasApiVersion(4)
@@ -31,7 +36,7 @@ public partial class UserEndpoints : ICarterModule
         //     .Produces(StatusCodes.Status500InternalServerError)
         //     .RequireAuthorization(p=>p.RequireAuthenticatedUser());
 
-        usersGroup.MapDelete("/{Id}",DeleteUserAsync)
+        usersGroup.MapDelete("/{Id:guid}",DeleteUserAsync)
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
