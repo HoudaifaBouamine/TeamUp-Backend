@@ -486,7 +486,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
                 projectPost.Creator.DisplayName,
                 projectPost.Creator.Handler,
                 projectPost.Creator.Rate,
-                projectPost.Creator.ProfilePicture!);
+                projectPost.Creator.ProfilePicture);
         }
     }
 

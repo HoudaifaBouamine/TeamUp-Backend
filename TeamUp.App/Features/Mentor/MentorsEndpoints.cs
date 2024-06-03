@@ -1,6 +1,8 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace Features;
 
@@ -13,67 +15,75 @@ public class MentorsEndpoints : ControllerBase
 {
 
     private readonly IMentorRepository repo;
-    public MentorsEndpoints([FromServices] IMentorRepository mentorRepository) 
+    private readonly UserManager<User> userManager;
+    public MentorsEndpoints([FromServices] IMentorRepository mentorRepository,UserManager<User> userManager) 
     {
         repo = mentorRepository;
+        this.userManager = userManager;
     }
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMentorsListResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMentorsDetailsListResponse))]
     public async Task<IResult> GetMentorsAsync(
-        [FromQuery] string? SearchPattern,
-        [FromQuery] int? PageSize,
-        [FromQuery] int? PageNumber)
+        [FromQuery] string? pearchPattern,
+        [FromQuery] int? pageSize = 10,
+        [FromQuery] int? pageNumber = 1)
     {
-        var mentors = await repo.GetMentorsAsync(SearchPattern!, PageSize ?? 10, PageNumber ?? 1);
+        var user = await userManager.GetUserAsync(User);
+        if (user is null) return Results.Unauthorized();
+        var mentors = await repo.GetMentorsAsync(user,pearchPattern!, pageSize!.Value, pageNumber!.Value);
         return Results.Ok(mentors);
     }
 }
 
 public class MentorRepository(AppDbContext db) : IMentorRepository
 {
-    public async Task<GetMentorsListResponse> GetMentorsAsync(string? SearchPattern, int? PageSize, int? PageNumber)
+    public async Task<GetMentorsDetailsListResponse> GetMentorsAsync(User currentUser, string? searchPattern, int pageSize, int pageNumber)
     {
         
         var mentors = db.Users
             .Include(u => u.UsersProjects)
             .Where(u => u.UsersProjects
                 .Any(p => p.IsMentor == true));
-
-        var wow = db.Users.Include(u=>u.UsersProjects).ToList();
-
-
-
-        if(PageSize is null) PageNumber = null;
-
-        if(SearchPattern is not null)
+        
+        if(searchPattern is not null)
             mentors = mentors.Where(u=>
-                u.DisplayName.ToLower().Contains(SearchPattern.ToLower()) ||
-                u.Handler.ToLower().Contains(SearchPattern.ToLower()));
+                u.DisplayName.ToLower().Contains(searchPattern.ToLower()) ||
+                u.Handler.ToLower().Contains(searchPattern.ToLower()));
 
-        int TotalCount = mentors.Count();
+        var totalCount = mentors.Count();
 
-        if(PageSize is not null && PageNumber is not null)
-            mentors = mentors
-                .Skip(PageSize.Value * (PageNumber.Value -1))
-                .Take(PageSize.Value);
-        else if (PageSize is not null)
-            mentors = mentors
-                .Take(PageSize.Value);
-
-
+        mentors = mentors
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize);
+        
         var usersResult = await mentors
             .Include(u=>u.Projects)
-            .Select(u => new MentorReadDto(u.Id,u.DisplayName,u.Handler,u.Rate,u.ProfilePicture!))
-            .ToListAsync();
+            .Select(u => new MentorDetailsReadDto
+                (
+                    u.Id,
+                    u.DisplayName,
+                    u.Handler,
+                    u.Rate,
+                    404,
+                    db.Follows.Include(f => f.Followee).Count(f => f.Followee.Id == u.Id),
+                    db.UsersProjects.Where(up=>up.IsMentor)
+                        .Include(up=>up.Project)
+                            .ThenInclude(p=>p.ProjectsUsers)
+                        .Select(up=>up.Project.ProjectsUsers
+                            .Count(p => p.IsMentor == false))
+                        .Count(),
+                    db.Follows.Include(f=>f.Followee).Include(f=>f.Follower).Any(f=>f.Followee.Id == u.Id && f.Follower.Id == currentUser.Id),
+                    u.ProfilePicture)).ToListAsync();
 
-        return new GetMentorsListResponse
+        return new GetMentorsDetailsListResponse
             (
-            TotalCount,
-            PageNumber??=1,
-            PageSize??=TotalCount,
-            PageNumber > 1,
-            PageNumber * PageSize < TotalCount, 
-            usersResult);
+                totalCount,
+                pageNumber,
+                pageSize,
+                pageNumber > 1,
+                pageNumber * pageSize < totalCount, 
+                usersResult
+            );
     }
 
 }
@@ -81,7 +91,7 @@ public class MentorRepository(AppDbContext db) : IMentorRepository
 
 public interface IMentorRepository
 {
-    Task<GetMentorsListResponse> GetMentorsAsync(string SearchPattern, int? pageSize, int? pageNumber);
+    Task<GetMentorsDetailsListResponse> GetMentorsAsync(User currentUser,string searchPattern, int pageSize, int pageNumber);
 }
 
 public record MentorReadDto
@@ -90,7 +100,20 @@ public record MentorReadDto
     string DisplayName,
     string Handler,
     float Rate,
-    string? ProfilePicture
+    string ProfilePicture
+);
+
+public record MentorDetailsReadDto
+(
+    Guid Id,
+    string DisplayName,
+    string Handler,
+    float Rate,
+    int ReviewsCount,
+    int FollowersCount,
+    int MenteesCount,
+    bool IsFollowed,
+    string ProfilePicture
 );
 
 public record GetMentorsListResponse
@@ -101,4 +124,14 @@ public record GetMentorsListResponse
     bool IsPrevPageExist,
     bool IsNextPageExist,
     IEnumerable<MentorReadDto> Mentors
+);
+
+public record GetMentorsDetailsListResponse
+(
+    int TotalCount,
+    int PageNumber,
+    int PageSize,
+    bool IsPrevPageExist,
+    bool IsNextPageExist,
+    IEnumerable<MentorDetailsReadDto> Mentors
 );
