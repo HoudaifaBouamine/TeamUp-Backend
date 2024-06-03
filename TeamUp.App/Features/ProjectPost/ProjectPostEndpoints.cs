@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
+using Features.Projects;
+using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -396,7 +398,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     /// <summary>
     /// get the list of all available project posts
     /// </summary>
-    /// <param name="searchPattern">pattern to search for, not case sensitive</param>
+    /// <param name="searchPattern">pattern to search for, not case sensitive, full string search, search in Title, Summary, LearningGoals, TeamAndRols</param>
     /// <param name="pageSize">number of project posts to be returned in the response</param>
     /// <param name="pageNumber">index of the page</param>
     /// <returns></returns>
@@ -408,8 +410,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         if(searchPattern is not null)
             posts = posts.Where(p=>
+                p.Title.ToLower().Contains(searchPattern.ToLower()) || 
                 p.Summary.ToLower().Contains(searchPattern.ToLower()) ||
-                p.LearningGoals.ToLower().Contains(searchPattern.ToLower()));
+                p.LearningGoals.ToLower().Contains(searchPattern.ToLower()) ||
+                p.TeamAndRols.ToLower().Contains(searchPattern.ToLower()));
 
         int TotalCount = posts.Count();
 
@@ -423,19 +427,69 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             .Include(p=>p.RequiredSkills)
             .Include(p=>p.Categories)
             .OrderByDescending(p=>p.PostingTime)
-            .Select(p => new ProjectPostReadDto(p)).ToListAsync();
+            .Select(p => new ProjectPostFullDetailsReadDto(p)).ToListAsync();
 
-        return Ok(new GetProjectPostListResponse
-        {
-            TotalCount = TotalCount,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            IsPrevPageExist = pageNumber > 1,
-            IsNextPageExist = pageNumber * pageSize < TotalCount, 
-            ProjectsPosts = projectsDto
-        });
+        return Ok(new GetProjectsListResponse4
+        (
+            TotalCount: TotalCount,
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            IsPrevPageExist: pageNumber > 1,
+            IsNextPageExist: pageNumber * pageSize < TotalCount,
+            Projects: projectsDto
+        ));
 
     }
+    
+    public record GetProjectsListResponse4
+    (
+        int TotalCount,
+        int PageNumber,
+        int PageSize,
+        bool IsPrevPageExist,
+        bool IsNextPageExist,
+        IEnumerable<ProjectPostFullDetailsReadDto> Projects
+    );
+
+    
+    public class ProjectPostFullDetailsReadDto
+    {
+        public int Id { get; init; }
+        public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public string Scenario { get; set; }
+        public string LearningGoals { get; set; }
+        public string TeamAndRols { get; set; }
+        public DateTime PostingTime { get; set; }
+
+        public string ProjectLevel { get; set; } = "Beginner";
+        public string ExpectedDuration { get; set; }
+        public int ExpectedTeamSize { get; set; }
+        public List<string> Categories { get; set; } = [];
+        public List<string> Skills { get; set; } = [];
+        public MentorReadDto Mentor { get; set; } = null!;
+
+        public ProjectPostFullDetailsReadDto(ProjectPost projectPost)
+        {
+            this.Id = projectPost.Id;
+            this.Title = projectPost.Title;
+            this.Summary = projectPost.Summary;
+            this.Scenario = projectPost.Scenario;
+            this.LearningGoals = projectPost.LearningGoals;
+            this.TeamAndRols = projectPost.TeamAndRols;
+            this.Categories = projectPost.Categories.Select(s => s.Name).ToList();
+            this.Skills = projectPost.RequiredSkills.Select(s => s.Name).ToList();
+            this.PostingTime = projectPost.PostingTime;
+            this.ExpectedDuration = projectPost.ExpextedDuration;
+            this.ExpectedTeamSize = projectPost.ExpectedTeamSize;
+            this.Mentor = new MentorReadDto(projectPost.Creator.Id,
+                projectPost.Creator.DisplayName,
+                projectPost.Creator.Handler,
+                projectPost.Creator.Rate,
+                projectPost.Creator.ProfilePicture!);
+        }
+    }
+
 
 
     public class GetProjectPostListResponse

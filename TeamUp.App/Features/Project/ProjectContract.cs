@@ -19,8 +19,8 @@ public interface IProjectRepository
 
     Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
 
-    Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? PageSize,int? PageNumber, string? SearchPattern);
-    Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? PageSize,int? PageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? pageSize,int? pageNumber, string? SearchPattern);
+    Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? pageSize,int? pageNumber, string? searchPattern);
 }
 
 #region V1
@@ -49,8 +49,7 @@ public record ProjecUserShortDto
     string ProfilePicture
 );
 
-public record ProjectDetailsReadDto
-(
+public record ProjectDetailsReadDto(
     int Id,
     string Name,
     string Description,
@@ -59,7 +58,6 @@ public record ProjectDetailsReadDto
     int UsersCount,
     List<ProjecUserLongDto> Users
 );
-
 public record ProjecUserLongDto
 (
     Guid Id, 
