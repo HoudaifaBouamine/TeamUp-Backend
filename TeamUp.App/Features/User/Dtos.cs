@@ -13,8 +13,7 @@ record GetUsersListResponse
     IEnumerable<UserReadDto> Users
 );
 
-record UserReadDto
-(
+public record UserReadDto(
     Guid Id,
     string Email,
     string DisplayName,

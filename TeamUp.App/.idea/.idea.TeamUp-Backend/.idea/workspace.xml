@@ -9,13 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Project/CreateProject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Project/CreateProject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Project/GetProjects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Project/GetProjects.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Project/ProjectContract.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Project/ProjectContract.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Project/Project.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/Project.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Project/ProjectPost.cs/ProjectPost.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/User/Dtos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/User/Dtos.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,8 +24,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0706dcfabddf4241b89dd5a90ab7061526a828/41/9535ffe8/InternalDbSet`1.cs" root0="SKIP_HIGHLIGHTING" />
@@ -140,6 +133,7 @@
       <workItem from="1717258648207" duration="10406000" />
       <workItem from="1717276930001" duration="6456000" />
       <workItem from="1717289082005" duration="1287000" />
+      <workItem from="1717314039448" duration="19884000" />
     </task>
     <servers />
   </component>
@@ -150,25 +144,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Features/Project/CreateProject.cs</url>
-          <line>87</line>
-          <properties documentPath="$PROJECT_DIR$/Features/Project/CreateProject.cs" containingFunctionPresentation="Method 'StartProjectAsync'">
-            <startOffsets>
-              <option value="3140" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3166" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Users;
 using Utils;
 
 namespace Features;
@@ -165,10 +166,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         return Ok(new ProjectJoinRequestReadDto(request));
     }
     
-    [HttpGet("join-requests/for-current-user")]
+    [HttpGet("join-requests/of-current-user")]
     [ProducesResponseType<List<ProjectJoinRequestReadDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetJoinRequestsForCurrentUser()
+    public async Task<IActionResult> GetJoinRequestsOfCurrentUser()
     {
         var user =  await userManager.GetUserAsync(User);
         if (user is null) return NotFound(new ErrorResponse("user does not exist any more"));
@@ -181,6 +182,25 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
             .ToListAsync();
         
         return Ok(requests.Select(r=>new ProjectJoinRequestReadDto(r)));
+    }
+    
+    [HttpGet("join-requests/for-mentor")]
+    [ProducesResponseType<List<ProjectJoinRequestReadDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetJoinRequestssForCurrentUser([FromQuery] int? projectId)
+    {
+        var user =  await userManager.GetUserAsync(User);
+        if (user is null) return NotFound(new ErrorResponse("user does not exist any more"));
+        
+        var requests = await db.ProjectJoinRequests
+            .Include(r=>r.ProjectPost)
+                .ThenInclude(p=>p.Creator)
+            .Where(r=>r.ProjectPost.Creator.Id == user.Id)
+            .Where(r => projectId == null || r.ProjectPost.Id == projectId.Value)
+            .Include(r => r.User)
+            .ToListAsync();
+        
+        return Ok(requests.Select(r=>new ProjectJoinRequestMentorReadDto(r)));
     }
 
     public record ProjectJoinRequestCreateDto(int ProjectPostId, string Message);
@@ -208,7 +228,23 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         }
     }
 
-
+    public class ProjectJoinRequestMentorReadDto : ProjectJoinRequestReadDto
+    {
+        public ProjectJoinRequestMentorReadDto(ProjectJoinRequest joinRequest) : base(joinRequest)
+        {
+            var u = joinRequest.User;
+            this.User = new UserReadDto
+                (
+                    Id:u.Id,
+                    DisplayName:u.DisplayName,
+                    Email:u.Email!,
+                    Handler:u.Handler,
+                    Rate:u.Rate,
+                    ProfilePicture:u.ProfilePicture
+                );
+        }
+        public UserReadDto User { get; set; }
+    }
 
 
 
