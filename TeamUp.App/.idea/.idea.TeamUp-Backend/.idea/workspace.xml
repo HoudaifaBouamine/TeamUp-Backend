@@ -9,9 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/User/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User/User.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,6 +134,7 @@
       <workItem from="1717314039448" duration="19884000" />
       <workItem from="1717374161568" duration="1820000" />
       <workItem from="1717396134181" duration="5313000" />
+      <workItem from="1717451145149" duration="372000" />
     </task>
     <servers />
   </component>

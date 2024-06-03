@@ -23,7 +23,6 @@ partial class UserEndpoints
         if(user is null) return TypedResults.BadRequest(new ErrorResponse("User not found, this should not happen because this endpoint require authenticated user"));
 
         user.Update(null,null,userUpdate.Email,userUpdate.DisplayName, userUpdate.Handler, null, userUpdate.ProfilePicture);
-        user.UpdateSkills(db.Skills.Where(s=>userUpdate.Skills.Contains(s.Name)).ToList());
         
         var result = await userManager.UpdateAsync(user);
         await db.SaveChangesAsync();
@@ -96,7 +95,5 @@ record UserUpdateRequest4Dto
     [MinLength(3)] string DisplayName,
     [EmailAddress] string? Email,
     string? Handler,
-    [Url] string? ProfilePicture,
-    List<string> Skills,
-    List<string> Categories
-    );
+    [Url] string? ProfilePicture
+);

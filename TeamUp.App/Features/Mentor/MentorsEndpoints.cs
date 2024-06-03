@@ -39,11 +39,8 @@ public class MentorRepository(AppDbContext db) : IMentorRepository
 {
     public async Task<GetMentorsDetailsListResponse> GetMentorsAsync(User currentUser, string? searchPattern, int pageSize, int pageNumber)
     {
-        
-        var mentors = db.Users
-            .Include(u => u.UsersProjects)
-            .Where(u => u.UsersProjects
-                .Any(p => p.IsMentor == true));
+
+        var mentors = db.Users.Where(u => u.IsMentor);
         
         if(searchPattern is not null)
             mentors = mentors.Where(u=>

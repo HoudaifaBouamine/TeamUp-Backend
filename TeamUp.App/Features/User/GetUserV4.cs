@@ -61,7 +61,7 @@ partial class UserEndpoints
     {
         dynamic userReadResult;
         
-        if (menteesCount == 0)
+        if (!user.IsMentor)
         {
             userReadResult = new UserOtherReadDetails5Dto
             (
@@ -76,7 +76,7 @@ partial class UserEndpoints
                 ProjectCount: user.Projects.Count,
                 FollowersCount: followersCount,
                 IsFollowed: isFollowed,
-                IsMentor: false
+                IsMentor: user.IsMentor
             );
         }
         else
@@ -95,7 +95,7 @@ partial class UserEndpoints
                 ProjectCount: user.Projects.Count,
                 FollowersCount: followersCount,
                 IsFollowed: isFollowed,
-                IsMentor:true
+                IsMentor:user.IsMentor
             );
         }
 

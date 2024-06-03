@@ -49,6 +49,8 @@ public partial class User : IdentityUser<Guid>
     public ICollection<Skill> Skills { get; set; } = [];
     
     public ICollection<Category> Categories { get; set; } = [];
+
+    public bool IsMentor { get; private set; } = false;
 }
 
 
@@ -236,6 +238,11 @@ partial class User
         string result = firstChar + input.Substring(1);
 
         return result;
+    }
+
+    public void SetAsMentor()
+    {
+        IsMentor = true;
     }
 }
 

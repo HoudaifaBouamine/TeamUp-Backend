@@ -275,11 +275,14 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectPostReadDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateProjectPostAsync([FromBody] ProjectPostCreateDto postDto)
     {
         var currentUser = await userManager.GetUserAsync(User);
 
         if (currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
+        
+        if (!currentUser.IsMentor) return Forbid();
 
         var skills = await db.Skills.Where(s => postDto.RequiredSkills.Contains(s.Name)).ToListAsync();
 
