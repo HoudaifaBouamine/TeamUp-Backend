@@ -7,6 +7,12 @@ using Serilog;
 
 public static class DataSeeder
 {
+
+    // public static async Task SeedFollowersData(AppDbContext db)
+    // {
+    //     var projectFaker = new Faker<ProjectPostFaker>("en_US");
+    //
+    // }
     public static async Task SeedCaterogyData(AppDbContext db)
     {  
         string[] categories = ["Mobile","Design","Web", "Cyber security","Ai", "Game", "Data Science"];

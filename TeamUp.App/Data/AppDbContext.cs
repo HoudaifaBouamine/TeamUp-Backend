@@ -13,6 +13,11 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<FireBaseNotificationSession>(b =>
+        {
+            b.HasOne<User>().WithMany().HasForeignKey(s => s.UserId);
+        });
+        
         builder.Entity<UserPicture>(b =>
         {
             b.Property(x => x.PictureDataId).IsRequired();
@@ -67,5 +72,7 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Picture> Pictures {get ; set ; } 
     public DbSet<UserPicture> UserPictures {get ; set ; } 
     public DbSet<Follow> Follows {get ; set ; } 
+    
+    public DbSet<FireBaseNotificationSession> FireBaseNotificationSessions { get ; set ; } 
 
 }
