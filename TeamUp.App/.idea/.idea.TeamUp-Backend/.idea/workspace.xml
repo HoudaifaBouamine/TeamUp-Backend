@@ -10,10 +10,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Data/AppDbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Notification/NotificationEndpoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/NotificationEndpoint.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Notifications/Notification.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Notifications/Notification.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Util/DataSeeder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Util/DataSeeder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Skills/Skill.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Skills/Skill.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.Development.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +139,7 @@
       <workItem from="1717374161568" duration="1820000" />
       <workItem from="1717396134181" duration="5313000" />
       <workItem from="1717451145149" duration="372000" />
-      <workItem from="1717616625948" duration="7296000" />
+      <workItem from="1717616625948" duration="11342000" />
     </task>
     <servers />
   </component>

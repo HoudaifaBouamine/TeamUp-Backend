@@ -74,9 +74,9 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
         // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-    // options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));                           
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));                           
     
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    // options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 

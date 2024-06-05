@@ -211,6 +211,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     {
         public int Id { get; set; }
         public int ProjectId { get; set; }
+        public string ProjectTitle { get; set; }
+        public Guid SenderId { get; set; }
+        public string SenderName { get; set; }
+        public string SenderPicture { get; set; }
         public bool IsAccepted { get; set; }
         public bool IsClosed { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -222,6 +226,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         {
             Id = joinRequest.Id;
             ProjectId = joinRequest.ProjectPost.Id;
+            ProjectTitle = joinRequest.ProjectPost.Title;
+            SenderId = joinRequest.User.Id;
+            SenderName = joinRequest.User.DisplayName;
+            SenderPicture = joinRequest.User.ProfilePicture;
             IsAccepted = joinRequest.IsAccepted;
             IsClosed = joinRequest.IsClosed;
             CreatedAt = joinRequest.CreatedAt;
