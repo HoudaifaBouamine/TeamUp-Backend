@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Authentication.IdentityApi;
@@ -158,7 +159,7 @@ app.Use((ctx,next)=>
         ctx?.Response.StatusCode,
         (end-start).TotalMilliseconds);
 
-    Log.Information("{log}",log);
+    // Log.Information("{log}",log);
 
    return task;
 
@@ -179,16 +180,42 @@ app.Use(async (ctx,next)=>
 
 app.Use(async (ctx, next) =>
 {
-    DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-    optionsBuilder.UseSqlite(app.Configuration.GetConnectionString("DefaultConnection"));
-    var db = new AppDbContext(optionsBuilder.Options);
 
-    if (!await db.Users.AnyAsync())
+    using (var scope = app.Services.CreateScope())
     {
-        await DataSeeder.SeedCaterogyData(db);
-        await DataSeeder.SeedSkillsData(db);
-        await DataSeeder.SeedUsersData(db);
-        await DataSeeder.SeedProjectPostData(db);
+
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        
+        if (!await db.Users.AnyAsync())
+        {
+
+            await AddTestingAccountsAsync(db, scope.ServiceProvider);
+
+            await DataSeeder.SeedCaterogyData(db);
+            await DataSeeder.SeedSkillsData(db);
+            await DataSeeder.SeedUsersData(db);
+            await DataSeeder.SeedProjectPostData(db);
+        }
+    }
+
+    async Task  AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
+    {
+        var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
+
+        var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
+
+        var dto = new AuthEndpoints.UserRegisterRequestDto
+            ("string", "string@gmail.com", "stringstring");
+
+        await authEndpoints.RegisterAsync(dto, userManager);
+
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
+        user.SetAsMentor();
+
+        await db.SaveChangesAsync();
+        
+        Log.Debug("User : " + JsonSerializer.Serialize(user));
+    
     }
     
     await next();

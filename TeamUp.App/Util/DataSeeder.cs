@@ -3,6 +3,8 @@ using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Serilog;
+
 public static class DataSeeder
 {
     public static async Task SeedCaterogyData(AppDbContext db)
@@ -47,8 +49,25 @@ public static class DataSeeder
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
             .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 1, 6), DateTime.UtcNow))
-            .RuleFor(u => u.categories, f=>categories.ToList().Where(c=>f.Random.Bool()).ToList());
+            .RuleFor(u => u.categories, f=>
+            {
+                var cs = categories.ToList()
+                    .Where(c => f.Random.Bool())
+                    .ToList();
+                
+                if(cs.Count == 0)
+                    cs.Add(categories[new Random().Next(0,categories.Count-1)]);
+
+                return cs;
+            });
         var projectsToCreat = projectFaker.Generate(10);
+        
+        projectFaker.RuleFor(u => u.Creator,
+            users.FirstOrDefault(u => u.Email == "string@gmail.com"));
+        
+        projectsToCreat.AddRange(projectFaker.Generate(3));
+
+        Log.Debug("Project Posts Count : " + projectsToCreat.Count);
         
         string[] expectedDuration = ["1 Week", "2-3 Weeks", "1 Month", "2-3 Months", "+3 Months"];
 
@@ -93,11 +112,16 @@ public static class DataSeeder
             .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
             .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
             .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
-            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
+            .RuleFor(u => u.PictureUrl, f =>
+            {
+                var parts = f.Person.Avatar.Split("cloudflare-ipfs.com");
+                return $"{parts[0]}ipfs.io{parts[1]}";
+            })
             .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName())
             .RuleFor(u=>u.IsMentor , f=>f.Random.Bool())
             .RuleFor(u=>u.Categories , f=>f.Random.Bool());
 
+        // https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/602.jpg
         var usersToCreat = userFaker.Generate(20);
 
         var users = usersToCreat.Select((u) =>
