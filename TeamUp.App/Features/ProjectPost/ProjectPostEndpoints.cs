@@ -365,7 +365,8 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetProjectPostListResponse) )]
     public async Task<IActionResult> GetProjectPostsAsync(Guid id, string? searchPattern, int pageSize = 10, int pageNumber = 1)
     {
-        IQueryable<ProjectPost> posts = db.ProjectPosts.Where(p=>p.CreatorId == id);
+        IQueryable<ProjectPost> posts = db.ProjectPosts
+            .Where(p=>p.CreatorId == id);
 
         if(searchPattern is not null)
             posts = posts.Where(p=>

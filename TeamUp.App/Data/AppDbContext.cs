@@ -6,18 +6,9 @@ using Models;
 
 public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    public AppDbContext(DbContextOptions options) : base(options)
     {
         Database.EnsureCreated();
-        
-        if (Users.Count() == 0)
-        {
-            DataSeeder.SeedCaterogyData(this).Wait();
-            DataSeeder.SeedSkillsData(this).Wait();
-            DataSeeder.SeedUsersData(this).Wait();
-            DataSeeder.SeedProjectPostData(this).Wait();
-        }
-        
     }
 
     protected override void OnModelCreating(ModelBuilder builder)

@@ -20,7 +20,7 @@ namespace EndpointsManager
 
 
             var testingGroup = app.MapGroup("/").WithTags("Testing");
-
+            
             testingGroup.MapGet("/",  ()=>
             {
                 return Results.Redirect("/swagger/index.html");

@@ -21,6 +21,8 @@ public interface IProjectRepository
 
     Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? pageSize,int? pageNumber, string? SearchPattern);
     Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? pageSize,int? pageNumber, string? searchPattern);
+    Task<GetProjectsListResponse4> GetUsersProjectsListWithSearchAndPaginationAsync (Guid userId ,int? pageSize,int? pageNumber, string? searchPattern);
+
 }
 
 #region V1

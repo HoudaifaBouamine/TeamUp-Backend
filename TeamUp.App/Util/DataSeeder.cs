@@ -93,7 +93,7 @@ public static class DataSeeder
             .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
             .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
             .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
-            .RuleFor(u => u.PictureUrl, f => "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTap6CR4Ge_5Wri3xUZxaibeNZsgJDSCwn7bw&s")
+            .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
             .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName())
             .RuleFor(u=>u.IsMentor , f=>f.Random.Bool())
             .RuleFor(u=>u.Categories , f=>f.Random.Bool());

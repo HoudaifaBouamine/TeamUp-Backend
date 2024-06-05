@@ -1,6 +1,10 @@
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Policy;
+using System.Text;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
+using Authentication.IdentityApi;
 using Authentication.Oauth.Google;
 using Authentication.UserManager;
 using Carter;
@@ -17,6 +21,7 @@ using Models;
 using Utils;
 using Features.Projects.Contracts;
 using Features.Projects;
+using Microsoft.AspNetCore.Http.Extensions;
 using Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,7 +73,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
         // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-        // options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));                           
+    // options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));                           
     
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -172,7 +177,22 @@ app.Use(async (ctx,next)=>
     } 
 });
 
+app.Use(async (ctx, next) =>
+{
+    DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+    optionsBuilder.UseSqlite(app.Configuration.GetConnectionString("DefaultConnection"));
+    var db = new AppDbContext(optionsBuilder.Options);
 
+    if (!await db.Users.AnyAsync())
+    {
+        await DataSeeder.SeedCaterogyData(db);
+        await DataSeeder.SeedSkillsData(db);
+        await DataSeeder.SeedUsersData(db);
+        await DataSeeder.SeedProjectPostData(db);
+    }
+    
+    await next();
+});
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();

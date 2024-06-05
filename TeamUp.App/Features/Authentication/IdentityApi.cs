@@ -11,7 +11,7 @@ namespace Authentication.IdentityApi;
 
 public partial class AuthEndpoints(
     IEmailSenderCustome emailSender
-    ) : ICarterModule 
+    ) : ICarterModule, IDisposable
 {
 
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -101,4 +101,9 @@ public partial class AuthEndpoints(
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
     IEmailSenderCustome emailSender = emailSender;
     string? confirmEmailEndpointName = null;
+
+    public void Dispose()
+    {
+        // TODO release managed resources here
+    }
 }

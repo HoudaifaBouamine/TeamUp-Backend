@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Features;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -42,12 +43,30 @@ partial class UserEndpoints
 
         var followersCount = await db.Follows.CountAsync(f => f.Followee == user);
         
-        var userReadResult = GetSelfReadDto(user,menteesCount, followersCount);
+        var projectsPosts = await ProjectList(db, user.Id);
+        
+        var userReadResult = GetSelfReadDto(user,projectsPosts,menteesCount, followersCount);
+
         
         return TypedResults.Ok(userReadResult);
     }
 
-    dynamic GetSelfReadDto(User user,int menteesCount,int followersCount)
+    async Task<List<ProjectPostEndpoints.ProjectPostReadDto>> ProjectList(AppDbContext db, Guid id)
+    {
+        IQueryable<ProjectPost> posts = db.ProjectPosts
+            .Where(p=>p.CreatorId == id);
+        
+        var projectsDto = await posts
+            .Include(p=>p.Creator)
+            .Include(p=>p.Categories)
+            .Include(p=>p.RequiredSkills)
+            .OrderByDescending(p=>p.PostingTime)
+            .Select(p => new ProjectPostEndpoints.ProjectPostReadDto(p)).ToListAsync();
+
+        return projectsDto;
+    }
+
+    dynamic GetSelfReadDto(User user,List<ProjectPostEndpoints.ProjectPostReadDto> projectPostReadDtos ,int menteesCount,int followersCount)
     {
         dynamic userReadResult;
         
@@ -83,13 +102,14 @@ partial class UserEndpoints
                 ProjectCount: user.Projects.Count,
                 MenteesCount: menteesCount,
                 FollowersCount: followersCount,
+                ProjectPosts:projectPostReadDtos,
                 IsMentor:user.IsMentor
             );
         }
 
         return userReadResult;
     }
-    
+
     public record MentorSelfReadDetailsDto(
         Guid Id,
         string Email,
@@ -99,6 +119,7 @@ partial class UserEndpoints
         string ProfilePicture,
         IEnumerable<string> Skills,
         IEnumerable<string> Categories,
+        IEnumerable<ProjectPostEndpoints.ProjectPostReadDto> ProjectPosts,
         int ProjectCount,
         int MenteesCount,
         int FollowersCount,
