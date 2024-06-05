@@ -383,6 +383,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         var projectsDto = await posts
             .Include(p=>p.Creator)
             .Include(p=>p.RequiredSkills)
+            .Include(p=>p.Categories)
             .OrderByDescending(p=>p.PostingTime)
             .Select(p => new ProjectPostReadDto(p)).ToListAsync();
 

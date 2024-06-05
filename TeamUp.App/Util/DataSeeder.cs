@@ -33,7 +33,7 @@ public static class DataSeeder
         var users = await db.Users.ToListAsync();
         var skills = await db.Skills.ToListAsync();
         var categories = await db.Categories.ToListAsync();
-        var projectFaker = new Faker<ProjectPostFaker>();
+        var projectFaker = new Faker<ProjectPostFaker>("en_US");
 
         projectFaker
             .RuleFor(u => u.Creator,
@@ -46,7 +46,7 @@ public static class DataSeeder
             .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
-            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 6, 1), DateTime.UtcNow))
+            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 1, 6), DateTime.UtcNow))
             .RuleFor(u => u.categories, f=>categories.ToList().Where(c=>f.Random.Bool()).ToList());
         var projectsToCreat = projectFaker.Generate(10);
         
