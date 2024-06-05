@@ -54,7 +54,7 @@ public static class DataSeeder
             .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.teamAndRols, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.Summary, (f, p) => f.Lorem.Sentence(20, 5))
-            .RuleFor(u => u.PostingTime, f => f.Date.Between(new DateTime(2023, 1, 6), DateTime.UtcNow))
+            .RuleFor(u => u.PostingTime, f => f.Date.Between(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow))
             .RuleFor(u => u.categories, f=>
             {
                 var cs = categories.ToList()
