@@ -282,7 +282,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         if (currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
         
-        if (!currentUser.IsMentor) return Forbid();
+        // if (!currentUser.IsMentor) return Forbid();
 
         var skills = await db.Skills.Where(s => postDto.RequiredSkills.Contains(s.Name)).ToListAsync();
 

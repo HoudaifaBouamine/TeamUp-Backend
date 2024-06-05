@@ -7,8 +7,8 @@ public static class DataSeeder
 {
     public static async Task SeedCaterogyData(AppDbContext db)
     {  
-        // string[] categories = ["Mobile","Design","Web", "Cyber security","Ai", "Game", "Data Science"];
-        string[] categories = ["Web Dev","Design","Mobile Dev","Cyber security"];
+        string[] categories = ["Mobile","Design","Web", "Cyber security","Ai", "Game", "Data Science"];
+        // string[] categories = ["Web Dev","Design","Mobile Dev","Cyber security"];
         await db.Categories.AddRangeAsync(categories.Select(c=>new Category
         {
             Name = c
@@ -37,7 +37,10 @@ public static class DataSeeder
 
         projectFaker
             .RuleFor(u => u.Creator,
-                (f, p) => users.Where((u, index) => new Random().Next(10) == 0 || index == 0).Last())
+                (f, p) => users
+                    .Where(u=>u.IsMentor)
+                    .Where((u, index) => new Random().Next(5) == 0 || index == 0)
+                    .Last())
             .RuleFor(u => u.Title, (f, p) => f.Commerce.ProductName())
             .RuleFor(u => u.Sinarios, (f, p) => f.Lorem.Paragraph())
             .RuleFor(u => u.learningGoals, (f, p) => f.Lorem.Paragraph())
@@ -77,6 +80,8 @@ public static class DataSeeder
         public string Email { get; set; }
         public string PictureUrl { get; set; }
         public string Handler { get; set; }
+        public bool IsMentor { get; set; }
+        public bool Categories { get; set; }
     }
 
     // record UserCreateFake(string FirstName, string LastName, string Email, string PicureUrl);
@@ -88,15 +93,24 @@ public static class DataSeeder
             .RuleFor(u => u.FirstName, (f, p) => f.Name.FirstName())
             .RuleFor(u => u.LastName, (f, p) => f.Name.LastName())
             .RuleFor(u => u.Email, (f, p) => f.Internet.Email(p.FirstName, p.LastName))
-            // .RuleFor(u => u.PictureUrl, f => f.Person.Avatar)
             .RuleFor(u => u.PictureUrl, f => "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTap6CR4Ge_5Wri3xUZxaibeNZsgJDSCwn7bw&s")
-            .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName());
+            .RuleFor(u=>u.Handler, f=> f.Name.JobTitle() + " at " + f.Company.CompanyName())
+            .RuleFor(u=>u.IsMentor , f=>f.Random.Bool())
+            .RuleFor(u=>u.Categories , f=>f.Random.Bool());
 
         var usersToCreat = userFaker.Generate(20);
 
-        var users = usersToCreat.Select(u => new User(u.FirstName, u.LastName, u.Email, u.PictureUrl)
+        var users = usersToCreat.Select((u) =>
         {
-            Handler = u.Handler
+            var mentor = new User(u.FirstName, u.LastName, u.Email, u.PictureUrl)
+            {
+                Handler = u.Handler,
+                Categories = [],
+            };
+
+            if(u.IsMentor) mentor.SetAsMentor();
+            
+            return mentor;
         }).ToList();
 
         await db.Users.AddRangeAsync(users);

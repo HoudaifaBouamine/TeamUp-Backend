@@ -92,7 +92,7 @@ partial class UserEndpoints
 
 record UserUpdateRequest4Dto
 (
-    [MinLength(3)] string DisplayName,
+    [MinLength(3)] string? DisplayName,
     [EmailAddress] string? Email,
     string? Handler,
     [Url] string? ProfilePicture
