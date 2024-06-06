@@ -16,6 +16,9 @@ namespace Features;
 [ApiController]
 public class FireBaseNotificationEndpoints(AppDbContext db, UserManager<User> userManager) : ControllerBase
 {
+    
+    
+    
     /// <summary>
     /// Store session token
     /// </summary>

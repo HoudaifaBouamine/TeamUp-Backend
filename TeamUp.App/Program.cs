@@ -221,10 +221,20 @@ app.Use(async (ctx, next) =>
     await next();
 });
 
+app.MapGet("sendNotification",async (string token,string title,string body) =>
+{
+    var data = new
+    {
+        Message = "Please let me join your project !!!",
+    };
+    await FireBaseNotification.SendMessageAsync(token,title,body,data);
+});
+
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
+
 
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();

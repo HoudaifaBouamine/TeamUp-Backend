@@ -34,8 +34,7 @@ public partial class User : IdentityUser<Guid>
     public float Rate { get; private set; } = MaxRate;
     public string ProfilePicture { get; set; } = "https://i.ibb.co/5vC2qyP/unknown.jpg";
     public string? FullAddress { get; private set; }
-
-
+    
     // private List<Project> _projects { get; set; } = [];
     // public IEnumerable<Project> Projects => _projects.AsReadOnly();
     // private List<UsersProject> _usersProjects { get; set; } = [];
