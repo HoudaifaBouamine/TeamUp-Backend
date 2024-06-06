@@ -18,7 +18,7 @@ public class FirebaseNotificationService : INotificationService
     }
 }
 
-interface INotificationService
+public interface INotificationService
 {
     Task<bool> SendJoinRequestNotification(AppDbContext db, User user, JoinRequestNotificationData data);
 }

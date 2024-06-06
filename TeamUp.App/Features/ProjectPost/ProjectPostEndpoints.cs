@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Newtonsoft.Json;
 using Users;
 using Utils;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Features;
 
@@ -130,7 +132,8 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
     public async Task<IActionResult> CreateProjectJoinRequestAsync(
-        [FromBody] ProjectJoinRequestCreateDto joinRequestDto)
+        [FromBody] ProjectJoinRequestCreateDto joinRequestDto,
+        [FromServices] INotificationService notificationService)
     {
         var currentUser = await userManager.GetUserAsync(User);
         if (currentUser is null) return Unauthorized(new ErrorResponse("User account does not exist any more"));
@@ -147,6 +150,25 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         db.ProjectJoinRequests.Add(joinRequest);
         await db.SaveChangesAsync();
 
+        var joinRequestASNotification = await db.ProjectJoinRequests
+            .AsNoTracking()
+            .Include(r=>r.User)
+            .Include(r=>r.ProjectPost)
+            .FirstOrDefaultAsync(r => r.Id == joinRequest.Id);
+
+        try
+        {
+            
+            await notificationService.SendJoinRequestNotification
+                (db,currentUser,new JoinRequestNotificationData(joinRequestASNotification));
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return NotFound("Zra + " + e.Message);
+        }
+        
         return Ok(new ProjectJoinRequestReadDto(joinRequest));
     }
 

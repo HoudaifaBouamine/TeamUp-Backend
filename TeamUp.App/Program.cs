@@ -138,6 +138,7 @@ builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("A
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<ISkillRepository,SkillRepository>();
 builder.Services.AddScoped<IMentorRepository,MentorRepository>();
+builder.Services.AddScoped<INotificationService,FirebaseNotificationService>();
 
 ///////////////////////////////////////////////////
 
