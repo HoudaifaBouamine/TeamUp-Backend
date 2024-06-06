@@ -27,6 +27,7 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
     /// <param name="requestId">request'id to be answered</param>
     /// <param name="isAccepted">send true, if request is accepted, otherwise send false</param>
     /// <returns></returns>
+    [Authorize]
     [HttpPost("join-requests/answer")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectJoinRequestReadDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorResponse))]
@@ -41,8 +42,9 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
 
         var request = await db.ProjectJoinRequests
             .Where(r => r.Id == requestId)
+            .Include(r=>r.User)
             .Include(r => r.ProjectPost)
-            .Include(r => r.ProjectPost.Creator)
+                .ThenInclude(pp => pp.Creator)
             .Where(r => r.ProjectPost.Creator.Id == currentUser.Id)
             .FirstOrDefaultAsync();
 

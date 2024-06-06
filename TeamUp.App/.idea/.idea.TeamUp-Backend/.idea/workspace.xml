@@ -9,11 +9,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationEndpoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationEndpoint.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/User/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User/User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,7 +27,6 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0706dcfabddf4241b89dd5a90ab7061526a828/41/9535ffe8/InternalDbSet`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/105b6864eb8d402e91d4f8d20b8744e3c2ce00/a6/39378239/InvalidOperationException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5f9bc6d1d54b416fb251b81fcb6dfe49c2d000/61/88f602fc/ArgumentNullException.cs" root0="SKIP_HIGHLIGHTING" />
@@ -45,6 +43,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3684e888fd93508450e2f4b0d7d38bee648cba98882592491596fc79375185f/SwaggerMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/781ebca67bd71532948352c2c24f8db410449e3c21f7191a17bf21348cd4fed4/SwaggerUIMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c33dc61ee1f8ae72ddca822c7e1e5978d9ddda4d42dd69feaa07925886918/Faker[T].cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{

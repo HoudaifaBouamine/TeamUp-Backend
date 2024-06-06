@@ -223,9 +223,14 @@ app.Use(async (ctx, next) =>
 
 app.MapGet("sendNotification",async (string token,string title,string body) =>
 {
-    var data = new
+    var data = new JoinRequestNotificationData
     {
-        Message = "Please let me join your project !!!",
+        message = "Please let me join your project !!!",
+        projectId = "1",
+        senderId = Guid.NewGuid(),
+        projectTitle = "TeamUp",
+        senderName = "Houdaifa Bouamine",
+        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg"
     };
     await FireBaseNotification.SendMessageAsync(token,title,body,data);
 });
