@@ -370,3 +370,7 @@ Migrations/*
 *.db
 */.idea/*
 */ServiceAccount.json
+
+
+TeamUp.App/Features/Notification/ServiceAccount.json
+
