@@ -9,8 +9,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Features/Notification/ServiceAccount.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />

@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Features;
 
@@ -14,11 +15,9 @@ public class FireBaseNotification
 
         // Load the service account key JSON file
         GoogleCredential credential;
-        await using (var stream = new FileStream("Features/Notification/ServiceAccount.json", FileMode.Open, FileAccess.Read))
-        {
-            credential = GoogleCredential.FromStream(stream)
-                .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
-        }
+
+        credential = GoogleCredential.FromJson(JsonSerializer.Serialize(ServiceAccount.Key))
+            .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
 
         // Create an authorized HTTP client
         var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();

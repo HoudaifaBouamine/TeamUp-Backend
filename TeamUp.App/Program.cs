@@ -231,7 +231,8 @@ app.MapGet("sendNotification",async (string token,string title,string body) =>
         senderId = Guid.NewGuid(),
         projectTitle = "TeamUp",
         senderName = "Houdaifa Bouamine",
-        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg"
+        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg",
+        requestId = "1"
     };
     await FireBaseNotification.SendMessageAsync(token,title,body,data);
 });
