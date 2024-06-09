@@ -1,16 +1,16 @@
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Features.Projects;
-partial class ProjectsController
+namespace TeamUp.Features.Project;
+
+public partial class ProjectsController
 {
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProjectDetailsReadDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProjectAsync(int id, [FromBody] ProjectCreateDto projectDto)
     {
-        await _projectRepository.UpdateAsync(id, projectDto);
-        var updatedProject = await _projectRepository.GetDetailsAsync(id);
+        await projectRepo.UpdateAsync(id, projectDto);
+        var updatedProject = await projectRepo.GetDetailsAsync(id);
         if (updatedProject == null)
         {
             return NotFound();
@@ -23,18 +23,15 @@ partial class ProjectRepository
 {
     public async Task<bool> UpdateAsync(int id, ProjectCreateDto projectDto)
     {
-        var project = await _context.Projects.FindAsync(id);
+        var project = await db.Projects.FindAsync(id);
+
+        if (project is null) return false;
         
-        if (project is not null)
-        {
-            project.Name = projectDto.Name;
-            project.Description = projectDto.Description;
-            project.StartDate = projectDto.StartDate;
+        project.Name = projectDto.Name;
+        project.Description = projectDto.Description;
+        project.StartDate = projectDto.StartDate;
 
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        return false;
+        await db.SaveChangesAsync();
+        return true;
     }
 }

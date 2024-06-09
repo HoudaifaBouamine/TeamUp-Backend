@@ -1,6 +1,6 @@
 ﻿using Models;
 
-namespace Features.Projects.Contracts;
+namespace TeamUp.Features.Project;
 
 public interface IProjectRepository
 {
@@ -15,14 +15,14 @@ public interface IProjectRepository
     Task<bool> DeleteAsync(int id);
     Task<int> GetUsersCountAsync(int projectId);
     Task<IEnumerable<ProjecUserShortDto>> GetUsersSampleAsync(int projectId);
-    Task<ProjectDetailsReadDto> GetDetailsAsync(int projectId);
+    Task<ProjectDetailsReadDto?> GetDetailsAsync(int projectId);
 
     Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor);
 
     Task<GetProjectsListResponse2> GetListWithSearchAndPagination2Async (int? pageSize,int? pageNumber, string? SearchPattern);
     Task<GetProjectsListResponse4> GetListWithSearchAndPagination4Async (int? pageSize,int? pageNumber, string? searchPattern);
     Task<GetProjectsListResponse4> GetUsersProjectsListWithSearchAndPaginationAsync (Guid userId ,int? pageSize,int? pageNumber, string? searchPattern);
-
+    Task<bool> CheckMentor(Guid userId, int projectId);
 }
 
 #region V1
@@ -95,7 +95,7 @@ public record GetProjectsListResponse4
     int PageSize,
     bool IsPrevPageExist,
     bool IsNextPageExist,
-    IEnumerable<ProjectsController.ProjectDetailsReadDto> Projects
+    IEnumerable<TeamUp.Features.Project.ProjectsController.ProjectDetailsReadDto> Projects
 );
 
 public record GetProjectsListResponse2

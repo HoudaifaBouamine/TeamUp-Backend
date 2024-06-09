@@ -1,35 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
-using Features.Projects.Contracts;
-using Models;
 using Microsoft.EntityFrameworkCore;
-namespace Features.Projects;
+
+namespace TeamUp.Features.Project;
 
 [Tags("Projects Group")]
 [ApiVersion(1)]
 [Route("api/v{v:apiVersion}/projects")]
 [ApiController]
-public partial class ProjectsController : ControllerBase
+public partial class ProjectsController(IProjectRepository projectRepo) : ControllerBase;
+
+public partial class ProjectRepository(AppDbContext db) : IProjectRepository
 {
-    private readonly IProjectRepository _projectRepository;
-
-    public ProjectsController(IProjectRepository projectRepository)
-    {
-        _projectRepository = projectRepository;
-    }
-}
-
-public partial class ProjectRepository : IProjectRepository
-{
-    private readonly AppDbContext _context;
-
-    public ProjectRepository(AppDbContext context)
-    {
-        _context = context;
-    }
-
     #region Utils
-    private ProjectReadDto MapProjectToProjectReadDto(Project project)
+    private static ProjectReadDto MapProjectToProjectReadDto(Models.Project? project)
     {
         if (project == null)
             return null!;
@@ -56,7 +40,7 @@ public partial class ProjectRepository : IProjectRepository
 
     public async Task<int> GetUsersCountAsync(int projectId)
     {
-        return await _context.UsersProjects
+        return await db.UsersProjects
             .Where(pu => pu.ProjectId == projectId)
             .CountAsync();
     }
@@ -67,7 +51,7 @@ public partial class ProjectRepository : IProjectRepository
 
     public async Task<IEnumerable<ProjecUserShortDto>> GetUsersSampleAsync(int projectId)
     {
-        var users = await _context.UsersProjects
+        var users = await db.UsersProjects
             .Include(pu=>pu.User)
             .Where(pu => pu.ProjectId == projectId)
             .Take(3)
@@ -84,9 +68,9 @@ public partial class ProjectRepository : IProjectRepository
 
 
 
-    public async Task<ProjectDetailsReadDto> GetDetailsAsync(int projectId)
+    public async Task<ProjectDetailsReadDto?> GetDetailsAsync(int projectId)
     {
-        var project = await _context.Projects
+        var project = await db.Projects
             .Include(p => p.Users)
             .Include(p => p.ProjectsUsers)
             .Where(p => p.Id == projectId)

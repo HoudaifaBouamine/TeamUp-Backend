@@ -1,15 +1,12 @@
 using Asp.Versioning;
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Utils;
-using Project = Models.Project;
 
-namespace Features.Projects;
+namespace TeamUp.Features.Project;
 
-partial class ProjectsController
+public partial class ProjectsController
 {
     
     [HttpGet]
@@ -20,7 +17,7 @@ partial class ProjectsController
         [FromQuery] int? pageSize = 10,
         [FromQuery] int? pageNumber = 1)
     {
-        var projects = await _projectRepository
+        var projects = await projectRepo
             .GetListWithSearchAndPagination4Async(pageSize, pageNumber, searchPattern);
 
         return Ok(projects);
@@ -35,7 +32,7 @@ partial class ProjectsController
         [FromQuery] int? pageSize = 10,
         [FromQuery] int? pageNumber = 1)
     {
-        var projects = await _projectRepository
+        var projects = await projectRepo
             .GetListWithSearchAndPagination2Async(pageSize, pageNumber, searchPattern);
 
         return Ok(projects);
@@ -49,7 +46,7 @@ partial class ProjectsController
         [FromQuery] int? pageNumber,
         [FromQuery] string? searchPattern)
     {
-        var projects = await _projectRepository
+        var projects = await projectRepo
             .GetListWithSearchAndPaginationAsync(pageSize, pageNumber, searchPattern);
 
         return Ok(projects);
@@ -59,13 +56,13 @@ partial class ProjectsController
     [ApiVersion(2)]
     [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(GetProjectsListResponse))]
     private async Task<IActionResult> GetProjectsV2Async(
-        [FromQuery] int? PageSize,
-        [FromQuery] int? PageNumber,
-        [FromQuery] string? SearchPattern,
-        [FromQuery] string[]? TeamSizes)
+        [FromQuery] int? pageSize,
+        [FromQuery] int? pageNumber,
+        [FromQuery] string? searchPattern,
+        [FromQuery] string[]? teamSizes)
     {
-        var projects = await _projectRepository
-            .GetListWithFiltersAsync(PageSize, PageNumber, SearchPattern, TeamSizes, null, null);
+        var projects = await projectRepo
+            .GetListWithFiltersAsync(pageSize, pageNumber, searchPattern, teamSizes, null, null);
 
             return Ok(projects);
     }
@@ -79,7 +76,7 @@ partial class ProjectRepository
     {
         if(pageSize is null) pageNumber = null;
 
-        IQueryable<ProjectPost> projects = _context.ProjectPosts
+        IQueryable<ProjectPost> projects = db.ProjectPosts
             .Include(p=>p.Project)
             .Where(p=>p.Project != null);
 
@@ -90,7 +87,7 @@ partial class ProjectRepository
                 p.LearningGoals.ToLower().Contains(searchPattern.ToLower()) ||
                 p.TeamAndRols.ToLower().Contains(searchPattern.ToLower()));
 
-        int TotalCount = projects.Count();
+        var totalCount = projects.Count();
 
         if(pageSize is not null && pageNumber is not null)
             projects = projects
@@ -105,15 +102,15 @@ partial class ProjectRepository
             .Include(pp=>pp.Categories)
             .Include(pp=>pp.Project)
                 .ThenInclude(p=>p!.Users)
-            .Select(p => new ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
+            .Select(p => new TeamUp.Features.Project.ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
 
         return new GetProjectsListResponse4
         (
-            TotalCount : TotalCount,
+            TotalCount : totalCount,
             PageNumber : pageNumber??=1,
-            PageSize : pageSize??=TotalCount,
+            PageSize : pageSize??=totalCount,
             IsPrevPageExist : pageNumber > 1,
-            IsNextPageExist : pageNumber * pageSize < TotalCount, 
+            IsNextPageExist : pageNumber * pageSize < totalCount, 
             Projects: projectsDto
         );
 
@@ -133,7 +130,7 @@ partial class ProjectRepository
     {
         if(PageSize is null) PageNumber = null;
 
-        IQueryable<Project> projects = _context.Projects;
+        IQueryable<Models.Project> projects = db.Projects;
 
         if(SearchPattern is not null)
             projects = projects.Where(p=>
@@ -190,14 +187,14 @@ partial class ProjectRepository
     {
         if(pageSize is null) pageNumber = null;
 
-        IQueryable<Project> projects = _context.Projects;
+        IQueryable<Models.Project> projects = db.Projects;
 
         if(SearchPattern is not null)
             projects = projects.Where(p=>
                 p.Description.ToLower().Contains(SearchPattern.ToLower()) ||
                 p.Name.ToLower().Contains(SearchPattern.ToLower()));
 
-        int TotalCount = projects.Count();
+        var totalCount = projects.Count();
 
         if(pageSize is not null && pageNumber is not null)
             projects = projects
@@ -232,11 +229,11 @@ partial class ProjectRepository
 
         return new GetProjectsListResponse2
         (
-            TotalCount : TotalCount,
+            TotalCount : totalCount,
             PageNumber : pageNumber??=1,
-            PageSize : pageSize??=TotalCount,
+            PageSize : pageSize??=totalCount,
             IsPrevPageExist : pageNumber > 1,
-            IsNextPageExist : pageNumber * pageSize < TotalCount, 
+            IsNextPageExist : pageNumber * pageSize < totalCount, 
             Projects: projectsDto
         );
 
@@ -255,7 +252,7 @@ partial class ProjectRepository
     {
         if(PageSize is null) PageNumber = null;
 
-        IQueryable<Project> projects = _context.Projects;
+        IQueryable<Models.Project> projects = db.Projects;
 
         if(TeamSizes is not null)
         {        
@@ -268,7 +265,7 @@ partial class ProjectRepository
                 p.Description.ToLower().Contains(SearchPattern.ToLower()) ||
                 p.Name.ToLower().Contains(SearchPattern.ToLower()));
 
-        int TotalCount = projects.Count();
+        var totalCount = projects.Count();
 
         if(PageSize is not null && PageNumber is not null)
             projects = projects
@@ -298,11 +295,11 @@ partial class ProjectRepository
 
         return new GetProjectsListResponse
         (
-            TotalCount : TotalCount,
+            TotalCount : totalCount,
             PageNumber : PageNumber??=1,
-            PageSize : PageSize??=TotalCount,
+            PageSize : PageSize??=totalCount,
             IsPrevPageExist : PageNumber > 1,
-            IsNextPageExist : PageNumber * PageSize < TotalCount, 
+            IsNextPageExist : PageNumber * PageSize < totalCount, 
             Projects: projectsDto
         );
     }

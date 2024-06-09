@@ -1,16 +1,15 @@
 using System.Text.Json;
 using Asp.Versioning;
 using Authentication.UserManager;
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
-using Org.BouncyCastle.Tls;
 using Utils;
+using Project = Models.Project;
 
-namespace Features.Projects;
-partial class ProjectsController
+namespace TeamUp.Features.Project;
+
+public partial class ProjectsController
 {
     
     /// <summary>
@@ -33,7 +32,7 @@ partial class ProjectsController
         [FromServices] AppDbContext db
     )
     {
-        Project obj = null;
+        Models.Project obj = null;
         try
         {
             var user = await userManager.GetUserAsync(User);
