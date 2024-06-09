@@ -18,6 +18,8 @@ using Swashbuckle.AspNetCore.Filters;
 using Models;
 using Utils;
 using Repositories;
+using TeamUp.Features.Mentor;
+using TeamUp.Features.Notification;
 using TeamUp.Features.Project;
 
 var builder = WebApplication.CreateBuilder(args);

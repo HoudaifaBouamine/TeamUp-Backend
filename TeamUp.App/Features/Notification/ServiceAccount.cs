@@ -1,6 +1,6 @@
-namespace Features;
+namespace TeamUp.Features.Notification;
 
-public class ServiceAccount
+public static class ServiceAccount
 {
     public static object Key = new
     {

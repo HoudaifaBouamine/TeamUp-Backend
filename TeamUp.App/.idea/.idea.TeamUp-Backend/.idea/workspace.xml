@@ -9,13 +9,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee256155-8949-49f2-9605-870cd9fce037" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Features/Notification/ServiceAccount.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.TeamUp-Backend/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Mentor/MentorsEndpoints.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationEndpoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationEndpoint.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/FirebaseNotificationService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Features/Notification/ServiceAccount.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/Notification/ServiceAccount.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Features/ProjectPost/ProjectPostEndpoints.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TeamUp.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/TeamUp.App.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/Projects.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../TeamUp.Test/IntegrationTesting/Projects/Projects.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +48,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/781ebca67bd71532948352c2c24f8db410449e3c21f7191a17bf21348cd4fed4/SwaggerUIMiddleware.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c33dc61ee1f8ae72ddca822c7e1e5978d9ddda4d42dd69feaa07925886918/Faker[T].cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Features/Notification/FireBaseIntegration.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///home/houdaifa/projects/TeamUp-Backend/TeamUp.Test/IntegrationTesting/Projects/Projects.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -56,27 +59,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.TeamUp.App: http.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.TeamUp.App: http.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "refactoring",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache&quot;,
-      &quot;/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache&quot;,
-      &quot;/home/houdaifa/.local/share/Symbols/src&quot;
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [],
+    "rider.external.source.directories": [
+      "/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/DecompilerCache",
+      "/home/houdaifa/.config/JetBrains/Rider2024.1/resharper-host/SourcesCache",
+      "/home/houdaifa/.local/share/Symbols/src"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.TeamUp.App: http">
     <configuration name="TeamUp.App: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/TeamUp.App.csproj" />
@@ -142,6 +146,7 @@
       <workItem from="1717396134181" duration="5313000" />
       <workItem from="1717451145149" duration="372000" />
       <workItem from="1717616625948" duration="17844000" />
+      <workItem from="1717941012537" duration="5387000" />
     </task>
     <servers />
   </component>

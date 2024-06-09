@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using Serilog;
 
-namespace Features;
+namespace TeamUp.Features.Notification;
 
 public class FirebaseNotificationService : INotificationService
 {

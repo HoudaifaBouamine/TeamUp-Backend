@@ -1,8 +1,8 @@
 using Bogus;
-using Features.Projects;
-using Features.Projects.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using TeamUp.Features.Project;
+using ProjectRepository = TeamUp.Features.Project.ProjectRepository;
 
 public class ProjectsTest()
 {
