@@ -3,6 +3,7 @@ using Features;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using TeamUp.Features.Mentor;
 using Utils;
 
 namespace TeamUp.Features.Project;
