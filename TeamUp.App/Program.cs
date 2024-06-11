@@ -69,11 +69,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
     // if(builder.Environment.IsDevelopment())
-        // options.UseInMemoryDatabase("TeamUpDb");
+    // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));                           
-    
-    // options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    //options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));                           
+
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 
@@ -245,5 +245,5 @@ app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
 
-app.Run();
+app.Run("https://localhost:7000");
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
