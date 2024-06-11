@@ -374,3 +374,6 @@ Migrations/*
 
 TeamUp.App/Features/Notification/ServiceAccount.json
 
+# sqlite tmp files
+*/*.db-shm
+*/*.db-wal
