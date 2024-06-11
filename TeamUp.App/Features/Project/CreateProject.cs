@@ -1,16 +1,14 @@
-using System.Text.Json;
-using Asp.Versioning;
 using Authentication.UserManager;
-using Features.Projects.Contracts;
+using Features;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Models;
-using Org.BouncyCastle.Tls;
+using TeamUp.Features.Mentor;
 using Utils;
 
-namespace Features.Projects;
-partial class ProjectsController
+namespace TeamUp.Features.Project;
+
+public partial class ProjectsController
 {
     [HttpPost]
     [Authorize]
@@ -30,7 +28,7 @@ partial class ProjectsController
         if (user.EmailConfirmed is false)
             return BadRequest(new ErrorResponse("User email is not confirmed"));
 
-        var projectId = await _projectRepository.CreateAsync(projectDto,user);
+        var projectId = await projectRepo.CreateAsync(projectDto,user);
 
         var projectReadDto = new ProjectReadDto
         (
@@ -97,7 +95,7 @@ partial class ProjectRepository
     /// <returns>Project Id</returns>
     public async Task<int> CreateAsync(ProjectCreateDto projectDto,User user)
     {
-        var project = Project.Create
+        var project = Models.Project.Create
         (
             name : projectDto.Name,
             description : projectDto.Description,
@@ -105,9 +103,9 @@ partial class ProjectRepository
             creator : user
         );
 
-        _context.Projects.Add(project);
+        db.Projects.Add(project);
 
-        await _context.SaveChangesAsync();
+        await db.SaveChangesAsync();
         return project.Id;
     }
     

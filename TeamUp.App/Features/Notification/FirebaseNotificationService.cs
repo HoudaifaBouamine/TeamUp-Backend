@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Serilog;
 
-namespace Features;
+namespace TeamUp.Features.Notification;
 
 public class FirebaseNotificationService : INotificationService
 {
@@ -9,11 +11,19 @@ public class FirebaseNotificationService : INotificationService
     {
         var title = data.senderName;
         var body = data.message;
-
+        
         var session = await db.FireBaseNotificationSessions.FirstOrDefaultAsync(s => s.UserId == user.Id);
+
+        var ow = JsonSerializer.Serialize(db.FireBaseNotificationSessions.ToList());
+        Log.Error($"FireBaseNotificationSessions : {ow}");
+        Log.Error($"session : {session}");
+        
         if (session is null) return false;
         
         var sent = await FireBaseNotification.SendMessageAsync(session.SessionToken,title,body,data);
+        
+        Log.Error($"sent : {sent}");
+
         return sent;
     }
 }
@@ -25,6 +35,7 @@ public interface INotificationService
 
 public record JoinRequestNotificationData
 {
+    public string requestId { get; set; }
     public Guid senderId { get; set; }
     public string senderName { get; set; }
     public string senderPicture { get; set; }
@@ -39,6 +50,7 @@ public record JoinRequestNotificationData
 
     public JoinRequestNotificationData(ProjectJoinRequest joinRequest)
     {
+        requestId = joinRequest.Id.ToString();
         senderId = joinRequest.User.Id;
         senderName = joinRequest.User.DisplayName;
         senderPicture = joinRequest.User.ProfilePicture;

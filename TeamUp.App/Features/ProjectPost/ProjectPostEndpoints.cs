@@ -1,16 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Asp.Versioning;
-using Features.Projects;
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Newtonsoft.Json;
+using Serilog;
+using TeamUp.Features.Mentor;
+using TeamUp.Features.Notification;
 using Users;
 using Utils;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Features;
 
@@ -159,9 +158,10 @@ public class ProjectPostEndpoints(AppDbContext db, UserManager<User> userManager
         try
         {
             
-            await notificationService.SendJoinRequestNotification
+            var success = await notificationService.SendJoinRequestNotification
                 (db,currentUser,new JoinRequestNotificationData(joinRequestASNotification));
             
+            Log.Error($"success : {success}");
         }
         catch (Exception e)
         {

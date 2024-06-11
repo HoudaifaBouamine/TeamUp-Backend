@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Bogus;
 using Configuration;
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using TeamUp.Features.Project;
 
 namespace EndpointsManager
 {

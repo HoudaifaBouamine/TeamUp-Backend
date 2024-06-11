@@ -1,7 +1,4 @@
-using System.Net.Http.Headers;
 using System.Reflection;
-using System.Security.Policy;
-using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
@@ -20,10 +17,10 @@ using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using Models;
 using Utils;
-using Features.Projects.Contracts;
-using Features.Projects;
-using Microsoft.AspNetCore.Http.Extensions;
 using Repositories;
+using TeamUp.Features.Mentor;
+using TeamUp.Features.Notification;
+using TeamUp.Features.Project;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -231,7 +228,8 @@ app.MapGet("sendNotification",async (string token,string title,string body) =>
         senderId = Guid.NewGuid(),
         projectTitle = "TeamUp",
         senderName = "Houdaifa Bouamine",
-        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg"
+        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg",
+        requestId = "1"
     };
     await FireBaseNotification.SendMessageAsync(token,title,body,data);
 });

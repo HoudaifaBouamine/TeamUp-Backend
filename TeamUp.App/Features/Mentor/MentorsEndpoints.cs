@@ -4,33 +4,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
-namespace Features;
+namespace TeamUp.Features.Mentor;
 
 
 [Tags("Mentors Group")]
 [ApiVersion(1)]
 [Route("api/v{v:apiVersion}/mentors")]
 [ApiController]
-public class MentorsEndpoints : ControllerBase
+
+public class MentorsEndpoints(
+    [FromServices] IMentorRepository mentorRepository,
+    [FromServices] UserManager<User> userManager) : ControllerBase
 {
 
-    private readonly IMentorRepository repo;
-    private readonly UserManager<User> userManager;
-    public MentorsEndpoints([FromServices] IMentorRepository mentorRepository,UserManager<User> userManager) 
-    {
-        repo = mentorRepository;
-        this.userManager = userManager;
-    }
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetMentorsDetailsListResponse))]
     public async Task<IResult> GetMentorsAsync(
-        [FromQuery] string? pearchPattern,
+        [FromQuery] string? searchPattern,
         [FromQuery] int? pageSize = 10,
         [FromQuery] int? pageNumber = 1)
     {
         var user = await userManager.GetUserAsync(User);
         if (user is null) return Results.Unauthorized();
-        var mentors = await repo.GetMentorsAsync(user,pearchPattern!, pageSize!.Value, pageNumber!.Value);
+        var mentors = await mentorRepository.GetMentorsAsync(user,searchPattern!, pageSize!.Value, pageNumber!.Value);
         return Results.Ok(mentors);
     }
 }

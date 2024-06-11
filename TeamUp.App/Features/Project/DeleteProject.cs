@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Features.Projects;
-partial class ProjectsController
+namespace TeamUp.Features.Project;
+
+public partial class ProjectsController
 {
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteProjectAsync(int id)
     {
-
-        var success = await _projectRepository.DeleteAsync(id);
+        var success = await projectRepo.DeleteAsync(id);
         
         if(success) return NoContent();
 
@@ -21,13 +21,13 @@ partial class ProjectRepository
 {
     public async Task<bool> DeleteAsync(int id)
     {
-        var project = await _context.Projects.FindAsync(id);
+        var project = await db.Projects.FindAsync(id);
         
         if (project is null)
             return false;
 
-        _context.Projects.Remove(project);
-        await _context.SaveChangesAsync();
+        db.Projects.Remove(project);
+        await db.SaveChangesAsync();
 
         return true;
     }

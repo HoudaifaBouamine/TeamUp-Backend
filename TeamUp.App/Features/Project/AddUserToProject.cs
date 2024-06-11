@@ -1,82 +1,71 @@
-using Features.Projects.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Utils;
 
-namespace Features.Projects;
-partial class ProjectsController
+namespace TeamUp.Features.Project;
+
+public partial class ProjectsController
 {
-    [HttpGet("{id}/AddUser/{user_id}")]
+    [Authorize]
+    [HttpGet("{projectId:int}/AddUser/{userId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK,Type = typeof(ProjectDetailsReadDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddUserToProjectAsync(int id,Guid user_id,[FromQuery] bool isMentor = false)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> AddUserToProjectAsync(int projectId,Guid userId,[FromQuery] bool isMentor = false)
     {
-        var isAddedSuccessfuly = await _projectRepository.AddUserToProjectAsync(id, user_id,isMentor);
-        if(isAddedSuccessfuly)
-        {
+        if (!await projectRepo.CheckMentor(userId, projectId)) 
+            return Forbid();
+        
+        if (await projectRepo.AddUserToProjectAsync(projectId, userId, isMentor))
             return Ok();
-        }
-        else
-        {
-            return BadRequest();
-        }
+
+        Log.Error("This should not happen");
+        return BadRequest(new ErrorResponse("This should not happen"));
     }
 }
 
 
 partial class ProjectRepository
 {
+    /// <summary>
+    /// Check if the user is mentor in a specified project
+    /// </summary>
+    /// <param name="userId">user id to check</param>
+    /// <param name="projectId"></param>
+    /// <returns>true if user is mentor, otherwise return false</returns>
+    public async Task<bool> CheckMentor(Guid userId, int projectId)
+    {
+        return await db.UsersProjects
+            .Where(p =>
+                p.UserId == userId
+                &&
+                p.ProjectId == projectId
+                &&
+                p.IsMentor == true)
+            .AnyAsync();
+    }
+
     public async Task<bool> AddUserToProjectAsync(int projectId, Guid userId, bool isMentor)
     {
-        var project = await _context.Projects
+        var project = await db.Projects
             .Include(p => p.ProjectsUsers)
             .FirstOrDefaultAsync(p => p.Id == projectId);
 
-        if(project is null) return false;
-
-       
-        var user = await _context.Users
+        if (project is null) return false;
+        
+        var user = await db.Users
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user is null)
             return false;
-
+        
         project.AddUser(user, isMentor);
 
-        await _context.SaveChangesAsync();
-    
-        return true;    
+        await db.SaveChangesAsync();
+
+        return true;
     }
-
-    /// <summary>
-    /// Add list of users to a project, returning the number of users added successfuly
-    /// </summary>
-    /// <param name="projectId"></param>
-    /// <param name="userIds"></param>
-    /// <returns></returns> <summary>
-    /// 
-    /// </summary>
-    /// <param name="projectId"></param>
-    /// <param name="userIds"></param>
-    /// <returns></returns>
-    public async Task<int> AddUsersToProjectAsync(int projectId, List<Guid> userIds)
-    {
-        var project = await _context.Projects
-            .Include(p => p.Users)
-            .FirstOrDefaultAsync(p => p.Id == projectId);
-
-        if(project is null) return -1;
-
-        var users = await _context.Users
-            .Where(u => userIds.Contains(u.Id))
-            .ToListAsync();
-
-        var prevUsersCount = project.Users.DistinctBy(u=>u.Id).Count();
-        project.AddUsers(users);
-
-        await _context.SaveChangesAsync();
-        
-        return project.TeamSize - prevUsersCount;
-    }
-
 }

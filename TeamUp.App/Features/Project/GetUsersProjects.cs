@@ -1,17 +1,13 @@
 using Asp.Versioning;
-using Features.Projects.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Utils;
-using Project = Models.Project;
 
-namespace Features.Projects;
+namespace TeamUp.Features.Project;
 
-partial class ProjectsController
+public partial class ProjectsController
 {
     
     [HttpGet("for-user")]
@@ -23,7 +19,7 @@ partial class ProjectsController
         [FromQuery] int? pageSize = 10,
         [FromQuery] int? pageNumber = 1)
     {
-        GetProjectsListResponse4 projects = await _projectRepository
+        GetProjectsListResponse4 projects = await projectRepo
             .GetUsersProjectsListWithSearchAndPaginationAsync(userId,pageSize, pageNumber, searchPattern);
 
         return Ok(projects);
@@ -41,7 +37,7 @@ partial class ProjectsController
     {
         Guid userId = Guid.Parse(userManager.GetUserId(User)!);
         
-        GetProjectsListResponse4 projects = await _projectRepository
+        GetProjectsListResponse4 projects = await projectRepo
             .GetUsersProjectsListWithSearchAndPaginationAsync(userId,pageSize, pageNumber, searchPattern);
 
         return Ok(projects);
@@ -55,7 +51,7 @@ public partial class ProjectRepository
     {
         if (pageSize is null) pageNumber = null;
 
-        IQueryable<ProjectPost> projects = _context.ProjectPosts
+        IQueryable<ProjectPost> projects = db.ProjectPosts
             .Include(pp => pp.Project)
                 .ThenInclude(p=>p!.ProjectsUsers)
             .Where(pp => pp.Project != null)
@@ -83,7 +79,7 @@ public partial class ProjectRepository
             .Include(pp => pp.Categories)
             .Include(pp => pp.Project)
             .ThenInclude(p => p!.Users)
-            .Select(p => new ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
+            .Select(p => new TeamUp.Features.Project.ProjectsController.ProjectDetailsReadDto(p)).ToListAsync();
 
         return new GetProjectsListResponse4
         (
