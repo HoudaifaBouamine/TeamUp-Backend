@@ -17,18 +17,18 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         {
             b.HasOne<User>().WithMany().HasForeignKey(s => s.UserId);
         });
-        
+
         builder.Entity<UserPicture>(b =>
         {
             b.Property(x => x.PictureDataId).IsRequired();
-            b.HasOne<Picture>().WithMany().HasForeignKey(o=>o.PictureDataId).IsRequired();
+            b.HasOne<Picture>().WithMany().HasForeignKey(o => o.PictureDataId).IsRequired();
             b.HasOne<User>().WithMany().HasForeignKey(o => o.UserId).IsRequired();
         });
-        
+
         builder.Entity<Project>()
             .HasOne(p => p.ChatRoom)
             .WithOne(ch => ch.Project)
-            .HasForeignKey<Project>("ChatRoom_Id");
+            .HasForeignKey<Project>(p=>p.ChatRoomId);
 
         builder.Entity<UsersProject>()
             .HasOne(up => up.User)
@@ -54,6 +54,17 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
                     .HasForeignKey(up => up.UserId)
             );
 
+        builder.Entity<Message>(m =>
+        {
+            m.HasOne<ChatRoom>()
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ChatRoomId);
+
+            m.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(m=>m.UserId);
+        });
+
         base.OnModelCreating(builder);
     }
 
@@ -63,6 +74,8 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<ProjectJoinRequest> ProjectJoinRequests { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<ChatRoom> ChatRooms { get; set; }
+    public DbSet<Message> Messages { get; set; }
+
     public DbSet<UsersProject> UsersProjects { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Skill> Skills { get; set; }

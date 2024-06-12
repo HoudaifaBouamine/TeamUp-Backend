@@ -11,7 +11,8 @@ public partial class Project
     public string Description { get; set; } = string.Empty ;
     public DateOnly StartDate { get; set;}
     public DateOnly? EndDate { get; set;} = null;
-    public ChatRoom ChatRoom { get; set;} = null!;
+    [Required] public ChatRoom ChatRoom { get; private init;} = null!;
+    [Required] public Guid ChatRoomId { get; private init; } = null!;
     public int TeamSize { get; private set; } = 0;
 
     public int ProjectPostId { get; init;}

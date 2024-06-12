@@ -50,6 +50,8 @@ public partial class User : IdentityUser<Guid>
     public ICollection<Category> Categories { get; set; } = [];
 
     public bool IsMentor { get; private set; } = false;
+
+    public bool IsConnected = false;
 }
 
 

@@ -1,4 +1,6 @@
-partial class ChatEndpoints
+
+namespace TeamUp.Features.Chat;
+partial class ChatHub
 {
     
 }

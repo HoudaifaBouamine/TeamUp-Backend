@@ -6,14 +6,22 @@ namespace Models;
 [Table("Messages")]
 public class Message
 {
-    public int Id { get; set; }
-    public string Text { get; set; } = string.Empty; 
-    public DateTime DateTime { get; set; }
 
-    [Required]
-    public required ChatRoom ChatRoomId { get; set; }
+    [Key] public int Id { get; set; }
+    [MinLength(1)] public string Text { get; set; } = string.Empty; 
+    public DateTime SendTime { get; set; }
+    [Required] public Guid ChatRoomId { get; set; }
+    [Required] public Guid UserId { get; set; }
+    public bool IsPinned { get; set; }
+
+    protected Message() { }
     
-    public required User UserID { get; set; }
-    public bool pinned { get; set; } 
-
+    public Message(Guid chatRoom, Guid userId, string text)
+    {
+        this.ChatRoomId = chatRoom;
+        this.UserId = userId;
+        this.Text = text;
+        this.IsPinned = false;
+        this.SendTime = DateTime.UtcNow;
+    }
 }
