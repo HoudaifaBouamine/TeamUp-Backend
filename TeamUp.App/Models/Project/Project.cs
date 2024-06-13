@@ -12,7 +12,7 @@ public partial class Project
     public DateOnly StartDate { get; set;}
     public DateOnly? EndDate { get; set;} = null;
     [Required] public ChatRoom ChatRoom { get; private init;} = null!;
-    [Required] public Guid ChatRoomId { get; private init; } = null!;
+    [Required] public Guid ChatRoomId { get; private init; }
     public int TeamSize { get; private set; } = 0;
 
     public int ProjectPostId { get; init;}

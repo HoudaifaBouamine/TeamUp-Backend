@@ -4,15 +4,23 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Serilog;
+using SignalRSwaggerGen.Attributes;
 using System.Collections.Concurrent;
 
 namespace TeamUp.Features.Chat;
 
+[SignalRHub("/chat")]
 internal partial class ChatHub (AppDbContext db, UserManager<User> userManager) : Hub
 {
 
     private static ConcurrentDictionary<string,Guid> UsersIds = new();
 
+
+    [SignalRMethod("Hi")]
+    public async Task Hi(string name)
+    {
+        await Clients.All.SendAsync($"Hi {name}");
+    }
     public async Task<bool> SendRoomMessage(Guid roomId, string message)
     {
         var userId = UsersIds.GetValueOrDefault(Context.ConnectionId);

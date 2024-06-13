@@ -21,6 +21,7 @@ using Repositories;
 using TeamUp.Features.Mentor;
 using TeamUp.Features.Notification;
 using TeamUp.Features.Project;
+using TeamUp.Features.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,13 +39,13 @@ builder.Services.AddSwaggerGen(options=>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
     
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.AddSignalRSwaggerGen();
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-
 });
 
 builder.Services.AddApiVersioning(options=>
 {
-    options.DefaultApiVersion = new ApiVersion(1);
+    options.DefaultApiVersion = new ApiVersion(4);
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 })
 .AddApiExplorer(options=>
@@ -116,6 +117,7 @@ builder.Services.AddRateLimiter(options=>
         ));             
 });
 
+builder.Services.AddSignalR();
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -240,10 +242,16 @@ app.UseHttpsRedirection();
 app.UseRateLimiter();
 
 
+var apiVersionSet = app.NewApiVersionSet()
+                .HasApiVersion(new ApiVersion(1))
+                .ReportApiVersions()
+                .Build();
+
+app.MapHub<ChatHub>("/chat").WithTags("Chat Group").WithApiVersionSet(apiVersionSet).HasApiVersion(1);
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
 
-app.Run("https://localhost:7000");
+app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
