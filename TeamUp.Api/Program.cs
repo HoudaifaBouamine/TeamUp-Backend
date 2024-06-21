@@ -40,12 +40,11 @@ builder.Services.AddSwaggerGen(options=>
     
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-
 });
 
 builder.Services.AddApiVersioning(options=>
 {
-    options.DefaultApiVersion = new ApiVersion(1);
+    options.DefaultApiVersion = new ApiVersion(4);
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 })
 .AddApiExplorer(options=>
@@ -241,11 +240,10 @@ app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
-
+app.MapHub<ChatHub>("/chat");
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
 app.MapControllers();
-app.MapHub<ChatHub>("/chatHub");
 app.UseSwaggerDocs();
 
 app.Run();
