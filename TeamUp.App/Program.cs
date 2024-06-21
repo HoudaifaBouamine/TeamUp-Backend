@@ -241,13 +241,7 @@ app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
-
-var apiVersionSet = app.NewApiVersionSet()
-                .HasApiVersion(new ApiVersion(1))
-                .ReportApiVersions()
-                .Build();
-
-app.MapHub<ChatHub>("/chat").WithTags("Chat Group").WithApiVersionSet(apiVersionSet).HasApiVersion(1);
+app.MapHub<ChatHub>("/chat");
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
 app.MapControllers();
