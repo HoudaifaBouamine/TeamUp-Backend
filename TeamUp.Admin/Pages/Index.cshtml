@@ -1,0 +1,62 @@
+@page
+@using TeamUp.Admin.Models.EF
+
+<h2 class="content-block">Home</h2>
+
+@(
+Html.DevExtreme().DataGrid<TeamUp.Admin.Models.EF.AspNetUser>()
+    .ColumnMinWidth(10)
+    .ColumnAutoWidth(true)
+    .CacheEnabled(true)
+    .FilterRow(a=> a.Visible(true))
+    .HeaderFilter(b=>b.Visible(false))
+    .Grouping(c=>c.ContextMenuEnabled(true))
+    .Paging(p => p.PageSize(10))
+    .Pager(p => p
+
+        .ShowPageSizeSelector(true)
+        .AllowedPageSizes(new[] { 5, 10, 15 })
+        .ShowInfo(true)
+    )
+    .Sorting(c=>c.Mode(GridSortingMode.Multiple))
+    .DataSource(ds => ds.Mvc()
+        .Controller("Users")
+        .LoadAction("Get")
+        .UpdateAction("Put")
+        .Key("Id")
+    )
+    .RemoteOperations(true)
+    .Editing(e => e
+            .AllowUpdating(true)
+        )
+    .AllowColumnResizing(true)
+    .Columns(columns => {
+
+        columns.AddFor(m => m.DisplayName)
+            .AllowHeaderFiltering(false)
+            .AllowSearch(true);
+
+        columns.AddFor(m => m.Email)
+            .AllowSearch(true)
+            .AllowHeaderFiltering(false)
+            .AllowEditing(false);
+
+        columns.AddFor(m => m.Handler)
+            .AllowSearch(true)
+            .AllowHeaderFiltering(false)
+            .Width(400);
+
+        columns.AddFor(m => m.IsMentor)
+            .MinWidth(110)
+            .Width(110);
+
+        columns.AddFor(m => m.Rate)
+            .AllowEditing(false);
+
+
+        columns.AddFor(m => m.EmailConfirmed)
+            .MinWidth(150)
+            .Width(150)
+            .AllowEditing(false);
+    })
+)
