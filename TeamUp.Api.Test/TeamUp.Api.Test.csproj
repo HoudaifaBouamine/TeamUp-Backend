@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamUp.App\TeamUp.Api.csproj" />
+    <ProjectReference Include="..\TeamUp.Api\TeamUp.Api.csproj" />
   </ItemGroup>
 
 </Project>
