@@ -22,6 +22,9 @@ using TeamUp.Features.Mentor;
 using TeamUp.Features.Notification;
 using TeamUp.Features.Project;
 using TeamUp.Features.Chat;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
+const enEnv env = enEnv.Production;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +74,13 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
     // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
+
+    //options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
+
+    if(env == enEnv.Production)
+        options.UseNpgsql(builder.Configuration.GetConnectionString("ProductionConnection"));
+    if (env == enEnv.Development)
+        options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
 
     //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -173,67 +182,59 @@ app.Use(async (ctx,next)=>
     catch(Exception ex)
     {
         ctx.Response.StatusCode = 500;
-        await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
+        if (env == enEnv.Development)
+            await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
+        else
+            Log.Error(JsonSerializer.Serialize(new ErrorResponse(ex.Message)));
     } 
 });
 
-app.Use(async (ctx, next) =>
+if (env == enEnv.Development)
 {
-
-    using (var scope = app.Services.CreateScope())
+    // seeding testing data
+    app.Use(async (ctx, next) =>
     {
 
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        
-        if (!await db.Users.AnyAsync())
+        using (var scope = app.Services.CreateScope())
         {
 
-            await AddTestingAccountsAsync(db, scope.ServiceProvider);
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            await DataSeeder.SeedCaterogyData(db);
-            await DataSeeder.SeedSkillsData(db);
-            await DataSeeder.SeedUsersData(db);
-            await DataSeeder.SeedProjectPostData(db);
+            if (!await db.Users.AnyAsync())
+            {
+
+                await AddTestingAccountsAsync(db, scope.ServiceProvider);
+
+                await DataSeeder.SeedCaterogyData(db);
+                await DataSeeder.SeedSkillsData(db);
+                await DataSeeder.SeedUsersData(db);
+                await DataSeeder.SeedProjectPostData(db);
+            }
         }
-    }
 
-    async Task  AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
-    {
-        var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
+        async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
 
-        var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
+            var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
 
-        var dto = new AuthEndpoints.UserRegisterRequestDto
-            ("string", "string@gmail.com", "stringstring");
+            var dto = new AuthEndpoints.UserRegisterRequestDto
+                ("string", "string@gmail.com", "stringstring");
 
-        await authEndpoints.RegisterAsync(dto, userManager);
+            await authEndpoints.RegisterAsync(dto, userManager);
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
-        user.SetAsMentor();
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
+            user.SetAsMentor();
 
-        await db.SaveChangesAsync();
-        
-        Log.Debug("User : " + JsonSerializer.Serialize(user));
-    
-    }
-    
-    await next();
-});
+            await db.SaveChangesAsync();
 
-app.MapGet("sendNotification",async (string token,string title,string body) =>
-{
-    var data = new JoinRequestNotificationData
-    {
-        message = "Please let me join your project !!!",
-        projectId = "1",
-        senderId = Guid.NewGuid(),
-        projectTitle = "TeamUp",
-        senderName = "Houdaifa Bouamine",
-        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg",
-        requestId = "1"
-    };
-    await FireBaseNotification.SendMessageAsync(token,title,body,data);
-});
+            Log.Debug("User : " + JsonSerializer.Serialize(user));
+
+        }
+
+        await next();
+    });
+}
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
@@ -248,5 +249,6 @@ app.UseSwaggerDocs();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
+enum enEnv { Production, Development }
 
 public partial class Program;
