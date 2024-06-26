@@ -2,7 +2,7 @@ name: Build and deploy .NET Core application to Web App TeamUp-Backend
 on:
   push:
     branches:
-    - main
+    - production
 env:
   AZURE_WEBAPP_NAME: TeamUp-Backend
   AZURE_WEBAPP_PACKAGE_PATH: TeamUp.Api/publish
