@@ -1,10 +1,10 @@
-name: Build and deploy production app
+name: Build and deploy .NET Core application to Web App TeamUp-Backend-Development
 on:
   push:
     branches:
-    - production
+    - development
 env:
-  AZURE_WEBAPP_NAME: TeamUp-Backend
+  AZURE_WEBAPP_NAME: TeamUp-Backend-Development
   AZURE_WEBAPP_PACKAGE_PATH: TeamUp.Api/publish
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
@@ -44,5 +44,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.TeamUp_Backend_6768 }}
+        publish-profile: ${{ secrets.TeamUp_Backend_Development_59E1 }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

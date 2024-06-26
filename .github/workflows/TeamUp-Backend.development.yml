@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Web App TeamUp-Production
+name: Build and deploy development app
 on:
   push:
     branches:
