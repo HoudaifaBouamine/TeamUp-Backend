@@ -28,6 +28,8 @@ const enEnv env = enEnv.Production;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Console.WriteLine(args[0]);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options=>
 {
@@ -74,14 +76,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
     // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-
-    //options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
-
-    if(env == enEnv.Production)
-        options.UseNpgsql(builder.Configuration.GetConnectionString("ProductionConnection"));
-    if (env == enEnv.Development)
-        options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
-
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
     //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -195,46 +190,55 @@ if (env == enEnv.Development)
     app.Use(async (ctx, next) =>
     {
 
-        using (var scope = app.Services.CreateScope())
+    using (var scope = app.Services.CreateScope())
+    {
+
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        
+        if (!await db.Users.AnyAsync())
         {
 
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            //await AddTestingAccountsAsync(db, scope.ServiceProvider);
 
-            if (!await db.Users.AnyAsync())
-            {
-
-                await AddTestingAccountsAsync(db, scope.ServiceProvider);
-
-                await DataSeeder.SeedCaterogyData(db);
-                await DataSeeder.SeedSkillsData(db);
-                await DataSeeder.SeedUsersData(db);
-                await DataSeeder.SeedProjectPostData(db);
-            }
+            await DataSeeder.SeedCaterogyData(db);
+            await DataSeeder.SeedSkillsData(db);
+            await DataSeeder.SeedUsersData(db);
+            await DataSeeder.SeedProjectPostData(db);
         }
+    }
 
-        async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
-        {
-            var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
+    async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
+    {
+        var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
 
-            var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
+        var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
 
-            var dto = new AuthEndpoints.UserRegisterRequestDto
-                ("string", "string@gmail.com", "stringstring");
+        var dto = new AuthEndpoints.UserRegisterRequestDto
+            ("string", "string@gmail.com", "stringstring");
 
-            await authEndpoints.RegisterAsync(dto, userManager);
+        var admindto = new AuthEndpoints.UserRegisterRequestDto
+            ("admin", "admin@teamup.com", "adminadmin");
 
-            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
-            user.SetAsMentor();
+        await authEndpoints.RegisterAsync(dto, userManager);
 
-            await db.SaveChangesAsync();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
+        user?.SetAsMentor();
 
-            Log.Debug("User : " + JsonSerializer.Serialize(user));
+        await authEndpoints.RegisterAsync(admindto, userManager);
 
-        }
+        var admin = await db.Users.FirstOrDefaultAsync(u => u.Email == "admin@teamup.com");
+        admin?.SetAsMentor();
 
-        await next();
-    });
-}
+        await db.SaveChangesAsync();
+        
+        Log.Debug("User  : " + JsonSerializer.Serialize(user));
+        Log.Debug("Admin : " + JsonSerializer.Serialize(user));
+
+    }
+    
+    await next();
+});
+
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();

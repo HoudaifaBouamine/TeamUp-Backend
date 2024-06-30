@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using TeamUp.Admin.Controllers;
 using TeamUp.Admin.Models.EF;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +9,7 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 builder.Services.AddDbContext<AppDbContext>(op=>op.UseNpgsql(
-    builder.Configuration.GetConnectionString("PostgresConnection")));
+    builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection")));
 
 var app = builder.Build();
 

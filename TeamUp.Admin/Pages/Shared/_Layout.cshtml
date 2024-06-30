@@ -119,16 +119,16 @@
                 .Items(items =>
                 {
                     items.Add()
-                        .Text("Home")
+                        .Text("Users")
                         .Icon("home")
                         .Option("path", GetUrl("/Index"))
                         .Selected(IsCurrentUrl("/Index"));
 
                     items.Add()
-                        .Text("About")
-                        .Icon("info")
-                        .Option("path", GetUrl("/About"))
-                        .Selected(IsCurrentUrl("/About"));
+                    .Text("Projects Posts")
+                    .Icon("info")
+                    .Option("path", GetUrl("/ProjectsPosts"))
+                    .Selected(IsCurrentUrl("/ProjectsPosts"));
                 })
                 .ExpandEvent(TreeViewExpandEvent.Click)
                 .SelectionMode(NavSelectionMode.Single)
