@@ -1,7 +1,7 @@
 @page
 @using TeamUp.Admin.Models.EF
 
-<h2 class="content-block">Home</h2>
+<h2 class="content-block">Users</h2>
 
 @(
 Html.DevExtreme().DataGrid<TeamUp.Admin.Models.EF.AspNetUser>()
@@ -30,6 +30,7 @@ Html.DevExtreme().DataGrid<TeamUp.Admin.Models.EF.AspNetUser>()
             .AllowUpdating(true)
         )
     .AllowColumnResizing(true)
+    .ShowColumnLines(true)
     .Columns(columns => {
 
         columns.AddFor(m => m.DisplayName)

@@ -23,11 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <ProjectReference Include="..\TeamUp.Api\TeamUp.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeamUp.Api\TeamUp.Api.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

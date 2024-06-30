@@ -6,6 +6,7 @@ namespace Models;
 
 public partial class ProjectPost
 {
+    [Key]
     public int Id { get; init; }
     public DateTime PostingTime { get; set; }
     public string Title { get; set; } = string.Empty;
