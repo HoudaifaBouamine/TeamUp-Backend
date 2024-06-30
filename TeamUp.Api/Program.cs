@@ -1,4 +1,4 @@
-using System.Reflection;
+connusing System.Reflection;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Asp.Versioning;
@@ -23,12 +23,39 @@ using TeamUp.Features.Notification;
 using TeamUp.Features.Project;
 using TeamUp.Features.Chat;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Azure.Identity;
+using Microsoft.Extensions.Options;
 
 const enEnv env = enEnv.Production;
 
+if (!args.Any()) return;
+
+string AzureConfigConnectionString = args[0];
+Console.WriteLine("connection : " + AzureConfigConnectionString);
+
 var builder = WebApplication.CreateBuilder(args);
 
-//Console.WriteLine(args[0]);
+builder.Host.ConfigureAppConfiguration(options =>
+{
+    options.AddAzureAppConfiguration(op =>
+    {
+        op.Connect(AzureConfigConnectionString);
+        op.ConfigureKeyVault(kv =>
+        {
+            kv.SetCredential(new DefaultAzureCredential());
+            kv.SetSecretRefreshInterval(TimeSpan.FromSeconds(15));
+        }).ConfigureRefresh(conf=>
+        {
+            conf.Register("ConnectionStrings:ProductionConnection")
+                .SetCacheExpiration(TimeSpan.FromSeconds(15));
+
+            conf.Register("ConnectionStrings:DevelopmentConnection")
+                .SetCacheExpiration(TimeSpan.FromSeconds(15));
+        });
+    });
+});
+
+builder.Services.AddAzureAppConfiguration();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options=>
@@ -73,11 +100,14 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
-    // if(builder.Environment.IsDevelopment())
-    // options.UseInMemoryDatabase("TeamUpDb");
-    // else if(builder.Environment.IsProduction())
-    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
-    //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    if(env == enEnv.LocalDevelopment)
+        options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
+
+    if (env == enEnv.LocalDevelopment)
+        options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DevelopemntConnection"));
+
+    if (env == enEnv.Production)
+        options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:ProductionConnection"));
 });
 
 
@@ -148,6 +178,8 @@ builder.Services.AddScoped<INotificationService,FirebaseNotificationService>();
 
 var app = builder.Build();
 
+app.UseAzureAppConfiguration();
+
 // Handmade Global logging
 app.Use((ctx,next)=>
 {
@@ -177,68 +209,68 @@ app.Use(async (ctx,next)=>
     catch(Exception ex)
     {
         ctx.Response.StatusCode = 500;
-        if (env == enEnv.Development)
+        if (env != enEnv.Production)
             await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
         else
             Log.Error(JsonSerializer.Serialize(new ErrorResponse(ex.Message)));
     } 
 });
 
-if (env == enEnv.Development)
+if (env != enEnv.Production)
 {
     // seeding testing data
     app.Use(async (ctx, next) =>
     {
 
-    using (var scope = app.Services.CreateScope())
-    {
-
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        
-        if (!await db.Users.AnyAsync())
+        using (var scope = app.Services.CreateScope())
         {
 
-            //await AddTestingAccountsAsync(db, scope.ServiceProvider);
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            await DataSeeder.SeedCaterogyData(db);
-            await DataSeeder.SeedSkillsData(db);
-            await DataSeeder.SeedUsersData(db);
-            await DataSeeder.SeedProjectPostData(db);
+            if (!await db.Users.AnyAsync())
+            {
+
+                //await AddTestingAccountsAsync(db, scope.ServiceProvider);
+
+                await DataSeeder.SeedCaterogyData(db);
+                await DataSeeder.SeedSkillsData(db);
+                await DataSeeder.SeedUsersData(db);
+                await DataSeeder.SeedProjectPostData(db);
+            }
         }
-    }
 
-    async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
-    {
-        var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
+        await next();
 
-        var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
+        async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
 
-        var dto = new AuthEndpoints.UserRegisterRequestDto
-            ("string", "string@gmail.com", "stringstring");
+            var authEndpoints = new AuthEndpoints(serviceProvider.GetRequiredService<IEmailSenderCustome>());
 
-        var admindto = new AuthEndpoints.UserRegisterRequestDto
-            ("admin", "admin@teamup.com", "adminadmin");
+            var dto = new AuthEndpoints.UserRegisterRequestDto
+                ("string", "string@gmail.com", "stringstring");
 
-        await authEndpoints.RegisterAsync(dto, userManager);
+            var admindto = new AuthEndpoints.UserRegisterRequestDto
+                ("admin", "admin@teamup.com", "adminadmin");
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
-        user?.SetAsMentor();
+            await authEndpoints.RegisterAsync(dto, userManager);
 
-        await authEndpoints.RegisterAsync(admindto, userManager);
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
+            user?.SetAsMentor();
 
-        var admin = await db.Users.FirstOrDefaultAsync(u => u.Email == "admin@teamup.com");
-        admin?.SetAsMentor();
+            await authEndpoints.RegisterAsync(admindto, userManager);
 
-        await db.SaveChangesAsync();
-        
-        Log.Debug("User  : " + JsonSerializer.Serialize(user));
-        Log.Debug("Admin : " + JsonSerializer.Serialize(user));
+            var admin = await db.Users.FirstOrDefaultAsync(u => u.Email == "admin@teamup.com");
+            admin?.SetAsMentor();
 
-    }
-    
-    await next();
-});
+            await db.SaveChangesAsync();
 
+            Log.Debug("User  : " + JsonSerializer.Serialize(user));
+            Log.Debug("Admin : " + JsonSerializer.Serialize(user));
+        }
+
+    });
+}
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
@@ -251,8 +283,14 @@ app.MapHelpersEndpoints();
 app.MapControllers();
 app.UseSwaggerDocs();
 
+if(env == enEnv.LocalDevelopment)
+    app.MapGet("connectionString", () =>
+    {
+        return app.Configuration.GetValue<string>("ConnectionStrings:ProductionConnection");
+    });
+
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
-enum enEnv { Production, Development }
+enum enEnv { Production, LocalDevelopment , RemoteDevelopment }
 
 public partial class Program;

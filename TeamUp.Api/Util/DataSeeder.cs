@@ -1,4 +1,3 @@
-using Authentication.UserManager;
 using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +15,7 @@ public static class DataSeeder
     public static async Task SeedCaterogyData(AppDbContext db)
     {  
         string[] categories = ["Mobile","Design","Web", "Cyber security","Ai", "Game", "Data Science"];
-        // string[] categories = ["Web Dev","Design","Mobile Dev","Cyber security"];
+
         await db.Categories.AddRangeAsync(categories.Select(c=>new Category
         {
             Name = c
@@ -66,7 +65,7 @@ public static class DataSeeder
 
                 return cs;
             });
-        var projectsToCreat = projectFaker.Generate(2000);
+        var projectsToCreat = projectFaker.Generate(30);
         
         //projectFaker.RuleFor(u => u.Creator,
         //    users.FirstOrDefault(u => u.Email == "string@gmail.com"));
@@ -128,7 +127,7 @@ public static class DataSeeder
             .RuleFor(u=>u.Categories , f=>f.Random.Bool());
 
         // https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/602.jpg
-        var usersToCreat = userFaker.Generate(50000);
+        var usersToCreat = userFaker.Generate(500);
 
         var users = usersToCreat.Select((u) =>
         {
