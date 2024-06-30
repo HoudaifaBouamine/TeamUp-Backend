@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Web App TeamUp-Backend-Development
+name: Backend Azure Development
 on:
   push:
     branches:
