@@ -9,6 +9,7 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: TeamUp.Api
+  AZURE_CONFIG_CONNECTIONSTRING: ${{ secrets.AZURE_CONFIG_CONNECTIONSTRING }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +26,7 @@ jobs:
     - name: Test
       run: dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" ${{ secrets.AZURE_CONFIG_CONNECTIONSTRING }} --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -46,3 +47,5 @@ jobs:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.TeamUp_Backend_Development_59E1 }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Echo Azure Config Connection String
+      run: echo "Connection String is ${{ secrets.AZURE_CONFIG_CONNECTIONSTRING }}"
