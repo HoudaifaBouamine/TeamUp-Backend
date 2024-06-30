@@ -25,6 +25,8 @@ using TeamUp.Features.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Console.WriteLine(args[0]);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options=>
 {
@@ -72,7 +74,7 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // if(builder.Environment.IsDevelopment())
     // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
 
     //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -189,7 +191,7 @@ app.Use(async (ctx, next) =>
         if (!await db.Users.AnyAsync())
         {
 
-            await AddTestingAccountsAsync(db, scope.ServiceProvider);
+            //await AddTestingAccountsAsync(db, scope.ServiceProvider);
 
             await DataSeeder.SeedCaterogyData(db);
             await DataSeeder.SeedSkillsData(db);
@@ -207,15 +209,24 @@ app.Use(async (ctx, next) =>
         var dto = new AuthEndpoints.UserRegisterRequestDto
             ("string", "string@gmail.com", "stringstring");
 
+        var admindto = new AuthEndpoints.UserRegisterRequestDto
+            ("admin", "admin@teamup.com", "adminadmin");
+
         await authEndpoints.RegisterAsync(dto, userManager);
 
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == "string@gmail.com");
-        user.SetAsMentor();
+        user?.SetAsMentor();
+
+        await authEndpoints.RegisterAsync(admindto, userManager);
+
+        var admin = await db.Users.FirstOrDefaultAsync(u => u.Email == "admin@teamup.com");
+        admin?.SetAsMentor();
 
         await db.SaveChangesAsync();
         
-        Log.Debug("User : " + JsonSerializer.Serialize(user));
-    
+        Log.Debug("User  : " + JsonSerializer.Serialize(user));
+        Log.Debug("Admin : " + JsonSerializer.Serialize(user));
+
     }
     
     await next();
