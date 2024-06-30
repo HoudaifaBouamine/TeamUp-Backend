@@ -41,11 +41,22 @@ jobs:
       with:
         name: webapp
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Login to azure
+      uses: azure/login@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+    - name: Add App Confuguration
+      uses: azure/appservice-settings@v1
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: 'staging'  # Optional and needed only if the settings have to be configured on the specific deployment slot
+        app-settings-json: '${{ secrets.APP_SETTINGS_JSON }}' 
+      id: settings
+    - name: Echo Azure  AppSettings.json
+      run: echo "Connection String is ${{ secrets.APP_SETTINGS_JSON }}"
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.TeamUp_Backend_Development_59E1 }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Echo Azure Config Connection String
-      run: echo "Connection String is ${{ secrets.AZURE_CONFIG_CONNECTIONSTRING }}"
