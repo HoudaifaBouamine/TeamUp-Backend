@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Asp.Versioning;
 using Carter;
+using TeamUp.Features.Chat;
 
 namespace EndpointsManager
 {
@@ -24,7 +25,7 @@ namespace EndpointsManager
                 .MapGroup("api/v{apiVersion:apiVersion}")
                 .WithApiVersionSet(apiVersionSet);
 
-            versionedApp.MapCarter();     
+            versionedApp.MapCarter();
         }
 
     }

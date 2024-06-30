@@ -1,9 +1,11 @@
+using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Serilog;
+using SignalRSwaggerGen.Attributes;
 using System.Collections.Concurrent;
 
 namespace TeamUp.Features.Chat;
@@ -13,6 +15,10 @@ internal partial class ChatHub (AppDbContext db, UserManager<User> userManager) 
 
     private static ConcurrentDictionary<string,Guid> UsersIds = new();
 
+    public async Task Hi(string name)
+    {
+        await Clients.All.SendAsync("GreatingRecieved",$"Hi {name}");
+    }
 
     [Authorize]
     public async Task<bool> SendRoomMessage(Guid roomId, string message)
@@ -57,9 +63,10 @@ internal partial class ChatHub (AppDbContext db, UserManager<User> userManager) 
 
     record MessageDto(string Message, Guid UserId, Guid ChatRoomId, DateTime SendTime);
 
-    [Authorize]
     public override async Task OnConnectedAsync()
     {
+        if (!Context.User.IsAuthenticated()) return;
+
         var user = await userManager.GetUserAsync( Context.User! );
 
         bool isAdded = UsersIds.TryAdd(Context.ConnectionId, user!.Id);

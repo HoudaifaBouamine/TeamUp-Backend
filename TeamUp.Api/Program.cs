@@ -22,6 +22,9 @@ using TeamUp.Features.Mentor;
 using TeamUp.Features.Notification;
 using TeamUp.Features.Project;
 using TeamUp.Features.Chat;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
+const enEnv env = enEnv.Production;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,12 +45,11 @@ builder.Services.AddSwaggerGen(options=>
     
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-
 });
 
 builder.Services.AddApiVersioning(options=>
 {
-    options.DefaultApiVersion = new ApiVersion(1);
+    options.DefaultApiVersion = new ApiVersion(4);
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 })
 .AddApiExplorer(options=>
@@ -75,7 +77,6 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     // options.UseInMemoryDatabase("TeamUpDb");
     // else if(builder.Environment.IsProduction())
     options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
-
     //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -176,12 +177,18 @@ app.Use(async (ctx,next)=>
     catch(Exception ex)
     {
         ctx.Response.StatusCode = 500;
-        await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
+        if (env == enEnv.Development)
+            await ctx.Response.WriteAsJsonAsync(new ErrorResponse(ex.Message));
+        else
+            Log.Error(JsonSerializer.Serialize(new ErrorResponse(ex.Message)));
     } 
 });
 
-app.Use(async (ctx, next) =>
+if (env == enEnv.Development)
 {
+    // seeding testing data
+    app.Use(async (ctx, next) =>
+    {
 
     using (var scope = app.Services.CreateScope())
     {
@@ -200,7 +207,7 @@ app.Use(async (ctx, next) =>
         }
     }
 
-    async Task  AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
+    async Task AddTestingAccountsAsync(AppDbContext db, IServiceProvider serviceProvider)
     {
         var userManager = serviceProvider.GetRequiredService<CustomUserManager>();
 
@@ -232,34 +239,20 @@ app.Use(async (ctx, next) =>
     await next();
 });
 
-app.MapGet("sendNotification",async (string token,string title,string body) =>
-{
-    var data = new JoinRequestNotificationData
-    {
-        message = "Please let me join your project !!!",
-        projectId = "1",
-        senderId = Guid.NewGuid(),
-        projectTitle = "TeamUp",
-        senderName = "Houdaifa Bouamine",
-        senderPicture = "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/363.jpg",
-        requestId = "1"
-    };
-    await FireBaseNotification.SendMessageAsync(token,title,body,data);
-});
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 
-
+app.MapHub<ChatHub>("/chat");
 app.MapAppEndpoints();     
 app.MapHelpersEndpoints();
 app.MapControllers();
-app.MapHub<ChatHub>("/chatHub");
 app.UseSwaggerDocs();
 
 app.Run();
 record RequestLog(string Path,string? User,int? StatusCode,double LatencyMilliseconds);
+enum enEnv { Production, Development }
 
 public partial class Program;
