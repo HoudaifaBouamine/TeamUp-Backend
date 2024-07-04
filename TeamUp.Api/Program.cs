@@ -26,36 +26,36 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Azure.Identity;
 using Microsoft.Extensions.Options;
 
-const enEnv env = enEnv.Production;
-
-if (!args.Any()) return;
-
-string AzureConfigConnectionString = args[0];
-Console.WriteLine("connection : " + AzureConfigConnectionString);
+const enEnv env = enEnv.LocalDevelopment;
+//
+// if (!args.Any()) return;
+//
+// string AzureConfigConnectionString = args[0];
+// Console.WriteLine("connection : " + AzureConfigConnectionString);
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.ConfigureAppConfiguration(options =>
-{
-    options.AddAzureAppConfiguration(op =>
-    {
-        op.Connect(AzureConfigConnectionString);
-        op.ConfigureKeyVault(kv =>
-        {
-            kv.SetCredential(new DefaultAzureCredential());
-            kv.SetSecretRefreshInterval(TimeSpan.FromSeconds(15));
-        }).ConfigureRefresh(conf=>
-        {
-            conf.Register("ConnectionStrings:ProductionConnection")
-                .SetCacheExpiration(TimeSpan.FromSeconds(15));
-
-            conf.Register("ConnectionStrings:DevelopmentConnection")
-                .SetCacheExpiration(TimeSpan.FromSeconds(15));
-        });
-    });
-});
-
-builder.Services.AddAzureAppConfiguration();
+// builder.Host.ConfigureAppConfiguration(options =>
+// {
+//     options.AddAzureAppConfiguration(op =>
+//     {
+//         op.Connect(AzureConfigConnectionString);
+//         op.ConfigureKeyVault(kv =>
+//         {
+//             kv.SetCredential(new DefaultAzureCredential());
+//             kv.SetSecretRefreshInterval(TimeSpan.FromSeconds(15));
+//         }).ConfigureRefresh(conf=>
+//         {
+//             conf.Register("ConnectionStrings:ProductionConnection")
+//                 .SetCacheExpiration(TimeSpan.FromSeconds(15));
+//
+//             conf.Register("ConnectionStrings:DevelopmentConnection")
+//                 .SetCacheExpiration(TimeSpan.FromSeconds(15));
+//         });
+//     });
+// });
+//
+// builder.Services.AddAzureAppConfiguration();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options=>
@@ -101,9 +101,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
     if(env == enEnv.LocalDevelopment)
-        options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
+        options.UseSqlite("Data Source=../teamUp.db");
+        // options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
 
-    if (env == enEnv.LocalDevelopment)
+    if (env == enEnv.RemoteDevelopment)
         options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DevelopemntConnection"));
 
     if (env == enEnv.Production)
@@ -178,7 +179,7 @@ builder.Services.AddScoped<INotificationService,FirebaseNotificationService>();
 
 var app = builder.Build();
 
-app.UseAzureAppConfiguration();
+// app.UseAzureAppConfiguration();
 
 // Handmade Global logging
 app.Use((ctx,next)=>

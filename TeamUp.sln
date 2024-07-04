@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamUp.Admin", "TeamUp.Admin\TeamUp.Admin.csproj", "{9791FC74-99B4-4D05-91B9-9089B34FEB28}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevExtreme NuGet.config", "DevExtreme NuGet.config", "{8987D307-BFBA-4DE2-8D12-DBB8564C440C}"
-	ProjectSection(SolutionItems) = preProject
-		NuGet.config = NuGet.config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamUp.Api", "TeamUp.Api\TeamUp.Api.csproj", "{DEB70BF4-6482-4968-A11D-376A15FD44D0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamUp.Api.Test", "TeamUp.Api.Test\TeamUp.Api.Test.csproj", "{3B4AA91C-CCA3-4BE0-B24C-9DD50BDEA09F}"
