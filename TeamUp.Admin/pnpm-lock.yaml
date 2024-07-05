@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.6.7
+        version: 1.6.7
       highlight.js:
         specifier: 11.9.0
         version: 11.9.0
@@ -267,6 +270,15 @@ packages:
   '@eslint/object-schema@2.1.4':
     resolution: {integrity: sha512-BsWiH1yFGjXXS2yvrf5LyuoSIIbPrGUWob917o+BTKuZ7qJdxX8aJLRxs1fS9n6r7vESrq1OUqb68dANcFXuQQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@floating-ui/core@1.6.4':
+    resolution: {integrity: sha512-a4IowK4QkXl4SCWTGUR0INAfEOX3wtsYw3rKK5InQEHMGObkR8Xk44qYQD9P4r6HHw0iIfK6GUKECmY8sTkqRA==}
+
+  '@floating-ui/dom@1.6.7':
+    resolution: {integrity: sha512-wmVfPG5o2xnKDU4jx/m4w5qva9FWHcnZ8BvzEe90D/RpwsJaTAVYPEPdQ8sbr/N8zZTAHlZUTQdqg8ZUbzHmng==}
+
+  '@floating-ui/utils@0.2.4':
+    resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -1941,6 +1953,17 @@ snapshots:
   '@eslint/js@9.6.0': {}
 
   '@eslint/object-schema@2.1.4': {}
+
+  '@floating-ui/core@1.6.4':
+    dependencies:
+      '@floating-ui/utils': 0.2.4
+
+  '@floating-ui/dom@1.6.7':
+    dependencies:
+      '@floating-ui/core': 1.6.4
+      '@floating-ui/utils': 0.2.4
+
+  '@floating-ui/utils@0.2.4': {}
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
