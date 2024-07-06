@@ -15,3 +15,7 @@
 - Database: PostgreSQL is utilized as the database management system.
 - UI/UX Design: Designs created using Figma to ensure a user-friendly interface.
 - Task Management: ClickUp is used for task management, ensuring smooth project organization and progress tracking.
+
+testing the repo mirros
+*mirror
+
