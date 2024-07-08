@@ -65,7 +65,7 @@ public static class DataSeeder
 
                 return cs;
             });
-        var projectsToCreat = projectFaker.Generate(30);
+        var projectsToCreat = projectFaker.Generate(10);
         
         //projectFaker.RuleFor(u => u.Creator,
         //    users.FirstOrDefault(u => u.Email == "string@gmail.com"));
@@ -127,7 +127,7 @@ public static class DataSeeder
             .RuleFor(u=>u.Categories , f=>f.Random.Bool());
 
         // https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/602.jpg
-        var usersToCreat = userFaker.Generate(500);
+        var usersToCreat = userFaker.Generate(50);
 
         var users = usersToCreat.Select((u) =>
         {
@@ -1101,8 +1101,7 @@ public static class DataSeeder
     "Zurb Foundation",
     "ZWave"
 };
-
-        await db.Skills.AddRangeAsync(skills.Select(s=>new Skill{Name = s}));
+        await db.Skills.AddRangeAsync(skills.Where((s, i) => i < 50).Select(s=>new Skill{Name = s}));
         await db.SaveChangesAsync();
     }
 }
