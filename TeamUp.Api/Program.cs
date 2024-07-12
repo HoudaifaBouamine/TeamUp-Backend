@@ -26,7 +26,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Azure.Identity;
 using Microsoft.Extensions.Options;
 
-const enEnv env = enEnv.RemoteDevelopment;
+const enEnv env = enEnv.LocalDevelopment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,8 +74,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options=>
 {
     if(env == enEnv.LocalDevelopment)
-        options.UseSqlite("Data Source=../teamUp.db");
-        // options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgresDevelopmentConnection"));
+        options.UseSqlite("Data Source=TeamUp.db");
 
     if (env == enEnv.RemoteDevelopment)
         options.UseNpgsql(builder.Configuration.GetConnectionString("DevelopmentConnection"));
@@ -101,10 +100,6 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 
 builder.Services.AddAuthentication();
-// (options=>
-// {
-//     options.DefaultScheme = "Cookie",
-// });
 builder.Services.AddAuthorization();
 
 builder.Services.AddCarter();
@@ -130,10 +125,7 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
-// if(builder.Environment.IsDevelopment())
-    // builder.Services.AddTransient<IEmailSenderCustome,EmailSenderMock>();
-// else
-     builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
+builder.Services.AddTransient<IEmailSenderCustome,EmailSender>();
 
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddScoped<CustomUserManager>();
@@ -151,8 +143,6 @@ builder.Services.AddScoped<INotificationService,FirebaseNotificationService>();
 
 
 var app = builder.Build();
-
-// app.UseAzureAppConfiguration();
 
 // Handmade Global logging
 app.Use((ctx,next)=>
