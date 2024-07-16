@@ -12,6 +12,7 @@
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
+
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
 	hljs.registerLanguage('xml', xml); // for HTML
@@ -26,6 +27,7 @@
 		type AutocompleteOption,
 		type PopupSettings
 	} from '@skeletonlabs/skeleton';
+	import { redirect } from '@sveltejs/kit';
 
 	let inputDemo = '';
 
@@ -62,7 +64,7 @@
 </script>
 
 <div class="flex h-screen bg-primary-500 text-on-primary">
-	<div class="w-64 p-4 flex flex-col bg-secondary-100">
+	<div class="w-64 p-4 flex flex-col bg-[#EEEEEE]">
 		<!-- Logo / Brand -->
 		<div class="mb-8">
 			<img src="assets/logo.svg" alt="Logo" class="h-12 mx-auto" />
@@ -79,6 +81,7 @@
 					<span>Home</span>
 				</button>
 				<button
+					href="/user"
 					type="button"
 					class="btn w-full bg-secondary-100 text-on-tertiary-token hover:bg-primary-400"
 				>
@@ -123,10 +126,10 @@
 
 	<!-- Main Content -->
 
-	<div class="flex flex-col bg-white">
-		<div class="mx-[24px] my-[22px]">
+	<div class="flex flex-col bg-white w-full">
+		<div class="mx-[24px] my-[20px] w-1/2">
 			<input
-				class="input autocomplete"
+				class="input autocomplete bg-[#EEEEEE]"
 				type="search"
 				name="autocomplete-search"
 				bind:value={inputPopupDemo}
@@ -142,8 +145,8 @@
 			</div>
 		</div>
 
-		<div class="mx-[23px] my-[20px">
-			<h1 class="text-[32px] font-[700]">
+		<div class="mx-[23px] my-[12px]">
+			<h1 class="text-[30px] font-[600]">
 				{$page.url.pathname.split('/').at(-1)}
 			</h1>
 			<br />
@@ -151,3 +154,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	button {
+		@apply bg-[#EEEEEE];
+	}
+</style>
